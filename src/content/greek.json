@@ -9,6 +9,7 @@
   "frontVowels": ["ε", "αι", "ι", "η", "υ", "ει", "οι"],
   "voicedAfterSigma": ["β", "γ", "δ", "μ", "ν", "λ", "ρ", "μπ", "ντ", "γκ"],
   "articles": ["ο", "η", "το"],
+  "contextDependentSounds": ["αυ", "ευ"],
   "visuallySimilar": [
     ["π", "τ"],
     ["ν", "υ"],
