@@ -143,6 +143,20 @@ describe('BrowserAudioService', () => {
     expect((deps.speech as ReturnType<typeof fakeSpeech>).spoken[0]).toMatchObject({ volume: 0 });
   });
 
+  it('gives up on a file that never ends or errors', async () => {
+    vi.useFakeTimers();
+    const { service } = makeService({
+      bundled: { 'phoneme/σ': '/broken.m4a' },
+      maxClipMs: 1000,
+      maxStartMs: 5000,
+      createPlayer: () => ({ onended: null, onerror: null, pause: () => {}, play: async () => {} }),
+    });
+    const playing = service.play({ kind: 'phoneme', key: 'σ' });
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(await playing).toBe('bundled');
+    vi.useRealTimers();
+  });
+
   it('stop cancels speech in progress', async () => {
     const speech = fakeSpeech([voice('el-GR', true)]);
     speech.speak = (u) => speech.spoken.push(u); // never ends on its own

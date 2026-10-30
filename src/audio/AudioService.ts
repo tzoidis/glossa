@@ -64,6 +64,7 @@ export interface PlayerLike {
   pause(): void;
   onended: (() => void) | null;
   onerror: (() => void) | null;
+  onplaying?: (() => void) | null;
 }
 
 export interface AudioDeps {
@@ -75,8 +76,15 @@ export interface AudioDeps {
   createObjectUrl(blob: Blob): string;
   revokeObjectUrl(url: string): void;
   voiceTimeoutMs?: number;
+  /** longest a recorded clip may take before playback is abandoned */
+  maxClipMs?: number;
+  /** a clip that has not started playing by then is abandoned */
+  maxStartMs?: number;
 }
 
+/** Instructions are the longest clips (~5 s); phonemes and words are far shorter. */
+const MAX_CLIP_MS = 10_000;
+const MAX_START_MS = 2_000;
 const NORMAL_RATE = 0.9;
 const SLOW_RATE = 0.6;
 
@@ -195,15 +203,28 @@ export class BrowserAudioService implements AudioService {
     const player = this.deps.createPlayer(src);
     if (slow && 'playbackRate' in player) (player as { playbackRate: number }).playbackRate = 0.75;
     return new Promise((resolve) => {
-      player.onended = () => resolve();
-      player.onerror = () => resolve();
+      // A broken or empty file may never fire 'ended' or 'error': never let it stall an exercise.
+      const abandon = () => {
+        player.pause();
+        done();
+      };
+      const guard = setTimeout(abandon, this.deps.maxClipMs ?? MAX_CLIP_MS);
+      const startGuard = setTimeout(abandon, this.deps.maxStartMs ?? MAX_START_MS);
+      const done = () => {
+        clearTimeout(guard);
+        clearTimeout(startGuard);
+        resolve();
+      };
+      player.onplaying = () => clearTimeout(startGuard);
+      player.onended = done;
+      player.onerror = done;
       this.current = {
         stop: () => {
           player.pause();
-          resolve();
+          done();
         },
       };
-      player.play().catch(() => resolve());
+      player.play().catch(done);
     });
   }
 
