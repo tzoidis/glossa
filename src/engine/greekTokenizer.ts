@@ -9,10 +9,13 @@ export interface Token {
   g: string; // grapheme: lowercase, no accent, final sigma folded
   accent: boolean;
   diaeresis: boolean;
+  /** as written, lowercase, with accent and final sigma (for letter tiles) */
+  surface: string;
 }
 
 interface Char {
   base: string;
+  raw: string;
   accent: boolean;
   diaeresis: boolean;
 }
@@ -44,10 +47,11 @@ function toChars(lower: string): Char[] {
       // stray combining mark that NFC could not compose: attach to previous letter
       prev.accent ||= accent;
       prev.diaeresis ||= diaeresis;
+      prev.raw += c;
       continue;
     }
     if (base === greek.finalSigma) base = greek.sigma;
-    out.push({ base, accent, diaeresis });
+    out.push({ base, raw: c, accent, diaeresis });
   }
   return out;
 }
@@ -77,6 +81,7 @@ export function tokenize(word: string): Token[] {
       g: m ?? slice[0]!.base,
       accent: slice.some((c) => c.accent),
       diaeresis: slice.some((c) => c.diaeresis),
+      surface: slice.map((c) => c.raw).join(''),
     });
     i += len;
   }
@@ -90,4 +95,9 @@ export function graphemes(word: string): string[] {
 /** Splits running text into words (letters and their combining marks). */
 export function splitWords(text: string): string[] {
   return normalizeText(text).match(/[\p{L}\p{M}]+/gu) ?? [];
+}
+
+/** Graphemes as written (lowercase, accents kept): «πίτα» → π, ί, τ, α. */
+export function surfaceGraphemes(word: string): string[] {
+  return tokenize(word).map((t) => t.surface);
 }

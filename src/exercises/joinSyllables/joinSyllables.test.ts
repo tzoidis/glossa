@@ -3,7 +3,7 @@ import { CONTENT } from '../../app/content.ts';
 import { graphemes } from '../../engine/greekTokenizer.ts';
 import { cases, tryGenerate } from '../propertyTest.ts';
 import { isReadable } from '../pool.ts';
-import type { JoinSyllablesItem } from './generate.ts';
+import type { OrderItem as JoinSyllablesItem } from '../shared/OrderExercise.tsx';
 import { joinSyllables } from './index.ts';
 
 describe('join-syllables property test', () => {
@@ -18,11 +18,11 @@ describe('join-syllables property test', () => {
       for (const item of items) {
         const word = CONTENT.wordsById.get(item.wordId)!;
         expect(isReadable(word, c.ctx), `${c.label}: «${word.text}» not allowed`).toBe(true);
-        expect(item.syllables.join(''), c.label).toBe(item.text);
+        expect(item.parts.join(''), c.label).toBe(item.text);
         for (const tile of item.tiles) {
           for (const g of graphemes(tile.text)) expect(c.ctx.allowedGraphemes.has(g), `${c.label}: tile «${tile.text}»`).toBe(true);
         }
-        const extra = item.tiles.length - item.syllables.length;
+        const extra = item.tiles.length - item.parts.length;
         expect(extra, c.label).toBe(c.level === 3 ? extra : 0);
         expect(extra, c.label).toBeLessThanOrEqual(1);
       }
@@ -40,7 +40,7 @@ describe('join-syllables property test', () => {
     for (const c of cases()) {
       const round = tryGenerate(joinSyllables, c);
       for (const item of (round?.items ?? []) as JoinSyllablesItem[]) {
-        expect(item.tiles.map((t) => t.text).join('|'), c.label).not.toBe(item.syllables.join('|'));
+        expect(item.tiles.map((t) => t.text).join('|'), c.label).not.toBe(item.parts.join('|'));
       }
     }
   });

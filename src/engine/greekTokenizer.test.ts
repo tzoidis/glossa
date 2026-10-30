@@ -55,12 +55,21 @@ describe('greekTokenizer', () => {
 
   it('keeps accent and diaeresis as token properties', () => {
     const t = tokenize('κοροϊδεύω');
-    expect(t[4]).toEqual({ g: 'ι', accent: false, diaeresis: true });
-    expect(t[6]).toEqual({ g: 'ευ', accent: true, diaeresis: false });
-    expect(tokenize('καΐκι')[2]).toEqual({ g: 'ι', accent: true, diaeresis: true });
+    expect(t[4]).toMatchObject({ g: 'ι', accent: false, diaeresis: true, surface: 'ϊ' });
+    expect(t[6]).toMatchObject({ g: 'ευ', accent: true, diaeresis: false, surface: 'εύ' });
+    expect(tokenize('καΐκι')[2]).toMatchObject({ g: 'ι', accent: true, diaeresis: true, surface: 'ΐ' });
   });
 
   it('splits running text into words', () => {
     expect(splitWords('Η Άννα έχει τόπι.')).toEqual(['Η', 'Άννα', 'έχει', 'τόπι']);
+  });
+});
+
+describe('surfaceGraphemes', () => {
+  it('keeps accents and final sigma as written', async () => {
+    const { surfaceGraphemes } = await import('./greekTokenizer.ts');
+    expect(surfaceGraphemes('πίτα')).toEqual(['π', 'ί', 'τ', 'α']);
+    expect(surfaceGraphemes('Μπαμπάς')).toEqual(['μπ', 'α', 'μπ', 'ά', 'ς']);
+    expect(surfaceGraphemes('τσάι')).toEqual(['τσ', 'ά', 'ι']);
   });
 });

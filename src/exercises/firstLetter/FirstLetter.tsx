@@ -1,73 +1,23 @@
-import { useEffect, useRef, useState } from 'react';
 import { t } from '../../i18n.ts';
 import { IconButton } from '../../ui/IconButton.tsx';
-import { CheckIcon, SpeakerIcon } from '../../ui/Icons.tsx';
+import { SpeakerIcon } from '../../ui/Icons.tsx';
 import { Picture } from '../../ui/Picture.tsx';
-import { makeAnswer, wordItemId } from '../answer.ts';
-import { Hand, useDemo } from '../shared/demo.tsx';
-import { NEXT_ITEM_DELAY_MS, useRoundAudio } from '../shared/useRoundAudio.ts';
+import { wordItemId } from '../answer.ts';
+import { ChoiceTile } from '../shared/ChoiceTile.tsx';
+import { useChoiceRound } from '../shared/useChoiceRound.ts';
+import { useRoundAudio } from '../shared/useRoundAudio.ts';
 import type { ExerciseProps } from '../types.ts';
 import { FIRST_LETTER_ID, type FirstLetterItem } from './generate.ts';
 
-export function FirstLetter({ round, onAnswer, onComplete }: ExerciseProps) {
-  const items = round.items as FirstLetterItem[];
+export function FirstLetter(props: ExerciseProps) {
   const audio = useRoundAudio();
-  const demo = useDemo();
-  const [index, setIndex] = useState(0);
-  const [faded, setFaded] = useState<string[]>([]);
-  const [mistake, setMistake] = useState(false);
-  const [solved, setSolved] = useState(false);
-  const shownAt = useRef(Date.now());
-  const item = items[index]!;
-
-  useEffect(() => {
-    let cancelled = false;
-    shownAt.current = Date.now();
-    (async () => {
-      if (index === 0) await audio.instruction(FIRST_LETTER_ID);
-      if (!cancelled) await audio.word(item.wordId, item.text);
-    })();
-    return () => {
-      cancelled = true;
-      audio.stop();
-    };
-  }, [index, item, audio]);
-
-  const log = (given: string, correct: boolean, attempt: 1 | 2) =>
-    onAnswer(
-      makeAnswer(round, {
-        itemId: wordItemId(item.wordId),
-        target: item.target,
-        given,
-        correct,
-        attempt,
-        position: index,
-        latencyMs: Date.now() - shownAt.current,
-      }),
-    );
-
-  const pickOption = async (g: string) => {
-    if (solved || faded.includes(g)) return;
-    if (g === item.target) {
-      log(g, true, mistake ? 2 : 1);
-      setSolved(true);
-      void audio.praise();
-      setTimeout(() => {
-        if (index + 1 >= items.length) return onComplete();
-        setIndex(index + 1);
-        setFaded([]);
-        setMistake(false);
-        setSolved(false);
-      }, NEXT_ITEM_DELAY_MS);
-      return;
-    }
-    if (!mistake) log(g, false, 1);
-    setMistake(true);
-    setFaded((f) => [...f, g]);
-    // Hear it again, stressed: the first sound, then the word slowly («ννν-ερό»).
-    await audio.phoneme(item.target);
-    await audio.word(item.wordId, item.text, true);
-  };
+  const { item, pick, stateOf, showHand } = useChoiceRound<FirstLetterItem>(props, {
+    exerciseId: FIRST_LETTER_ID,
+    itemId: (i) => wordItemId(i.wordId),
+    prompt: (i, slow) => audio.word(i.wordId, i.text, slow),
+    // stressed replay: the first sound, then the word slowly («ννν-ερό»)
+    onWrong: (i) => audio.phoneme(i.target),
+  });
 
   return (
     <div className="exercise-stage first-letter">
@@ -78,21 +28,11 @@ export function FirstLetter({ round, onAnswer, onComplete }: ExerciseProps) {
         </IconButton>
       </div>
       <div className="choices">
-        {item.options.map((g) => {
-          const isTarget = g === item.target;
-          const state = solved && isTarget ? 'correct' : faded.includes(g) ? 'faded' : mistake && isTarget ? 'hint' : '';
-          return (
-            <button key={g} type="button" className={`letter-tile ${state}`} onClick={() => void pickOption(g)} disabled={state === 'faded'}>
-              <span className="letter">{g}</span>
-              {state === 'correct' && (
-                <span className="tile-badge">
-                  <CheckIcon />
-                </span>
-              )}
-              {demo && isTarget && !solved && <Hand />}
-            </button>
-          );
-        })}
+        {item.options.map((g) => (
+          <ChoiceTile key={g} state={stateOf(g)} hand={showHand(g)} onPick={() => void pick(g)}>
+            <span className="letter">{g}</span>
+          </ChoiceTile>
+        ))}
       </div>
     </div>
   );
