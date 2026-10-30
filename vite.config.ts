@@ -5,5 +5,7 @@ export default defineConfig({
   plugins: [react()],
   test: {
     include: ['src/**/*.test.{ts,tsx}', 'scripts/**/*.test.ts'],
+    // property tests sweep every position × level × seed
+    testTimeout: 30_000,
   },
 });

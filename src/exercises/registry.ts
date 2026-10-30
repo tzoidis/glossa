@@ -1,6 +1,7 @@
 // All exercise types. The mechanism drives station variety (PRD §5: never the same
 // mechanism twice in a row); the icon is the station's picture (OpenMoji code).
 
+import { buildWord } from './buildWord/index.ts';
 import { firstLetter } from './firstLetter/index.ts';
 import { joinSyllables } from './joinSyllables/index.ts';
 import { NotEnoughContent } from './pool.ts';
@@ -21,6 +22,7 @@ export const EXERCISES: ExerciseEntry[] = [
   { module: joinSyllables, mechanism: 'order', icon: '1F9E9' },
   { module: syllableCount, mechanism: 'tap-choice', icon: '1F44F' },
   { module: wordPicture, mechanism: 'listen-image', icon: '1F4D6' },
+  { module: buildWord, mechanism: 'order', icon: '1F9F1' },
 ];
 
 export interface Availability {
