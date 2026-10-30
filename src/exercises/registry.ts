@@ -4,6 +4,7 @@
 import { firstLetter } from './firstLetter/index.ts';
 import { joinSyllables } from './joinSyllables/index.ts';
 import { NotEnoughContent } from './pool.ts';
+import { syllableCount } from './syllableCount/index.ts';
 import type { ExerciseModule, GenerateContext } from './types.ts';
 
 export type Mechanism = 'tap-choice' | 'order' | 'listen-image' | 'trace';
@@ -17,6 +18,7 @@ export interface ExerciseEntry {
 export const EXERCISES: ExerciseEntry[] = [
   { module: firstLetter, mechanism: 'tap-choice', icon: '1F442' },
   { module: joinSyllables, mechanism: 'order', icon: '1F9E9' },
+  { module: syllableCount, mechanism: 'tap-choice', icon: '1F44F' },
 ];
 
 export interface Availability {
