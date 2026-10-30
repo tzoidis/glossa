@@ -1,0 +1,57 @@
+:root {
+  --bg: #fdf8ee;
+  --ink: #1f2a37;
+  --accent: #2f7d4a;
+  --accent-ink: #ffffff;
+  color-scheme: light;
+  font-family: system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.start {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  padding: 24px;
+}
+
+.go {
+  min-width: 240px;
+  min-height: 120px;
+  padding: 0 48px;
+  border: 0;
+  border-radius: 60px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: inherit;
+  font-size: 56px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .go {
+    transition: transform 120ms ease-out;
+  }
+  .go:active {
+    transform: scale(0.96);
+  }
+}
