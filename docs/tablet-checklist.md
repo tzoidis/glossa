@@ -1,6 +1,6 @@
 # Tablet checklist (PRD §8, M7)
 
-Run on the real tablet, from the **https** address of the hosted app (not the plain-http dev server: install, offline and recording all need https). Tick each item; note the tablet model and OS version.
+Run on the real tablet, from the **https** address of the hosted app, https://tzoidis.github.io/glossa/ (not the plain-http dev server: install, offline and recording all need https). Tick each item; note the tablet model and OS version.
 
 Tablet: ____________________   OS: ____________   Date: ____________
 

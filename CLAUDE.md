@@ -35,6 +35,7 @@ Node ≥ 22.18 (scripts in `scripts/` run as plain `.ts` via Node type stripping
 - vite-plugin-pwa, `registerType: 'prompt'`: a new version waits and is applied only on the start screen or from the parent screen (`src/app/appUpdate.ts`), never mid-round.
 - Everything is precached, including bundled recordings in `src/audio/files/`; `base: './'` so the build works at a domain root or a subpath.
 - `navigator.storage.persist()` runs at startup when installed.
+- Hosted at https://tzoidis.github.io/glossa/ (repo `tzoidis/glossa`, public). Every push to `main` runs CI and, if it passes, deploys `dist/` to GitHub Pages (`.github/workflows/ci.yml`).
 - Manual tablet checks: `docs/tablet-checklist.md`.
 
 ## Engine conventions
