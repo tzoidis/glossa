@@ -12,6 +12,8 @@ Offline PWA with Greek reading games for a first-grade child, following the book
 - `npm run build` – typecheck + production build
 - `npm run ci` – everything CI runs, in order
 - `npm run word-list` – regenerates `docs/word-list.md` (the parent's approval list) from `words.json`
+- `npm run build && npm run preview` – production build with the service worker (the dev server has no service worker)
+- `bash scripts/icons/render.sh` – re-renders the PNG app icons from `public/icon.svg` with headless Edge
 
 Node ≥ 22.18 (scripts in `scripts/` run as plain `.ts` via Node type stripping, so use only erasable TS syntax there: no enums, namespaces or parameter properties).
 
@@ -27,6 +29,13 @@ Node ≥ 22.18 (scripts in `scripts/` run as plain `.ts` via Node type stripping
 - **Every new exercise needs:** `requires`, a seeded property test, an audio instruction (file, not TTS), a first-time demo, and a tap alternative to every drag.
 - TTS is only for whole words and sentences, only with a local `el-GR` voice; never for phonemes or letter names.
 - Reading material is never played automatically.
+
+## PWA
+
+- vite-plugin-pwa, `registerType: 'prompt'`: a new version waits and is applied only on the start screen or from the parent screen (`src/app/appUpdate.ts`), never mid-round.
+- Everything is precached, including bundled recordings in `src/audio/files/`; `base: './'` so the build works at a domain root or a subpath.
+- `navigator.storage.persist()` runs at startup when installed.
+- Manual tablet checks: `docs/tablet-checklist.md`.
 
 ## Engine conventions
 

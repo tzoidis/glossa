@@ -97,5 +97,8 @@
   "parent.backup.last": "Τελευταίο αντίγραφο: {date}",
   "parent.backup.never": "Δεν έχει γίνει ακόμα αντίγραφο.",
 
+  "parent.update.ready": "Υπάρχει νέα έκδοση της εφαρμογής.",
+  "parent.update.install": "Ενημέρωση τώρα",
+
   "parent.close": "Κλείσιμο"
 }

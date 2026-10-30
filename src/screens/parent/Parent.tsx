@@ -4,6 +4,7 @@
 
 import { useEffect, useState } from 'react';
 import { useApp } from '../../app/AppContext.tsx';
+import { installUpdate, isInstalled, useUpdateReady } from '../../app/appUpdate.ts';
 import { t } from '../../i18n.ts';
 import { backupDue } from '../../storage/backupFile.ts';
 import { IconButton } from '../../ui/IconButton.tsx';
@@ -14,10 +15,6 @@ import { ExercisesSection } from './ExercisesSection.tsx';
 import { LettersSection } from './LettersSection.tsx';
 import { ParentGate } from './ParentGate.tsx';
 import { FlagsSection, OtherSection, TimeSection } from './SettingsSections.tsx';
-
-export function isInstalled(): boolean {
-  return window.matchMedia('(display-mode: standalone)').matches || (navigator as { standalone?: boolean }).standalone === true;
-}
 
 function StorageStatus() {
   const [persisted, setPersisted] = useState<boolean | null>(null);
@@ -56,15 +53,11 @@ export function Parent({ onClose }: { onClose(): void }) {
   const [unlocked, setUnlocked] = useState(false);
   const [installAck, setInstallAck] = useState(isInstalled);
   const [hasProgress, setHasProgress] = useState(false);
+  const updateReady = useUpdateReady();
 
   useEffect(() => {
     void db.answers.count().then((n) => setHasProgress(n > 0));
   }, [db, child.id]);
-
-  useEffect(() => {
-    // installed: ask the browser not to evict our data (PRD §7)
-    if (unlocked && isInstalled()) void navigator.storage?.persist?.();
-  }, [unlocked]);
 
   if (!unlocked) return <ParentGate onPass={() => setUnlocked(true)} onCancel={onClose} />;
 
@@ -80,6 +73,14 @@ export function Parent({ onClose }: { onClose(): void }) {
         <InstallNotice onContinue={() => setInstallAck(true)} />
       ) : (
         <>
+          {updateReady && (
+            <p className="warn-text">
+              {t('parent.update.ready')}{' '}
+              <button type="button" className="parent-button primary" onClick={installUpdate}>
+                {t('parent.update.install')}
+              </button>
+            </p>
+          )}
           <StorageStatus />
           {backupDue(settings.lastBackupAt, hasProgress) && <p className="warn-text">{t('parent.backupDue')}</p>}
           <LettersSection />
