@@ -58,16 +58,23 @@ describe('pickStations', () => {
   it('never offers the previous mechanism', () => {
     for (let i = 0; i < 50; i++) {
       const picked = pickStations(c, 'tap', [], mulberry32(i));
-      expect(picked).toHaveLength(2);
+      expect(picked).toHaveLength(2); // only order1 and listen1 are left
       expect(picked.some((id) => id.startsWith('tap'))).toBe(false);
     }
   });
 
-  it('offers two different mechanisms when it can', () => {
+  it('offers three stations with as many different mechanisms as it can', () => {
     for (let i = 0; i < 50; i++) {
-      const [a, b] = pickStations(c, null, [], mulberry32(i));
-      expect(c.find((x) => x.id === a)!.mechanism).not.toBe(c.find((x) => x.id === b)!.mechanism);
+      const picked = pickStations(c, null, [], mulberry32(i));
+      expect(picked).toHaveLength(3);
+      expect(new Set(picked.map((id) => c.find((x) => x.id === id)!.mechanism)).size).toBe(3);
     }
+  });
+
+  it('fills the third station with a repeated mechanism rather than show two', () => {
+    const picked = pickStations([...c, { id: 'order2', mechanism: 'order' }], 'listen', [], mulberry32(3));
+    expect(picked).toHaveLength(3);
+    expect(picked).not.toContain('listen1');
   });
 
   it('prefers stations not played yet', () => {

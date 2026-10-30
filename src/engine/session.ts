@@ -1,9 +1,10 @@
 // Session flow, PRD §5: 3 rounds × 5 questions. Before each round the child picks
-// one of 2 stations; a break between rounds; never the same mechanism twice in a
+// one of 3 stations; a break between rounds; never the same mechanism twice in a
 // row. When the daily limit is reached, the current round finishes, then the
 // session ends with "see you tomorrow".
 
 export const ROUNDS_PER_SESSION = 3;
+export const STATIONS_PER_CHOICE = 3;
 
 export type Phase =
   | { kind: 'choose'; options: string[] }
@@ -24,7 +25,7 @@ export type SessionAction =
   | { type: 'choose'; exerciseId: string }
   | { type: 'roundComplete' }
   | { type: 'limitReached' }
-  /** leave the break; options are the next two stations */
+  /** leave the break; options are the next stations */
   | { type: 'continue'; options: string[] };
 
 export function startSession(exerciseId: string): SessionState {
@@ -68,10 +69,16 @@ export interface StationCandidate {
 }
 
 /**
- * Up to 2 stations: never the previous mechanism (unless nothing else is available),
- * least-played first, and the two differ in mechanism when possible.
+ * Up to `count` stations: never the previous mechanism (unless nothing else is available),
+ * least-played first, and as many different mechanisms as possible.
  */
-export function pickStations(candidates: StationCandidate[], lastMechanism: string | null, played: string[], rng: () => number): string[] {
+export function pickStations(
+  candidates: StationCandidate[],
+  lastMechanism: string | null,
+  played: string[],
+  rng: () => number,
+  count = STATIONS_PER_CHOICE,
+): string[] {
   const fresh = candidates.filter((c) => c.mechanism !== lastMechanism);
   const pool = fresh.length > 0 ? fresh : candidates;
   const timesPlayed = (id: string) => played.filter((p) => p === id).length;
@@ -80,8 +87,8 @@ export function pickStations(candidates: StationCandidate[], lastMechanism: stri
     .sort((a, b) => timesPlayed(a.c.id) - timesPlayed(b.c.id) || a.r - b.r)
     .map((x) => x.c);
 
-  const first = ranked[0];
-  if (!first) return [];
-  const second = ranked.find((c) => c.id !== first.id && c.mechanism !== first.mechanism) ?? ranked.find((c) => c.id !== first.id);
-  return second ? [first.id, second.id] : [first.id];
+  const picked: StationCandidate[] = [];
+  for (const c of ranked) if (picked.length < count && !picked.some((p) => p.mechanism === c.mechanism)) picked.push(c);
+  for (const c of ranked) if (picked.length < count && !picked.includes(c)) picked.push(c);
+  return picked.map((c) => c.id);
 }

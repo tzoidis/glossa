@@ -4,7 +4,7 @@ import { buildGenerateContext } from '../app/generateContext.ts';
 import { pickStations } from '../engine/session.ts';
 import { availableExercises, canGenerate, EXERCISES, findExercise } from '../exercises/registry.ts';
 
-/** Picks the next two stations from the exercises available right now. */
+/** Picks the next stations (STATIONS_PER_CHOICE) from the exercises available right now. */
 export function useStations() {
   const { settings, voice, content, allow, hasPhonemeAudio } = useApp();
   const available = useMemo(

@@ -7,6 +7,7 @@
   --card-edge: #e8dcc4;
   --station-0: #fde7c8;
   --station-1: #d6ecf7;
+  --station-2: #e3f2d3;
   --star: #f6c443;
   --star-edge: #b9861a;
   --shadow: rgba(60, 40, 10, 0.12);
@@ -403,20 +404,28 @@ button {
 
 .stations {
   display: flex;
-  gap: 40px;
+  gap: clamp(12px, 4vw, 40px);
   flex-wrap: wrap;
   justify-content: center;
 }
 
 .station {
-  width: 220px;
-  height: 220px;
-  border-radius: 40px;
+  /* three side by side, from a phone in portrait up to a tablet */
+  width: clamp(96px, 27vw, 220px);
+  aspect-ratio: 1;
+  container-type: size;
+  border-radius: 18%;
   border: 4px solid var(--card-edge);
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 8px 0 var(--card-edge);
+}
+
+.station .picture {
+  width: 64cqw;
+  height: 64cqw;
+  font-size: 52cqw !important;
 }
 
 .station--0 {
@@ -425,6 +434,10 @@ button {
 
 .station--1 {
   background: var(--station-1);
+}
+
+.station--2 {
+  background: var(--station-2);
 }
 
 /* ---------- session ---------- */
@@ -846,12 +859,5 @@ button {
 @media (max-width: 600px) {
   :root {
     --gutter: 16px;
-  }
-  .station {
-    width: 150px;
-    height: 150px;
-  }
-  .stations {
-    gap: 20px;
   }
 }

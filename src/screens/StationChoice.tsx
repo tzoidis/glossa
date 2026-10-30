@@ -1,4 +1,4 @@
-// Two big station cards; the child picks one (PRD §5). No text: each station is a picture.
+// Three big station cards; the child picks one (PRD §5). No text: each station is a picture.
 
 import { findExercise } from '../exercises/registry.ts';
 import { t } from '../i18n.ts';
