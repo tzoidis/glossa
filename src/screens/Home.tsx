@@ -6,13 +6,13 @@ import { useApp } from '../app/AppContext.tsx';
 import { t } from '../i18n.ts';
 import { getDailyTime } from '../storage/db.ts';
 import { IconButton } from '../ui/IconButton.tsx';
-import { VillageIcon } from '../ui/Icons.tsx';
+import { LockIcon, VillageIcon } from '../ui/Icons.tsx';
 import { Mascot } from '../ui/Mascot.tsx';
 import { StationChoice } from './StationChoice.tsx';
 import { useStations } from './useStations.ts';
 import { DevDebug } from '../ui/DevDebug.tsx';
 
-export function Home({ onPlay, onVillage }: { onPlay(exerciseId: string): void; onVillage(): void }) {
+export function Home({ onPlay, onVillage, onParent }: { onPlay(exerciseId: string): void; onVillage(): void; onParent(): void }) {
   const { db, child, settings, audio } = useApp();
   const nextStations = useStations();
   // Re-pick when availability changes (the voice check can finish after Home opens).
@@ -34,6 +34,9 @@ export function Home({ onPlay, onVillage }: { onPlay(exerciseId: string): void; 
   return (
     <main className="screen home">
       <div className="top-bar">
+        <button type="button" className="parent-lock" aria-label={t('nav.parent')} onClick={onParent}>
+          <LockIcon />
+        </button>
         <IconButton label={t('nav.village')} onClick={onVillage}>
           <VillageIcon />
         </IconButton>

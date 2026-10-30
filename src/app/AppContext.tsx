@@ -79,8 +79,12 @@ export function AppProvider({ children, audio, dbName, fallback }: AppProviderPr
 
   const refresh = useCallback(async () => {
     if (!loaded) return;
-    const [child, settings] = await Promise.all([loaded.db.children.get(DEFAULT_CHILD_ID), loaded.db.settings.get(DEFAULT_CHILD_ID)]);
-    setLoaded((l) => l && { ...l, child: child ?? l.child, settings: settings ?? l.settings });
+    const [child, settings, hasPhonemeAudio] = await Promise.all([
+      loaded.db.children.get(DEFAULT_CHILD_ID),
+      loaded.db.settings.get(DEFAULT_CHILD_ID),
+      allPhonemesRecorded(loaded.db),
+    ]);
+    setLoaded((l) => l && { ...l, child: child ?? l.child, settings: settings ?? l.settings, hasPhonemeAudio });
   }, [loaded]);
 
   const recheckVoice = useCallback(() => {
