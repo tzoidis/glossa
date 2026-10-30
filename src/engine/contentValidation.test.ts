@@ -60,6 +60,7 @@ describe('validateWords', () => {
     ['flag that is not there', word('πίτα', ['πί', 'τα'], { flags: ['cluster'] }), 'detected []'],
     ['hand-written computed fields', word('πίτα', ['πί', 'τα'], { minPosition: 3 }), 'computed'],
     ['missing image', word('πίτα', ['πί', 'τα'], { imageId: undefined }), 'imageId'],
+    ['image that is not an OpenMoji code', word('πίτα', ['πί', 'τα'], { imageId: 'pie.svg' }), 'not an OpenMoji code'],
     ['grapheme outside the curriculum', word('νεράντζι', ['νε', 'ρά', 'ντζι'], { flags: [] }), 'not in curriculum: ντζ'],
   ])('reports %s', (_, w, message) => {
     expect(validateWords([w], book).join('\n')).toContain(message);

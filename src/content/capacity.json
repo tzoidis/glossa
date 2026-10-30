@@ -1,7 +1,7 @@
 {
   "minWords": 15,
   "minChoices": 3,
-  "checkpoints": [],
+  "checkpoints": [18],
   "exercises": {
     "syllable-count": { "from": 0, "shows": "none", "needsImage": true },
     "blend-sounds": { "from": 0, "shows": "none", "needsImage": true },

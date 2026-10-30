@@ -56,6 +56,7 @@ export function validateWords(words: Word[], curriculum: Curriculum): string[] {
     if (!ARTICLES.has(w.article)) errors.push(`${at}: bad article ${JSON.stringify(w.article)}`);
     if (!w.category) errors.push(`${at}: missing category`);
     if (!w.imageId) errors.push(`${at}: missing imageId`);
+    else if (!/^[0-9A-F]{4,6}(-[0-9A-F]{4,6})*$/.test(w.imageId)) errors.push(`${at}: imageId "${w.imageId}" is not an OpenMoji code (e.g. 1F34E)`);
     if (w.graphemes !== undefined || w.minPosition !== undefined) {
       errors.push(`${at}: graphemes/minPosition are computed, do not write them by hand`);
     }
