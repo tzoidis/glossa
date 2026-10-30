@@ -19,7 +19,9 @@ const appFiles = sourceFiles(srcDir)
   .map((path) => ({ rel: relative(srcDir, path).split(sep).join('/'), text: readFileSync(path, 'utf8') }))
   .filter((f) => !f.rel.startsWith('content/'));
 
-const GREEK = /[Ͱ-Ͽἀ-῿]/;
+// Schema literals copied from PRD §8 (e.g. Word.article) are the only exception.
+const GREEK_ALLOWED = new Set(['engine/types.ts']);
+const GREEK =/[Ͱ-Ͽἀ-῿]/;
 const NETWORK = /\b(fetch\s*\(|XMLHttpRequest|WebSocket|EventSource|sendBeacon)|https?:\/\//;
 
 describe('repo rules', () => {
@@ -27,8 +29,10 @@ describe('repo rules', () => {
     expect(appFiles.length).toBeGreaterThan(0);
   });
 
-  it.each(appFiles)('$rel has no hardcoded Greek text', ({ text }) => {
-    const line = text.split('\n').find((l) => GREEK.test(l));
+  it.each(appFiles.filter((f) => !GREEK_ALLOWED.has(f.rel)))('$rel has no hardcoded Greek text', ({ text }) => {
+    // Comments may use Greek examples; they never reach the screen.
+    const code = text.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
+    const line = code.split('\n').find((l) => GREEK.test(l));
     expect(line).toBeUndefined();
   });
 

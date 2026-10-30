@@ -26,6 +26,14 @@ Node ≥ 22.18 (scripts in `scripts/` run as plain `.ts` via Node type stripping
 - TTS is only for whole words and sentences, only with a local `el-GR` voice; never for phonemes or letter names.
 - Reading material is never played automatically.
 
+## Engine conventions
+
+- **Position** = number of graphemes taught, counted along `curriculum.json` order (0 = transition only, 1 = «α» taught, …). `Word.minPosition` uses the same scale.
+- Linguistic tables (multigraphs, vowels, homophone groups, flag triggers) live in `src/content/greek.json`, not in code.
+- Sight words bypass both grapheme and flag checks (they are read whole; «έχει» has soft-g-ch). Diaeresis is a separate skill, `diaeresis`.
+- Flags of bank words come from `words.json` and must match `detectFlags(text, syllables)`; `validate-content` reports a mismatch, and you ask before changing either. Free text uses detection without syllables, which errs on the strict side.
+- `src/content/capacity.json` lists what each exercise shows and the positions (`checkpoints`) where capacity must reach the minimum. Engine code imported by `scripts/` must be erasable TS and use `with { type: 'json' }` for JSON imports.
+
 ## Layout
 
 ```

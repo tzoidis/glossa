@@ -1,0 +1,69 @@
+{
+  "book": "glossa-mas-2025",
+  "units": [
+    {
+      "id": 0,
+      "title": "Μετάβαση",
+      "graphemes": [],
+      "sightWords": [],
+      "unlocksFlags": [],
+      "skills": []
+    },
+    {
+      "id": 1,
+      "title": "Ενότητα 1",
+      "graphemes": ["α", "ν", "ι", "τ", "π", "ο", "ε", "σ", "η"],
+      "sightWords": ["είναι", "έχει", "και"],
+      "unlocksFlags": [],
+      "skills": ["upper-lower", "capital-start", "full-stop"]
+    },
+    {
+      "id": 2,
+      "title": "Ενότητα 2",
+      "graphemes": ["ρ", "κ", "μ", "λ", "β", "δ", "ω", "υ", "ου"],
+      "sightWords": [],
+      "unlocksFlags": [],
+      "skills": []
+    },
+    {
+      "id": 3,
+      "title": "Ενότητα 3",
+      "graphemes": ["γ", "θ", "χ", "ζ", "φ", "ξ", "ψ", "οι", "ει"],
+      "sightWords": [],
+      "unlocksFlags": [],
+      "skills": []
+    },
+    {
+      "id": 4,
+      "title": "Ενότητα 4",
+      "graphemes": ["αι", "μπ", "ντ", "γκ", "γγ", "αυ", "ευ", "τσ", "τζ"],
+      "sightWords": [],
+      "unlocksFlags": [],
+      "skills": []
+    },
+    {
+      "id": 5,
+      "title": "Ενότητα 5",
+      "graphemes": [],
+      "sightWords": [],
+      "unlocksFlags": [],
+      "skills": []
+    },
+    {
+      "id": 6,
+      "title": "Ενότητα 6",
+      "graphemes": [],
+      "sightWords": [],
+      "unlocksFlags": [],
+      "skills": []
+    },
+    {
+      "id": 7,
+      "title": "Ενότητα 7",
+      "graphemes": [],
+      "sightWords": [],
+      "unlocksFlags": [],
+      "skills": []
+    }
+  ]
+}

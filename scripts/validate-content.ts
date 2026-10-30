@@ -1,9 +1,10 @@
 // Validates everything in src/content/. Run with `npm run validate-content`.
-// M0: every file parses and every string is NFC-normalized.
-// M1 adds: tokenizer-derived graphemes/minPosition, flags, syllables, images, capacity.
+// Generic: every JSON file parses and every string is NFC.
+// Specific (src/engine/contentValidation.ts): curriculum, words, sentences, stories, capacity.
 
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { validateContent, type CapacityConfig, type Content } from '../src/engine/contentValidation.ts';
 
 const contentDir = join(import.meta.dirname, '..', 'src', 'content');
 const errors: string[] = [];
@@ -21,17 +22,40 @@ function walkStrings(value: unknown, path: string, visit: (s: string, path: stri
   }
 }
 
+const files = new Map<string, unknown>();
 for (const file of readdirSync(contentDir).filter((f) => f.endsWith('.json'))) {
-  let data: unknown;
   try {
-    data = JSON.parse(readFileSync(join(contentDir, file), 'utf8'));
+    files.set(file, JSON.parse(readFileSync(join(contentDir, file), 'utf8')));
   } catch (e) {
     errors.push(`${file}: invalid JSON (${(e as Error).message})`);
-    continue;
   }
+}
+for (const [file, data] of files) {
   walkStrings(data, file, (s, path) => {
     if (s !== s.normalize('NFC')) errors.push(`${path}: not NFC: ${JSON.stringify(s)}`);
   });
+}
+
+const load = <T>(file: string, fallback: T): T =>
+  existsSync(join(contentDir, file)) ? ((files.get(file) as T | undefined) ?? fallback) : fallback;
+
+const content: Content = {
+  curriculum: load('curriculum.json', { book: '', units: [] }),
+  words: load('words.json', []),
+  sentences: load('sentences.json', []),
+  stories: load('stories.json', []),
+};
+const capacity = load<CapacityConfig>('capacity.json', { minWords: 0, minChoices: 0, checkpoints: [], exercises: {} });
+
+const result = validateContent(content, capacity);
+errors.push(...result.errors);
+
+// Capacity report: how many items each exercise can draw from at each unit end.
+const ids = Object.keys(capacity.exercises);
+console.log(`words: ${content.words.length}, sentences: ${content.sentences.length}, stories: ${content.stories.length}`);
+console.log(['position', ...ids].join('\t'));
+for (const row of result.capacity) {
+  console.log([`${row.position} ${row.label}`, ...ids.map((id) => row.counts[id] ?? '-')].join('\t'));
 }
 
 if (errors.length > 0) {
