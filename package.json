@@ -15,7 +15,8 @@
     "test:watch": "vitest",
     "validate-content": "node scripts/validate-content.ts",
     "ci": "npm run typecheck && npm run validate-content && npm test && npm run build",
-    "word-list": "node scripts/word-list.ts"
+    "word-list": "node scripts/word-list.ts",
+    "dev:lan": "vite --host"
   },
   "dependencies": {
     "dexie": "^4.4.7",

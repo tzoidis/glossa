@@ -1,5 +1,12 @@
 import type { AnswerLog, Round } from '../engine/types.ts';
 
+/** randomUUID exists only in secure contexts; the tablet may load the dev server over plain http on the LAN. */
+export function newId(): string {
+  if (typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+  const b = crypto.getRandomValues(new Uint8Array(16));
+  return [...b].map((x) => x.toString(16).padStart(2, '0')).join('');
+}
+
 /**
  * Builds an AnswerLog from inside an exercise. The session fills childId.
  * itemId doubles as the review-queue key: "word:<wordId>" or "grapheme:<g>".
@@ -10,7 +17,7 @@ export function makeAnswer(
     Partial<Pick<AnswerLog, 'soundsRight' | 'usedListen' | 'latencyMs'>>,
 ): AnswerLog {
   return {
-    id: crypto.randomUUID(),
+    id: newId(),
     childId: '',
     ts: Date.now(),
     exerciseId: round.exerciseId,

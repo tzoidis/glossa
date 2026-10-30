@@ -5,6 +5,7 @@ Offline PWA with Greek reading games for a first-grade child, following the book
 ## Commands
 
 - `npm run dev` – Vite dev server
+- `npm run dev:lan` – dev server reachable from the tablet on the home Wi-Fi (plain http: no secure-context APIs without a fallback)
 - `npm test` – Vitest (`npm run test:watch` for watch mode)
 - `npm run validate-content` – checks `src/content/*.json` (runs in CI)
 - `npm run typecheck` – `tsc -b`
