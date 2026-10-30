@@ -11,6 +11,8 @@ export interface Child {
   createdAt: number;
   /** completion stars, spent in the village (PRD §5) */
   stars: number;
+  /** rounds completed ever; the review queue's clock */
+  roundsPlayed: number;
 }
 
 export interface Settings {

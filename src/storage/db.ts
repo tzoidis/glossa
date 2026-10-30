@@ -72,7 +72,7 @@ export async function openDb(options: OpenOptions = {}): Promise<GlossaDb> {
 export async function ensureChild(db: GlossaDb, defaultPosition: number, now = Date.now()): Promise<Settings> {
   return db.transaction('rw', db.children, db.settings, async () => {
     if (!(await db.children.get(DEFAULT_CHILD_ID))) {
-      await db.children.add({ id: DEFAULT_CHILD_ID, name: null, createdAt: now, stars: 0 });
+      await db.children.add({ id: DEFAULT_CHILD_ID, name: null, createdAt: now, stars: 0, roundsPlayed: 0 });
     }
     const existing = await db.settings.get(DEFAULT_CHILD_ID);
     if (existing) return existing;

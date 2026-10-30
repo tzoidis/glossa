@@ -35,6 +35,13 @@ Node ≥ 22.18 (scripts in `scripts/` run as plain `.ts` via Node type stripping
 - Flags of bank words come from `words.json` and must match `detectFlags(text, syllables)`; `validate-content` reports a mismatch, and you ask before changing either. Free text uses detection without syllables, which errs on the strict side.
 - `src/content/capacity.json` lists what each exercise shows and the positions (`checkpoints`) where capacity must reach the minimum. Engine code imported by `scripts/` must be erasable TS and use `with { type: 'json' }` for JSON imports.
 
+## Session conventions
+
+- Exercises register in `src/exercises/registry.ts` with a `mechanism` (station variety) and an `icon` (OpenMoji code). `devStub` is registered only in dev builds; remove it once real exercises exist.
+- `AnswerLog.itemId` is also the review-queue key: `word:<wordId>` or `grapheme:<g>` (helpers in `src/exercises/answer.ts`). Exercises leave `childId` empty; the session fills it.
+- The pure session flow is `src/engine/session.ts`; persistence of answers, review queue, village items and stars is `src/storage/progress.ts`.
+- `Picture` renders the OpenMoji code with the device emoji font until the OpenMoji subset is bundled.
+
 ## Layout
 
 ```

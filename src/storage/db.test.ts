@@ -50,7 +50,7 @@ describe('openDb', () => {
     const [backup, ...rest] = await listMigrationBackups(opts.backupsName);
     expect(rest).toEqual([]);
     expect(backup).toMatchObject({ dbName: opts.name, fromVersion: 1, toVersion: 2, createdAt: 2000 });
-    expect(backup!.data.children).toEqual([{ id: DEFAULT_CHILD_ID, name: null, createdAt: 1000, stars: 0 }]);
+    expect(backup!.data.children).toEqual([{ id: DEFAULT_CHILD_ID, name: null, createdAt: 1000, stars: 0, roundsPlayed: 0 }]);
     expect(backup!.data.settings).toHaveLength(1);
   });
 
