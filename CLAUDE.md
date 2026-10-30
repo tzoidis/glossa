@@ -37,7 +37,9 @@ Node ≥ 22.18 (scripts in `scripts/` run as plain `.ts` via Node type stripping
 
 ## Session conventions
 
-- Exercises register in `src/exercises/registry.ts` with a `mechanism` (station variety) and an `icon` (OpenMoji code). `devStub` is registered only in dev builds; remove it once real exercises exist.
+- Exercises register in `src/exercises/registry.ts` with a `mechanism` (station variety) and an `icon` (OpenMoji code, never a Latin-letter emoji). An exercise is offered only if `generate` does not throw `NotEnoughContent`.
+- Pattern to copy for new exercises: `src/exercises/firstLetter/` and `joinSyllables/` — `generate.ts` (pure, uses `pickWords`/`isReadable` from `pool.ts`), the component (feedback: wrong choice fades, word replays slowly, right one glows, child makes the right move; log attempt 1 and, after a mistake, attempt 2), `index.ts`, and a property test over `cases()` from `propertyTest.ts`.
+- First-time demo: `RoundPlayer` wraps one practice item in `DemoProvider`; components render `<Hand />` on the right target when `useDemo()` is true. Drags use `useDragOrTap` so a tap always works too.
 - `AnswerLog.itemId` is also the review-queue key: `word:<wordId>` or `grapheme:<g>` (helpers in `src/exercises/answer.ts`). Exercises leave `childId` empty; the session fills it.
 - The pure session flow is `src/engine/session.ts`; persistence of answers, review queue, village items and stars is `src/storage/progress.ts`.
 - `Picture` renders the OpenMoji code with the device emoji font until the OpenMoji subset is bundled.

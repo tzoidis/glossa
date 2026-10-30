@@ -12,11 +12,13 @@ export const RECENT_ANSWERS = 15;
 export async function recordAnswer(db: GlossaDb, answer: AnswerLog, roundCounter: number): Promise<void> {
   await db.transaction('rw', db.answers, db.reviewQueue, db.world, async () => {
     await db.answers.add(answer);
-    if (answer.attempt !== 1) return;
+    if (answer.attempt === 1) {
+      // only first attempts move the review queue (PRD §4)
+      const prev = await db.reviewQueue.get(reviewId(answer.childId, answer.itemId));
+      await db.reviewQueue.put(updateReview(prev, answer.childId, answer.itemId, answer.correct, roundCounter, answer.ts));
+    }
 
-    const prev = await db.reviewQueue.get(reviewId(answer.childId, answer.itemId));
-    await db.reviewQueue.put(updateReview(prev, answer.childId, answer.itemId, answer.correct, roundCounter, answer.ts));
-
+    // every word solved, even on the second try, joins the village
     const wordId = wordIdOf(answer.itemId);
     if (answer.correct && wordId) {
       const id = `${answer.childId}:word:${wordId}`;

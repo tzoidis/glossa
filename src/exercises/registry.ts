@@ -1,8 +1,10 @@
 // All exercise types. The mechanism drives station variety (PRD §5: never the same
 // mechanism twice in a row); the icon is the station's picture (OpenMoji code).
 
-import { devStub } from './devStub/index.tsx';
-import type { ExerciseModule } from './types.ts';
+import { firstLetter } from './firstLetter/index.ts';
+import { joinSyllables } from './joinSyllables/index.ts';
+import { NotEnoughContent } from './pool.ts';
+import type { ExerciseModule, GenerateContext } from './types.ts';
 
 export type Mechanism = 'tap-choice' | 'order' | 'listen-image' | 'trace';
 
@@ -13,7 +15,8 @@ export interface ExerciseEntry {
 }
 
 export const EXERCISES: ExerciseEntry[] = [
-  ...(import.meta.env.DEV ? [{ module: devStub, mechanism: 'tap-choice' as const, icon: '1F9EA' }] : []),
+  { module: firstLetter, mechanism: 'tap-choice', icon: '1F442' },
+  { module: joinSyllables, mechanism: 'order', icon: '1F9E9' },
 ];
 
 export interface Availability {
@@ -29,6 +32,17 @@ export function availableExercises(entries: ExerciseEntry[], a: Availability): E
     if (m.requires.needs.includes('localTTS') && !a.hasLocalVoice) return false;
     return true;
   });
+}
+
+/** An exercise is offered only if it can fill a round right now (PRD §5: hide rather than show a locked word). */
+export function canGenerate(m: ExerciseModule, ctx: GenerateContext): boolean {
+  try {
+    m.generate(ctx);
+    return true;
+  } catch (e) {
+    if (e instanceof NotEnoughContent) return false;
+    throw e;
+  }
 }
 
 export function findExercise(id: string): ExerciseEntry | undefined {

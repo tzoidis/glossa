@@ -25,6 +25,14 @@ export const NextIcon = () => (
   </svg>
 );
 
+export const SpeakerIcon = () => (
+  <svg {...common} aria-hidden>
+    <path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor" />
+    <path d="M16 9a4 4 0 0 1 0 6" />
+    <path d="M18.5 6.5a7.5 7.5 0 0 1 0 11" />
+  </svg>
+);
+
 export const CheckIcon = () => (
   <svg {...common} aria-hidden>
     <path d="m5 12 5 5 9-10" />

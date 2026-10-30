@@ -34,10 +34,10 @@ const answer = (itemId: string, correct: boolean, attempt: 1 | 2 = 1): AnswerLog
 });
 
 describe('recordAnswer', () => {
-  it('stores the answer, queues mistakes and adds solved words to the village once', async () => {
+  it('stores the answer, queues mistakes and adds every solved word to the village once', async () => {
     const db = await freshDb();
     await recordAnswer(db, answer('word:pie', false), 0);
-    await recordAnswer(db, answer('word:pie', true, 2), 0); // second attempt: logged only
+    await recordAnswer(db, answer('word:pie', true, 2), 0); // second attempt: no review change, still a village item
     await recordAnswer(db, answer('word:ball', true), 0);
     await recordAnswer(db, answer('word:ball', true), 1);
     await recordAnswer(db, answer('grapheme:π', true), 1);
@@ -45,7 +45,7 @@ describe('recordAnswer', () => {
     expect(await db.answers.count()).toBe(5);
     expect(await dueReviewKeys(db, DEFAULT_CHILD_ID, 1)).toEqual(['word:pie']);
     const world = await worldItems(db, DEFAULT_CHILD_ID);
-    expect(world.map((w) => w.ref)).toEqual(['ball']);
+    expect(world.map((w) => w.ref)).toEqual(['ball', 'pie']);
 
     await placeWorldItem(db, world[0]!.id, 40, 60);
     expect((await worldItems(db, DEFAULT_CHILD_ID))[0]).toMatchObject({ x: 40, y: 60 });
