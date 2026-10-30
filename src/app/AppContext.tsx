@@ -18,6 +18,8 @@ export interface App {
   voice: VoiceInfo | null;
   /** re-read child and settings after a write */
   refresh(): Promise<void>;
+  /** look for the local voice again (call after the first tap: iOS may only list voices then) */
+  recheckVoice(): void;
 }
 
 const AppContext = createContext<App | null>(null);
@@ -69,6 +71,11 @@ export function AppProvider({ children, audio, dbName, fallback }: AppProviderPr
     setLoaded((l) => l && { ...l, child: child ?? l.child, settings: settings ?? l.settings });
   }, [loaded]);
 
+  const recheckVoice = useCallback(() => {
+    if (!loaded) return;
+    void loaded.audio.voice().then((voice) => setLoaded((l) => l && (l.voice?.name === voice?.name ? l : { ...l, voice })));
+  }, [loaded]);
+
   const app = useMemo<App | null>(() => {
     if (!loaded) return null;
     const allow = makeContext(
@@ -76,8 +83,8 @@ export function AppProvider({ children, audio, dbName, fallback }: AppProviderPr
       { position: loaded.settings.upToPosition, extraFlags: loaded.settings.extraFlags, extraSkills: loaded.settings.extraSkills },
       CONTENT.words,
     );
-    return { ...loaded, content: CONTENT, allow, refresh };
-  }, [loaded, refresh]);
+    return { ...loaded, content: CONTENT, allow, refresh, recheckVoice };
+  }, [loaded, refresh, recheckVoice]);
 
   if (!app) return <>{fallback}</>;
   return <AppContext.Provider value={app}>{children}</AppContext.Provider>;

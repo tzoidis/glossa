@@ -5,7 +5,7 @@ import { t } from '../i18n.ts';
 import { Mascot } from '../ui/Mascot.tsx';
 
 export function Start({ onGo }: { onGo(): void }) {
-  const { audio } = useApp();
+  const { audio, recheckVoice } = useApp();
   return (
     <main className="screen screen--center start">
       <Mascot mood="happy" size={220} />
@@ -14,6 +14,7 @@ export function Start({ onGo }: { onGo(): void }) {
         className="go"
         onClick={() => {
           audio.unlock();
+          recheckVoice();
           void audio.play({ kind: 'instruction', key: 'welcome' });
           onGo();
         }}

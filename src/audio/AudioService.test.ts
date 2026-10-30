@@ -72,6 +72,27 @@ describe('pickVoice', () => {
     expect((await p)?.name).toBe('late');
   });
 
+  it('notices voices that appear without a voiceschanged event (Safari)', async () => {
+    vi.useFakeTimers();
+    let voices: VoiceLike[] = [];
+    const s = { ...fakeSpeech([]), getVoices: () => voices };
+    const p = pickVoice(s, 3000);
+    voices = [voice('el-GR', true, 'silent')];
+    vi.advanceTimersByTime(300);
+    expect((await p)?.name).toBe('silent');
+    vi.useRealTimers();
+  });
+
+  it('retries after a miss instead of remembering "no voice"', async () => {
+    let voices: VoiceLike[] = [voice('en-US', true)];
+    const speech = { ...fakeSpeech([]), getVoices: () => voices };
+    const { service } = makeService({ speech });
+    expect(await service.voice()).toBeNull();
+    await Promise.resolve();
+    voices = [voice('el-GR', true, 'later')];
+    expect((await service.voice())?.name).toBe('later');
+  });
+
   it('gives up after the timeout', async () => {
     vi.useFakeTimers();
     const p = pickVoice(fakeSpeech([]), 1000);

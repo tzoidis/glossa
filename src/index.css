@@ -411,6 +411,19 @@ button {
   filter: drop-shadow(0 4px 4px var(--shadow));
 }
 
+.dev-debug {
+  margin: 0;
+  padding: 12px;
+  max-height: 40vh;
+  overflow: auto;
+  font: 13px/1.4 ui-monospace, monospace;
+  background: #111;
+  color: #9f9;
+  border-radius: 8px;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
 /* ---------- motion (never blinking; off when reduced) ---------- */
 
 @media (prefers-reduced-motion: no-preference) {

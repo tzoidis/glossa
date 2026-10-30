@@ -1,7 +1,7 @@
 // Home: the first station choice is right here, so a session starts in 2 taps
 // from the start screen («Πάμε!», then a station). PRD §9.
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useApp } from '../app/AppContext.tsx';
 import { t } from '../i18n.ts';
 import { getDailyTime } from '../storage/db.ts';
@@ -10,11 +10,13 @@ import { VillageIcon } from '../ui/Icons.tsx';
 import { Mascot } from '../ui/Mascot.tsx';
 import { StationChoice } from './StationChoice.tsx';
 import { useStations } from './useStations.ts';
+import { DevDebug } from '../ui/DevDebug.tsx';
 
 export function Home({ onPlay, onVillage }: { onPlay(exerciseId: string): void; onVillage(): void }) {
   const { db, child, settings, audio } = useApp();
   const nextStations = useStations();
-  const [options] = useState(() => nextStations());
+  // Re-pick when availability changes (the voice check can finish after Home opens).
+  const options = useMemo(() => nextStations(), [nextStations]);
   const [limitReached, setLimitReached] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -46,6 +48,7 @@ export function Home({ onPlay, onVillage }: { onPlay(exerciseId: string): void; 
           <StationChoice options={options} onPick={onPlay} />
         </div>
       )}
+      {import.meta.env.DEV && location.search.includes('debug') && <DevDebug />}
     </main>
   );
 }

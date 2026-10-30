@@ -84,7 +84,12 @@ export function isLocalGreek(v: VoiceLike): boolean {
   return v.localService && v.lang.replace('_', '-').toLowerCase().startsWith('el');
 }
 
-/** getVoices() is often empty until 'voiceschanged'; wait for it, but not forever. */
+const POLL_MS = 250;
+
+/**
+ * getVoices() is often empty at first. Chrome fires 'voiceschanged' when the list
+ * arrives; Safari may fill it silently, so poll too. Give up after timeoutMs.
+ */
 export function pickVoice(speech: SpeechLike | null, timeoutMs: number): Promise<VoiceLike | null> {
   if (!speech) return Promise.resolve(null);
   const choose = (voices: VoiceLike[]) => {
@@ -94,13 +99,18 @@ export function pickVoice(speech: SpeechLike | null, timeoutMs: number): Promise
   const now = speech.getVoices();
   if (now.length > 0) return Promise.resolve(choose(now));
   return new Promise((resolve) => {
-    const done = () => {
+    const finish = () => {
       clearTimeout(timer);
-      speech.removeEventListener('voiceschanged', done);
+      clearInterval(poll);
+      speech.removeEventListener('voiceschanged', check);
       resolve(choose(speech.getVoices()));
     };
-    const timer = setTimeout(done, timeoutMs);
-    speech.addEventListener('voiceschanged', done);
+    const check = () => {
+      if (speech.getVoices().length > 0) finish();
+    };
+    const timer = setTimeout(finish, timeoutMs);
+    const poll = setInterval(check, POLL_MS);
+    speech.addEventListener('voiceschanged', check);
   });
 }
 
@@ -114,8 +124,12 @@ export class BrowserAudioService implements AudioService {
   }
 
   private getVoice(): Promise<VoiceLike | null> {
-    this.voicePromise ??= pickVoice(this.deps.speech, this.deps.voiceTimeoutMs ?? 2000);
-    return this.voicePromise;
+    const p = (this.voicePromise ??= pickVoice(this.deps.speech, this.deps.voiceTimeoutMs ?? 3000));
+    // Not found yet is not final: voices can appear later (e.g. after the first tap on iOS).
+    void p.then((v) => {
+      if (!v && this.voicePromise === p) this.voicePromise = null;
+    });
+    return p;
   }
 
   unlock(): void {
