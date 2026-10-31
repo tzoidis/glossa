@@ -14,6 +14,7 @@ Offline PWA with Greek reading games for a first-grade child, following the book
 - `npm run word-list` – regenerates `docs/word-list.md` (the parent's approval list) from `words.json`
 - `npm run build && npm run preview` – production build with the service worker (the dev server has no service worker)
 - `bash scripts/icons/render.sh` – re-renders the PNG app icons from `public/icon.svg` with headless Edge
+- `python scripts/voice/generate.py` – re-creates the instruction and praise clips (`src/audio/files/`) from `audio.json` with the Microsoft neural voice el-GR-AthinaNeural, 10% slower; needs `pip install edge-tts` in a separate venv and network. Run it after changing a phrase in `audio.json`. Phonemes stay real recordings.
 
 Node ≥ 22.18 (scripts in `scripts/` run as plain `.ts` via Node type stripping, so use only erasable TS syntax there: no enums, namespaces or parameter properties).
 
