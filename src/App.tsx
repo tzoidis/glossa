@@ -8,7 +8,12 @@ import { Village } from './screens/Village.tsx';
 import { ErrorBoundary } from './ui/ErrorBoundary.tsx';
 import { Mascot } from './ui/Mascot.tsx';
 
-type Screen = { name: 'start' } | { name: 'home' } | { name: 'session'; exerciseId: string } | { name: 'village' } | { name: 'parent' };
+type Screen =
+  | { name: 'start' }
+  | { name: 'home' }
+  | { name: 'session'; exerciseId: string }
+  | { name: 'village' }
+  | { name: 'parent'; from: 'start' | 'home' };
 
 function Screens() {
   const { settings } = useApp();
@@ -27,6 +32,7 @@ function Screens() {
               setWelcome(w);
               home();
             }}
+            onParent={() => setScreen({ name: 'parent', from: 'start' })}
           />
         )}
         {screen.name === 'home' && (
@@ -34,12 +40,13 @@ function Screens() {
             after={welcome}
             onPlay={(exerciseId) => setScreen({ name: 'session', exerciseId })}
             onVillage={village}
-            onParent={() => setScreen({ name: 'parent' })}
+            onParent={() => setScreen({ name: 'parent', from: 'home' })}
           />
         )}
         {screen.name === 'session' && <Session firstExerciseId={screen.exerciseId} onHome={home} onVillage={village} />}
         {screen.name === 'village' && <Village onHome={home} />}
-        {screen.name === 'parent' && <Parent onClose={home} />}
+        {/* back to «Πάμε!» when opened there: its tap is what unlocks the sound */}
+        {screen.name === 'parent' && <Parent onClose={() => (screen.from === 'start' ? setScreen({ name: 'start' }) : home())} />}
       </ErrorBoundary>
     </div>
   );

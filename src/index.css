@@ -92,6 +92,27 @@ button {
 }
 
 /* small and plain on purpose: for the parent, not an invitation to the child */
+.parent-entry {
+  margin-top: 32px;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.parent-entry p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.parent-entry .parent-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .parent-lock {
   width: 48px;
   height: 48px;
@@ -195,6 +216,24 @@ button {
   cursor: pointer;
   font-weight: 600;
   padding: 6px 0;
+}
+
+.guide details {
+  margin-top: 0;
+}
+
+.guide summary {
+  font-size: 1.25rem;
+}
+
+.guide h3 {
+  margin: 16px 0 4px;
+  font-size: 1rem;
+}
+
+.guide p {
+  margin: 0;
+  line-height: 1.5;
 }
 
 .parent-list {
