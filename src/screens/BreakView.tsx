@@ -26,8 +26,9 @@ export function useUnplaced() {
   useEffect(() => {
     void worldItems(db, child.id).then((all) => setItems(all.filter((i) => i.x === null)));
   }, [db, child.id]);
-  const place = (item: WorldItem) => {
-    const { x, y } = randomGroundSpot();
+  /** at `spot` (scene percent) when dropped there, else somewhere on the grass */
+  const place = (item: WorldItem, spot = randomGroundSpot()) => {
+    const { x, y } = spot;
     setItems((list) => list.filter((i) => i.id !== item.id));
     return placeWorldItem(db, item.id, x, y);
   };
