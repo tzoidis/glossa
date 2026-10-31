@@ -5,7 +5,7 @@ import { t, type UiKey } from '../../i18n.ts';
 import { Picture } from '../../ui/Picture.tsx';
 import { useUpdateSettings } from './useSettings.ts';
 
-type Status = 'ok' | 'off' | 'later' | 'noVoice' | 'noPhonemes' | 'noContent';
+type Status = 'ok' | 'off' | 'later' | 'noVoice' | 'noContent';
 
 /** Why an exercise is or is not offered to the child right now. */
 export function exerciseStatus({ module: m }: ExerciseEntry, app: App): Status {
@@ -13,7 +13,6 @@ export function exerciseStatus({ module: m }: ExerciseEntry, app: App): Status {
   if (settings.enabledExercises && !settings.enabledExercises.includes(m.id)) return 'off';
   if (m.requires.minGraphemes > settings.upToPosition) return 'later';
   if (m.requires.needs.includes('localTTS') && !app.voice) return 'noVoice';
-  if (m.requires.needs.includes('phonemeAudio') && !app.hasPhonemeAudio) return 'noPhonemes';
   const ctx = buildGenerateContext({ content: app.content, allow: app.allow, level: 1, recentWordIds: [], reviewQueue: [], seed: 1 });
   return canGenerate(m, ctx) ? 'ok' : 'noContent';
 }

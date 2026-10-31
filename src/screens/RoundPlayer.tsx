@@ -8,10 +8,14 @@ import { buildGenerateContext } from '../app/generateContext.ts';
 import { newSeed } from '../engine/rng.ts';
 import type { AnswerLog, Round } from '../engine/types.ts';
 import { findExercise } from '../exercises/registry.ts';
-import { DemoProvider } from '../exercises/shared/demo.tsx';
+import { DemoProvider, InstructionHeard } from '../exercises/shared/demo.tsx';
 import { completeRound, dueReviewKeys, recentWordIds, recordAnswer } from '../storage/progress.ts';
 
-const wordIdOfItem = (item: unknown) => (item as { wordId?: string }).wordId ?? '';
+/** what a question is about: its word, or its target for questions without one (a syllable) */
+const wordIdOfItem = (item: unknown) => {
+  const i = item as { wordId?: string; target?: unknown };
+  return i.wordId ?? String(i.target ?? '');
+};
 
 export function RoundPlayer({ exerciseId, onComplete }: { exerciseId: string; onComplete(): void }) {
   const app = useApp();
@@ -20,6 +24,7 @@ export function RoundPlayer({ exerciseId, onComplete }: { exerciseId: string; on
   const [round, setRound] = useState<Round | null>(null);
   const [practice, setPractice] = useState<Round | null>(null);
   const [demoDone, setDemoDone] = useState(() => app.settings.seenDemos.includes(exerciseId));
+  const demoShown = useRef(!demoDone);
   const finished = useRef(false);
 
   useEffect(() => {
@@ -90,5 +95,7 @@ export function RoundPlayer({ exerciseId, onComplete }: { exerciseId: string; on
       .finally(onComplete);
   };
 
-  return <Component key="round" round={round} onAnswer={onAnswer} onComplete={complete} />;
+  const real = <Component key="round" round={round} onAnswer={onAnswer} onComplete={complete} />;
+  // the demo just played the instruction: do not repeat it
+  return demoShown.current ? <InstructionHeard>{real}</InstructionHeard> : real;
 }

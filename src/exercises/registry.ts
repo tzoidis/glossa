@@ -7,7 +7,7 @@ import { firstLetter } from './firstLetter/index.ts';
 import { joinSyllables } from './joinSyllables/index.ts';
 import { NotEnoughContent } from './pool.ts';
 import { syllableCount } from './syllableCount/index.ts';
-import { whichLetter } from './whichLetter/index.ts';
+import { whichSyllable } from './whichSyllable/index.ts';
 import { wordPicture } from './wordPicture/index.ts';
 import type { ExerciseModule, GenerateContext } from './types.ts';
 
@@ -25,7 +25,7 @@ export const EXERCISES: ExerciseEntry[] = [
   { module: syllableCount, mechanism: 'tap-choice', icon: '1F44F' },
   { module: wordPicture, mechanism: 'listen-image', icon: '1F4D6' },
   { module: buildWord, mechanism: 'order', icon: '1F9F1' },
-  { module: whichLetter, mechanism: 'tap-choice', icon: '1F4E3' },
+  { module: whichSyllable, mechanism: 'tap-choice', icon: '1F4E3' },
   { module: blendSounds, mechanism: 'listen-image', icon: '1F50A' },
 ];
 
@@ -33,7 +33,6 @@ export interface Availability {
   position: number;
   enabledExercises: string[] | null;
   hasLocalVoice: boolean;
-  hasPhonemeAudio: boolean;
 }
 
 export function availableExercises(entries: ExerciseEntry[], a: Availability): ExerciseEntry[] {
@@ -41,7 +40,6 @@ export function availableExercises(entries: ExerciseEntry[], a: Availability): E
     if (a.enabledExercises && !a.enabledExercises.includes(m.id)) return false;
     if (m.requires.minGraphemes > a.position) return false;
     if (m.requires.needs.includes('localTTS') && !a.hasLocalVoice) return false;
-    if (m.requires.needs.includes('phonemeAudio') && !a.hasPhonemeAudio) return false;
     return true;
   });
 }

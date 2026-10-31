@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useApp } from '../../app/AppContext.tsx';
 import { t } from '../../i18n.ts';
 import { IconButton } from '../../ui/IconButton.tsx';
@@ -20,24 +20,28 @@ export function BlendSounds(props: ExerciseProps) {
   const { content } = useApp();
   const [beat, setBeat] = useState(-1);
 
-  // one sound at a time, with a dot lighting up for each (also works muted)
-  const playSounds = async (i: BlendSoundsItem, slow: boolean) => {
-    for (let k = 0; k < i.sounds.length; k++) {
+  // one syllable at a time, with a dot lighting up for each (also works muted);
+  // false if a tap or the next question cut it short
+  const passes = useRef(0);
+  const playSyllables = async (i: BlendSoundsItem, slow: boolean) => {
+    const run = audio.sequence();
+    const pass = ++passes.current;
+    for (let k = 0; k < i.syllables.length && run.alive(); k++) {
       setBeat(k);
-      await audio.phoneme(i.sounds[k]!);
-      await sleep(slow ? SLOW_GAP_MS : GAP_MS);
+      await audio.syllable(i.syllables[k]!, slow);
+      if (run.alive()) await sleep(slow ? SLOW_GAP_MS : GAP_MS);
     }
-    setBeat(-1);
+    if (pass === passes.current) setBeat(-1);
+    return run.alive();
   };
 
   const { item, pick, stateOf, showHand } = useChoiceRound<BlendSoundsItem>(props, {
     exerciseId: BLEND_SOUNDS_ID,
     itemId: (i) => wordItemId(i.wordId),
-    prompt: playSounds,
-    // after the slow sounds, the whole word once (pictures, not text: hearing it is fine)
-    onWrong: async (i) => {
-      await playSounds(i, true);
-      await audio.word(i.wordId, i.text);
+    // after a mistake: the syllables slowly, then the whole word once
+    // (pictures, not text: hearing it is fine)
+    prompt: async (i, slow) => {
+      if ((await playSyllables(i, slow)) && slow) await audio.word(i.wordId, i.text);
     },
   });
 
@@ -45,11 +49,11 @@ export function BlendSounds(props: ExerciseProps) {
     <div className="exercise-stage blend-sounds">
       <div className="prompt">
         <div className="beats" aria-hidden>
-          {item.sounds.map((_, k) => (
+          {item.syllables.map((_, k) => (
             <span key={k} className={`beat ${k === beat ? 'on' : ''}`} />
           ))}
         </div>
-        <IconButton label={t('exercise.listen')} onClick={() => void playSounds(item, false)}>
+        <IconButton label={t('exercise.listen')} onClick={() => audio.replay(() => playSyllables(item, false))}>
           <SpeakerIcon />
         </IconButton>
       </div>

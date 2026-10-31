@@ -14,7 +14,8 @@ Offline PWA with Greek reading games for a first-grade child, following the book
 - `npm run word-list` – regenerates `docs/word-list.md` (the parent's approval list) from `words.json`
 - `npm run build && npm run preview` – production build with the service worker (the dev server has no service worker)
 - `bash scripts/icons/render.sh` – re-renders the PNG app icons from `public/icon.svg` with headless Edge
-- `python scripts/voice/generate.py` – re-creates the instruction and praise clips (`src/audio/files/`) from `audio.json` with the Microsoft neural voice el-GR-AthinaNeural, 10% slower; needs `pip install edge-tts` in a separate venv and network. Run it after changing a phrase in `audio.json`. Phonemes stay real recordings.
+- `python scripts/voice/generate.py` – re-creates the instruction and praise clips (`src/audio/files/`) from `audio.json` with the Microsoft neural voice el-GR-AthinaNeural, 10% slower; needs `pip install edge-tts` in a separate venv and network. Run it after changing a phrase in `audio.json`.
+- `node scripts/voice/syllable-list.ts > syllables.json` then `python scripts/voice/generate.py --syllables syllables.json --skip-existing` – makes the syllable clips (`src/audio/files/syllable/<sound key>.mp3`); run after adding words or letters. The service drops requests, so rerun until nothing is missing.
 
 Node ≥ 22.18 (scripts in `scripts/` run as plain `.ts` via Node type stripping, so use only erasable TS syntax there: no enums, namespaces or parameter properties).
 
@@ -28,7 +29,8 @@ Node ≥ 22.18 (scripts in `scripts/` run as plain `.ts` via Node type stripping
 - **Do not "fix" `curriculum.json` or word flags without asking.** Letter order and pronunciation flags come from the book and the parent.
 - **The allowed-words rule (PRD §3) applies to every string that reaches the screen**: words, sentences, wrong choices, keyboard keys.
 - **Every new exercise needs:** `requires`, a seeded property test, an audio instruction (file, not TTS), a first-time demo, and a tap alternative to every drag.
-- TTS is only for whole words and sentences, only with a local `el-GR` voice; never for phonemes or letter names.
+- The sound games use **syllables, not phonemes**: synthetic phonemes sound wrong (tried). Syllable clips are keyed by sound (`syllableSoundKey`: «τή», «τι» → `syllable/τι`) so homophone spellings share one clip.
+- Device TTS is only for words, sentences and syllables without a clip, only with a local `el-GR` voice; never for phonemes or letter names.
 - Reading material is never played automatically.
 
 ## PWA
@@ -64,7 +66,7 @@ src/
   engine/     tokenizer, allowed words, round generator, adaptive, review queue, rng
   exercises/  one folder per exercise type (shared ExerciseModule interface)
   audio/      AudioService (+ MockAudioService), recordings list, bundled files
-    files/    <kind>/<key>.<ext> recordings shipped in the app (phoneme/σ.m4a, instruction/welcome.mp3)
+    files/    <kind>/<key>.<ext> clips shipped in the app (instruction/welcome.mp3, praise/1.mp3, syllable/σα.mp3)
   screens/    Start, Home, Village, Session, Parent
   storage/    Dexie db, migrations (append-only; openDb snapshots before upgrading), backup
 scripts/      validate-content.ts, build-openmoji-subset.ts

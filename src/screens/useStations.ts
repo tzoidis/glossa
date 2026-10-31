@@ -6,18 +6,17 @@ import { availableExercises, canGenerate, EXERCISES, findExercise } from '../exe
 
 /** Picks the next stations (STATIONS_PER_CHOICE) from the exercises available right now. */
 export function useStations() {
-  const { settings, voice, content, allow, hasPhonemeAudio } = useApp();
+  const { settings, voice, content, allow } = useApp();
   const available = useMemo(
     () =>
       availableExercises(EXERCISES, {
         position: settings.upToPosition,
         enabledExercises: settings.enabledExercises,
         hasLocalVoice: voice !== null,
-        hasPhonemeAudio,
       })
         .filter((e) => canGenerate(e.module, buildGenerateContext({ content, allow, level: 1, recentWordIds: [], reviewQueue: [], seed: 1 })))
         .map((e) => ({ id: e.module.id, mechanism: e.mechanism })),
-    [settings, voice, content, allow, hasPhonemeAudio],
+    [settings, voice, content, allow],
   );
 
   return useCallback(

@@ -38,7 +38,7 @@ export function SyllableCount(props: ExerciseProps) {
     <div className="exercise-stage syllable-count">
       <div className="prompt">
         <Picture imageId={item.imageId} size={200} />
-        <IconButton label={t('exercise.listen')} onClick={() => void audio.word(item.wordId, item.text)}>
+        <IconButton label={t('exercise.listen')} onClick={() => audio.replay(() => audio.word(item.wordId, item.text))}>
           <SpeakerIcon />
         </IconButton>
       </div>

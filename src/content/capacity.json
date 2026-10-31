@@ -5,7 +5,7 @@
   "exercises": {
     "syllable-count": { "from": 0, "shows": "none", "needsImage": true },
     "blend-sounds": { "from": 0, "shows": "none", "needsImage": true },
-    "which-letter": { "from": 1, "shows": "graphemes" },
+    "which-syllable": { "from": 2, "shows": "graphemes" },
     "first-letter": { "from": 2, "shows": "first-grapheme", "needsImage": true },
     "join-syllables": { "from": 3, "shows": "word", "needsImage": true, "minSyllables": 2 },
     "build-word": { "from": 4, "shows": "word", "needsImage": true, "minLetters": 2, "maxLetters": 4 },

@@ -12,7 +12,18 @@ import { StationChoice } from './StationChoice.tsx';
 import { useStations } from './useStations.ts';
 import { DevDebug } from '../ui/DevDebug.tsx';
 
-export function Home({ onPlay, onVillage, onParent }: { onPlay(exerciseId: string): void; onVillage(): void; onParent(): void }) {
+export function Home({
+  after,
+  onPlay,
+  onVillage,
+  onParent,
+}: {
+  /** a clip still playing (the welcome): speak after it, not over it */
+  after?: Promise<unknown> | null;
+  onPlay(exerciseId: string): void;
+  onVillage(): void;
+  onParent(): void;
+}) {
   const { db, child, settings, audio } = useApp();
   const nextStations = useStations();
   // Re-pick when availability changes (the voice check can finish after Home opens).
@@ -25,9 +36,13 @@ export function Home({ onPlay, onVillage, onParent }: { onPlay(exerciseId: strin
 
   useEffect(() => {
     if (limitReached === null) return;
-    void audio.play({ kind: 'instruction', key: limitReached ? 'see-you-tomorrow' : 'choose-station' });
+    const run = audio.sequence();
+    void (async () => {
+      await after;
+      if (run.alive()) await audio.play({ kind: 'instruction', key: limitReached ? 'see-you-tomorrow' : 'choose-station' });
+    })();
     return () => audio.stop();
-  }, [limitReached, audio]);
+  }, [limitReached, audio, after]);
 
   if (limitReached === null) return <main className="screen" />;
 

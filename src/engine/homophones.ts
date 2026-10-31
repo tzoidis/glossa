@@ -23,6 +23,14 @@ export function wordsSoundSame(a: string, b: string): boolean {
   return ga.length === gb.length && ga.every((g, i) => soundsSame(g, gb[i]!));
 }
 
+/**
+ * One key per spoken syllable: accents dropped, each grapheme replaced by its sound
+ * («τή», «τι» and «τυ» → «τι»; «νάς» → «νασ»). Syllable clips are stored under it.
+ */
+export function syllableSoundKey(syllable: string): string {
+  return graphemes(syllable).map(soundOf).join('');
+}
+
 /** Drops candidates that sound like the target or like an earlier kept candidate. */
 export function distinctSounds(target: string, candidates: string[]): string[] {
   const seen = new Set([soundOf(target)]);

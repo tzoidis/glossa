@@ -4,7 +4,7 @@ import { BLEND_SOUNDS_ID, generateBlendSounds } from './generate.ts';
 
 export const blendSounds: ExerciseModule = {
   id: BLEND_SOUNDS_ID,
-  requires: { skills: [], minGraphemes: 0, needs: ['image', 'phonemeAudio'] },
+  requires: { skills: [], minGraphemes: 0, needs: ['image'] },
   generate: generateBlendSounds,
   Component: BlendSounds,
 };

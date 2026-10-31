@@ -30,6 +30,7 @@ export function makeAnswer(
 
 export const wordItemId = (wordId: string) => `word:${wordId}`;
 export const graphemeItemId = (g: string) => `grapheme:${g}`;
+export const syllableItemId = (s: string) => `syllable:${s}`;
 
 export function wordIdOf(itemId: string): string | null {
   return itemId.startsWith('word:') ? itemId.slice(5) : null;

@@ -1,9 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import curriculum from '../content/curriculum.json' with { type: 'json' };
-import type { Curriculum } from '../engine/types.ts';
 import { BrowserAudioService, pickVoice, type AudioDeps, type PlayerLike, type SpeechLike, type UtteranceLike, type VoiceLike } from './AudioService.ts';
 import { MockAudioService } from './MockAudioService.ts';
-import { phonemeKey, requiredRecordings } from './recordings.ts';
+import { audioKey, requiredRecordings } from './recordings.ts';
 
 const voice = (lang: string, localService: boolean, name = lang): VoiceLike => ({ name, lang, localService, default: false });
 
@@ -169,14 +167,48 @@ describe('BrowserAudioService', () => {
   });
 });
 
-describe('requiredRecordings', () => {
-  const required = requiredRecordings(curriculum as Curriculum);
+describe('BrowserAudioService timing', () => {
+  it('a clip replaced while it looks for its source never plays (no overlap)', async () => {
+    const { service, played } = makeService({ bundled: { 'instruction/welcome': '/w.mp3', 'instruction/choose-station': '/c.mp3' } });
+    const first = service.play({ kind: 'instruction', key: 'welcome' });
+    const second = service.play({ kind: 'instruction', key: 'choose-station' });
+    expect(await first).toBeNull();
+    expect(await second).toBe('bundled');
+    expect(played).toEqual(['/c.mp3']);
+  });
 
-  it('records one phoneme per sound', () => {
-    const phonemes = required.filter((r) => r.kind === 'phoneme');
-    expect(phonemeKey('ω')).toBe(phonemeKey('ο'));
-    expect(phonemeKey('η')).toBe(phonemeKey('ει'));
-    expect(phonemes).toHaveLength(29);
+  it('stop() also cancels a clip that has not started yet', async () => {
+    const { service, played } = makeService({ bundled: { 'syllable/σα': '/sa.mp3' } });
+    const p = service.play({ kind: 'syllable', key: 'σα' });
+    service.stop();
+    expect(await p).toBeNull();
+    expect(played).toEqual([]);
+  });
+
+  it('a sequence ends at stop(), not when its own next clip starts', async () => {
+    const { service } = makeService({ bundled: { 'syllable/σα': '/sa.mp3', 'syllable/πα': '/pa.mp3' } });
+    const run = service.sequence();
+    await service.play({ kind: 'syllable', key: 'σα' });
+    await service.play({ kind: 'syllable', key: 'πα' });
+    expect(run.alive()).toBe(true);
+    service.stop();
+    expect(run.alive()).toBe(false);
+    expect(service.sequence().alive()).toBe(true);
+  });
+});
+
+describe('requiredRecordings', () => {
+  const required = requiredRecordings();
+
+  it('no longer asks for letter sounds: the sound games play syllables', () => {
+    expect(required.filter((r) => r.kind === 'phoneme')).toHaveLength(0);
+  });
+
+  it('keys syllables by sound, so homophone spellings share one clip', () => {
+    expect(audioKey('syllable', 'τή')).toBe(audioKey('syllable', 'τι'));
+    expect(audioKey('syllable', 'τύ')).toBe('syllable/τι');
+    expect(audioKey('syllable', 'νάς')).toBe('syllable/νασ');
+    expect(audioKey('syllable', 'πώ')).not.toBe(audioKey('syllable', 'πα'));
   });
 
   it('includes every instruction and praise', () => {

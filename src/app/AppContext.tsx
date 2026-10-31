@@ -2,8 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { createBrowserAudioService, type AudioService, type VoiceInfo } from '../audio/AudioService.ts';
-import { bundledKeys, bundledUrl } from '../audio/bundled.ts';
-import { requiredRecordings } from '../audio/recordings.ts';
+import { bundledUrl } from '../audio/bundled.ts';
 import { makeContext, type AllowContext } from '../engine/allowedWords.ts';
 import { ensureChild, openDb, type GlossaDb } from '../storage/db.ts';
 import { DEFAULT_CHILD_ID, type Child, type Settings } from '../storage/schema.ts';
@@ -17,19 +16,10 @@ export interface App {
   settings: Settings;
   allow: AllowContext;
   voice: VoiceInfo | null;
-  /** every letter sound is recorded (bundled or by the parent): needed by sound exercises */
-  hasPhonemeAudio: boolean;
   /** re-read child and settings after a write */
   refresh(): Promise<void>;
   /** look for the local voice again (call after the first tap: iOS may only list voices then) */
   recheckVoice(): void;
-}
-
-async function allPhonemesRecorded(db: GlossaDb): Promise<boolean> {
-  const have = new Set([...bundledKeys(), ...((await db.recordings.toCollection().primaryKeys()) as string[])]);
-  return requiredRecordings(CONTENT.curriculum)
-    .filter((r) => r.kind === 'phoneme')
-    .every((r) => have.has(r.key));
 }
 
 const AppContext = createContext<App | null>(null);
@@ -46,7 +36,6 @@ interface Loaded {
   child: Child;
   settings: Settings;
   voice: VoiceInfo | null;
-  hasPhonemeAudio: boolean;
 }
 
 export interface AppProviderProps {
@@ -67,8 +56,7 @@ export function AppProvider({ children, audio, dbName, fallback }: AppProviderPr
       const settings = await ensureChild(db, defaultPosition());
       const child = (await db.children.get(DEFAULT_CHILD_ID))!;
       const service = audio ?? createBrowserAudioService(async (key) => (await db.recordings.get(key))?.blob, bundledUrl);
-      const hasPhonemeAudio = await allPhonemesRecorded(db);
-      if (!cancelled) setLoaded({ db, audio: service, child, settings, voice: null, hasPhonemeAudio });
+      if (!cancelled) setLoaded({ db, audio: service, child, settings, voice: null });
       const voice = await service.voice();
       if (!cancelled) setLoaded((l) => l && { ...l, voice });
     })();
@@ -79,12 +67,8 @@ export function AppProvider({ children, audio, dbName, fallback }: AppProviderPr
 
   const refresh = useCallback(async () => {
     if (!loaded) return;
-    const [child, settings, hasPhonemeAudio] = await Promise.all([
-      loaded.db.children.get(DEFAULT_CHILD_ID),
-      loaded.db.settings.get(DEFAULT_CHILD_ID),
-      allPhonemesRecorded(loaded.db),
-    ]);
-    setLoaded((l) => l && { ...l, child: child ?? l.child, settings: settings ?? l.settings, hasPhonemeAudio });
+    const [child, settings] = await Promise.all([loaded.db.children.get(DEFAULT_CHILD_ID), loaded.db.settings.get(DEFAULT_CHILD_ID)]);
+    setLoaded((l) => l && { ...l, child: child ?? l.child, settings: settings ?? l.settings });
   }, [loaded]);
 
   const recheckVoice = useCallback(() => {

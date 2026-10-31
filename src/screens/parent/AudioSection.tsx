@@ -59,7 +59,7 @@ export function AudioSection() {
 
   const reload = useCallback(async () => {
     setRecorded(new Set((await db.recordings.toCollection().primaryKeys()) as string[]));
-    await refresh(); // a new phoneme may unlock the sound games
+    await refresh();
   }, [db, refresh]);
 
   useEffect(() => {
@@ -70,12 +70,14 @@ export function AudioSection() {
   }, [db]);
 
   const sourceOf = (key: string): Source => (recorded.has(key) ? 'recorded' : bundled.has(key) ? 'bundled' : 'missing');
-  const required = requiredRecordings(content.curriculum);
+  const required = requiredRecordings();
   const missing = required.filter((r) => sourceOf(r.key) === 'missing').length;
-  const syllables = useMemo(
-    () => [...new Set(content.words.flatMap((w) => w.syllables.map(lowerKey)))].sort((a, b) => a.localeCompare(b, 'el')),
-    [content.words],
-  );
+  // one row per spoken syllable: «τή» and «τι» share a clip
+  const syllables = useMemo(() => {
+    const byKey = new Map<string, string>();
+    for (const s of content.words.flatMap((w) => w.syllables.map(lowerKey))) if (!byKey.has(audioKey('syllable', s))) byKey.set(audioKey('syllable', s), s);
+    return [...byKey.values()].sort((a, b) => a.localeCompare(b, 'el'));
+  }, [content.words]);
 
   const group = (kind: RequiredRecording['kind']) => required.filter((r) => r.kind === kind);
 
@@ -86,8 +88,8 @@ export function AudioSection() {
       <p className={missing ? 'warn-text' : ''}>{missing ? t('parent.audio.missing', { n: missing }) : t('parent.audio.complete')}</p>
       {!canRecord() && <p className="warn-text">{t('parent.audio.noMic')}</p>}
 
-      {(['phoneme', 'instruction', 'praise'] as const).map((kind) => (
-        <details key={kind} open={kind === 'phoneme' && missing > 0}>
+      {(['instruction', 'praise'] as const).map((kind) => (
+        <details key={kind} open={missing > 0}>
           <summary>{t(`parent.audio.kind.${kind}` as UiKey)}</summary>
           <ul className="parent-list">
             {group(kind).map((r) => (

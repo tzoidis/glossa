@@ -28,7 +28,7 @@ export function WordPicture(props: ExerciseProps) {
           label={t('exercise.listen')}
           onClick={() => {
             markListen();
-            void audio.word(item.wordId, item.text);
+            audio.replay(() => audio.word(item.wordId, item.text));
           }}
         >
           <SpeakerIcon />

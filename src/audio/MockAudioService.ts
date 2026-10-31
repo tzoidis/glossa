@@ -30,6 +30,11 @@ export class MockAudioService implements AudioService {
     this.stops++;
   }
 
+  sequence(): { alive(): boolean } {
+    const at = this.stops;
+    return { alive: () => this.stops === at };
+  }
+
   async voice(): Promise<VoiceInfo | null> {
     return this.voiceInfo;
   }

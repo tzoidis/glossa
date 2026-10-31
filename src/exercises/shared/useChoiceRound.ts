@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { Round } from '../../engine/types.ts';
 import { makeAnswer } from '../answer.ts';
 import type { ExerciseProps } from '../types.ts';
-import { useDemo } from './demo.tsx';
+import { useDemo, useOpensWithInstruction } from './demo.tsx';
 import { NEXT_ITEM_DELAY_MS, useRoundAudio } from './useRoundAudio.ts';
 
 export interface ChoiceItem {
@@ -41,19 +41,18 @@ export function useChoiceRound<T extends ChoiceItem>({ round, onAnswer, onComple
   const cfg = useRef(config);
   cfg.current = config;
 
+  const withInstruction = useOpensWithInstruction(index);
+
   useEffect(() => {
-    let cancelled = false;
     shownAt.current = Date.now();
     usedListen.current = false;
+    const run = audio.sequence();
     (async () => {
-      if (index === 0) await audio.instruction(cfg.current.exerciseId);
-      if (!cancelled) await cfg.current.prompt?.(item, false);
+      if (withInstruction) await audio.instruction(cfg.current.exerciseId);
+      if (run.alive()) await cfg.current.prompt?.(item, false);
     })();
-    return () => {
-      cancelled = true;
-      audio.stop();
-    };
-  }, [index, item, audio]);
+    return () => audio.stop();
+  }, [index, item, audio, withInstruction]);
 
   const log = (given: string, correct: boolean, attempt: 1 | 2, soundsRight = false) =>
     onAnswer(
@@ -72,6 +71,9 @@ export function useChoiceRound<T extends ChoiceItem>({ round, onAnswer, onComple
 
   const pick = async (option: string) => {
     if (solved || faded.includes(option)) return;
+    // a tap ends whatever was playing; what follows plays only if no newer tap came
+    audio.stop();
+    const run = audio.sequence();
     if (option === item.target) {
       log(option, true, mistake ? 2 : 1);
       setSolved(true);
@@ -90,8 +92,8 @@ export function useChoiceRound<T extends ChoiceItem>({ round, onAnswer, onComple
     setMistake(true);
     setFaded((f) => [...f, option]);
     if (soundsRight) await audio.instruction('sounds-right');
-    await cfg.current.onWrong?.(item, option);
-    await cfg.current.prompt?.(item, true);
+    if (run.alive()) await cfg.current.onWrong?.(item, option);
+    if (run.alive()) await cfg.current.prompt?.(item, true);
   };
 
   const stateOf = (option: string): ChoiceState =>

@@ -25,9 +25,15 @@ export interface VoiceInfo {
 export interface AudioService {
   /** Call inside the «Πάμε!» tap: browsers block audio before a user gesture. */
   unlock(): void;
-  /** Resolves when playback ends; null if nothing could be played. */
+  /**
+   * Resolves when playback ends; null if nothing could be played. A new play()
+   * replaces the clip in progress, including one still looking for its source.
+   */
   play(req: AudioRequest): Promise<AudioSource | null>;
+  /** Stops the clip and ends every running sequence (a new tap, leaving a screen). */
   stop(): void;
+  /** For a run of several clips: alive() turns false at the next stop(). */
+  sequence(): { alive(): boolean };
   resolveSource(req: AudioRequest): Promise<AudioSource | null>;
   /** The local Greek voice in use, or null (exercises needing localTTS are then hidden). */
   voice(): Promise<VoiceInfo | null>;
@@ -82,9 +88,10 @@ export interface AudioDeps {
   maxStartMs?: number;
 }
 
-/** Instructions are the longest clips (~5 s); phonemes and words are far shorter. */
-const MAX_CLIP_MS = 10_000;
-const MAX_START_MS = 2_000;
+/** Instructions are the longest clips (~6.5 s, ~9 s at slow speed); syllables and words are far shorter. */
+const MAX_CLIP_MS = 15_000;
+/** generous: over Wi-Fi from the dev server, or on a busy device, a clip can take seconds to begin */
+const MAX_START_MS = 5_000;
 const NORMAL_RATE = 0.9;
 const SLOW_RATE = 0.6;
 
@@ -125,6 +132,10 @@ export function pickVoice(speech: SpeechLike | null, timeoutMs: number): Promise
 export class BrowserAudioService implements AudioService {
   private voicePromise: Promise<VoiceLike | null> | null = null;
   private current: { stop(): void } | null = null;
+  /** bumped by every play() and stop(): a play that is no longer the latest gives up */
+  private playSeq = 0;
+  /** bumped by stop() only: ends sequences */
+  private epoch = 0;
   private readonly deps: AudioDeps;
 
   constructor(deps: AudioDeps) {
@@ -164,15 +175,30 @@ export class BrowserAudioService implements AudioService {
   }
 
   stop(): void {
+    this.epoch++;
+    this.playSeq++;
+    this.halt();
+  }
+
+  sequence(): { alive(): boolean } {
+    const epoch = this.epoch;
+    return { alive: () => this.epoch === epoch };
+  }
+
+  private halt(): void {
     this.current?.stop();
     this.current = null;
   }
 
   async play(req: AudioRequest): Promise<AudioSource | null> {
-    this.stop();
+    const seq = ++this.playSeq;
+    this.halt();
     const key = audioKey(req.kind, req.key);
+    // looking up a recording takes a moment: a newer play() or a stop() may come first
+    const superseded = () => seq !== this.playSeq;
 
     const recording = await this.deps.getRecording(key);
+    if (superseded()) return null;
     if (recording) {
       const url = this.deps.createObjectUrl(recording);
       try {
@@ -191,6 +217,7 @@ export class BrowserAudioService implements AudioService {
 
     if (TTS_KINDS.has(req.kind) && req.text) {
       const voice = await this.getVoice();
+      if (superseded()) return null;
       if (voice && this.deps.speech) {
         await this.speak(this.deps.speech, voice, req.text, req.slow);
         return 'tts';

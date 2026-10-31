@@ -15,15 +15,15 @@ export function FirstLetter(props: ExerciseProps) {
     exerciseId: FIRST_LETTER_ID,
     itemId: (i) => wordItemId(i.wordId),
     prompt: (i, slow) => audio.word(i.wordId, i.text, slow),
-    // stressed replay: the first sound, then the word slowly («ννν-ερό»)
-    onWrong: (i) => audio.phoneme(i.target),
+    // hint: the first syllable; the word then replays slowly («νε… νερό»)
+    onWrong: (i) => audio.syllable(i.firstSyllable),
   });
 
   return (
     <div className="exercise-stage first-letter">
       <div className="prompt">
         <Picture imageId={item.imageId} size={200} />
-        <IconButton label={t('exercise.listen')} onClick={() => void audio.word(item.wordId, item.text)}>
+        <IconButton label={t('exercise.listen')} onClick={() => audio.replay(() => audio.word(item.wordId, item.text))}>
           <SpeakerIcon />
         </IconButton>
       </div>

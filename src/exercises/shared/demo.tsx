@@ -13,6 +13,18 @@ export function useDemo(): boolean {
   return useContext(DemoContext);
 }
 
+const InstructionHeardContext = createContext(false);
+
+/** Wraps the real round right after the demo: its instruction was just heard. */
+export function InstructionHeard({ children }: { children: ReactNode }) {
+  return <InstructionHeardContext.Provider value>{children}</InstructionHeardContext.Provider>;
+}
+
+/** Whether the round should open with its spoken instruction. */
+export function useOpensWithInstruction(index: number): boolean {
+  return index === 0 && !useContext(InstructionHeardContext);
+}
+
 /** A paw that taps. Put it inside the element the child should press. */
 export function Hand() {
   return (

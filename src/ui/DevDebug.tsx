@@ -19,7 +19,7 @@ export function DevDebug() {
     return () => clearInterval(id);
   }, []);
 
-  const availability = { position: app.settings.upToPosition, enabledExercises: app.settings.enabledExercises, hasLocalVoice: app.voice !== null, hasPhonemeAudio: app.hasPhonemeAudio };
+  const availability = { position: app.settings.upToPosition, enabledExercises: app.settings.enabledExercises, hasLocalVoice: app.voice !== null };
   const offered = new Set(availableExercises(EXERCISES, availability).map((e) => e.module.id));
   const ctx = () => buildGenerateContext({ content: app.content, allow: app.allow, level: 1, recentWordIds: [], reviewQueue: [], seed: 1 });
 
@@ -27,7 +27,6 @@ export function DevDebug() {
     <pre className="dev-debug">
       {[
         `secure context: ${window.isSecureContext}  speechSynthesis: ${typeof speechSynthesis !== 'undefined'}`,
-        `all letter sounds recorded: ${app.hasPhonemeAudio}`,
         `voice in use:${app.voice ? `${app.voice.name} (${app.voice.lang})` : 'none'}`,
         `position: ${app.settings.upToPosition}`,
         '',

@@ -7,7 +7,8 @@ import { installUpdate, useUpdateReady } from '../app/appUpdate.ts';
 import { t } from '../i18n.ts';
 import { Mascot } from '../ui/Mascot.tsx';
 
-export function Start({ onGo }: { onGo(): void }) {
+/** onGo gets the welcome clip in progress, so the next screen can speak after it. */
+export function Start({ onGo }: { onGo(welcome: Promise<unknown>): void }) {
   const { audio, recheckVoice } = useApp();
   const updateReady = useUpdateReady();
 
@@ -24,8 +25,8 @@ export function Start({ onGo }: { onGo(): void }) {
         onClick={() => {
           audio.unlock();
           recheckVoice();
-          void audio.play({ kind: 'instruction', key: 'welcome' });
-          onGo();
+          // played inside the tap: browsers allow sound only from a user gesture
+          onGo(audio.play({ kind: 'instruction', key: 'welcome' }));
         }}
       >
         {t('start.go')}

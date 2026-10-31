@@ -10,7 +10,7 @@ import { CheckIcon, SpeakerIcon } from '../../ui/Icons.tsx';
 import { Picture } from '../../ui/Picture.tsx';
 import { makeAnswer, wordItemId } from '../answer.ts';
 import type { ExerciseProps } from '../types.ts';
-import { Hand, useDemo } from './demo.tsx';
+import { Hand, useDemo, useOpensWithInstruction } from './demo.tsx';
 import { useDragOrTap } from './useDragOrTap.ts';
 import { NEXT_ITEM_DELAY_MS, useRoundAudio } from './useRoundAudio.ts';
 
@@ -65,13 +65,15 @@ export function OrderExercise({ round, onAnswer, onComplete, exerciseId, tileCla
   const unplaced = item.tiles.filter((tile) => !placed.includes(tile));
   const nextCorrect = expected === undefined ? undefined : unplaced.find((tile) => same(tile.text, expected));
 
+  const withInstruction = useOpensWithInstruction(index);
+
   useEffect(() => {
     shownAt.current = Date.now();
     usedListen.current = false;
     // The instruction is heard; the pieces are reading material and are not.
-    if (index === 0) void audio.instruction(exerciseId);
+    if (withInstruction) void audio.instruction(exerciseId);
     return () => audio.stop();
-  }, [index, audio, exerciseId]);
+  }, [index, audio, exerciseId, withInstruction]);
 
   const log = (given: string, correct: boolean, attempt: 1 | 2, soundsRight = false) =>
     onAnswer(
@@ -97,8 +99,10 @@ export function OrderExercise({ round, onAnswer, onComplete, exerciseId, tileCla
       setMistake(true);
       setShaking(tile.id);
       setTimeout(() => setShaking(null), 500);
+      audio.stop();
+      const run = audio.sequence();
       if (soundsRight) await audio.instruction('sounds-right');
-      void audio.word(item.wordId, item.text, true);
+      if (run.alive()) void audio.word(item.wordId, item.text, true);
       return;
     }
     const next = [...placed, tile];
@@ -123,7 +127,7 @@ export function OrderExercise({ round, onAnswer, onComplete, exerciseId, tileCla
           label={t('exercise.listen')}
           onClick={() => {
             usedListen.current = true; // hearing the word is help on a reading exercise (PRD §4)
-            void audio.word(item.wordId, item.text);
+            audio.replay(() => audio.word(item.wordId, item.text));
           }}
         >
           <SpeakerIcon />

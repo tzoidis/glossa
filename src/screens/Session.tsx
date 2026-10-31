@@ -35,7 +35,9 @@ export function Session({ firstExerciseId, onHome, onVillage }: { firstExerciseI
 
   useEffect(() => {
     const key = phase.kind === 'choose' ? 'choose-station' : phase.kind === 'done' ? (phase.reason === 'limit' ? 'see-you-tomorrow' : 'round-complete') : null;
-    if (key) void audio.play({ kind: 'instruction', key });
+    if (!key) return;
+    void audio.play({ kind: 'instruction', key });
+    return () => audio.stop();
   }, [phase, audio]);
 
   switch (phase.kind) {

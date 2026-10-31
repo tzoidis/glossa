@@ -14,6 +14,8 @@ export interface FirstLetterItem {
   wordId: string;
   text: string;
   imageId: string;
+  /** played as the hint after a wrong answer */
+  firstSyllable: string;
   target: string;
   options: string[];
 }
@@ -37,7 +39,7 @@ export function generateFirstLetter(ctx: GenerateContext): Round {
     }
     const wrong = distinctSounds(target, others).slice(0, count - 1);
     if (wrong.length === 0) throw new NotEnoughContent('no letter that sounds different');
-    return { wordId: w.id, text: w.text, imageId: w.imageId!, target, options: shuffle([target, ...wrong], ctx.rng) };
+    return { wordId: w.id, text: w.text, imageId: w.imageId!, firstSyllable: w.syllables[0]!, target, options: shuffle([target, ...wrong], ctx.rng) };
   });
 
   return { id: `${FIRST_LETTER_ID}-${Math.floor(ctx.rng() * 1e9)}`, exerciseId: FIRST_LETTER_ID, seed: 0, level: ctx.level, items };

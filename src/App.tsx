@@ -13,15 +13,29 @@ type Screen = { name: 'start' } | { name: 'home' } | { name: 'session'; exercise
 function Screens() {
   const { settings } = useApp();
   const [screen, setScreen] = useState<Screen>({ name: 'start' });
+  // the welcome clip from «Πάμε!»: Home speaks only after it ends
+  const [welcome, setWelcome] = useState<Promise<unknown> | null>(null);
   const home = () => setScreen({ name: 'home' });
   const village = () => setScreen({ name: 'village' });
 
   return (
     <div className={`app ${settings.leftHanded ? 'left-handed' : ''}`}>
       <ErrorBoundary onHome={home}>
-        {screen.name === 'start' && <Start onGo={home} />}
+        {screen.name === 'start' && (
+          <Start
+            onGo={(w) => {
+              setWelcome(w);
+              home();
+            }}
+          />
+        )}
         {screen.name === 'home' && (
-          <Home onPlay={(exerciseId) => setScreen({ name: 'session', exerciseId })} onVillage={village} onParent={() => setScreen({ name: 'parent' })} />
+          <Home
+            after={welcome}
+            onPlay={(exerciseId) => setScreen({ name: 'session', exerciseId })}
+            onVillage={village}
+            onParent={() => setScreen({ name: 'parent' })}
+          />
         )}
         {screen.name === 'session' && <Session firstExerciseId={screen.exerciseId} onHome={home} onVillage={village} />}
         {screen.name === 'village' && <Village onHome={home} />}
