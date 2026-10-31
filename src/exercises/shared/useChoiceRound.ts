@@ -7,7 +7,7 @@ import type { Round } from '../../engine/types.ts';
 import { makeAnswer } from '../answer.ts';
 import type { ExerciseProps } from '../types.ts';
 import { useDemo, useOpensWithInstruction } from './demo.tsx';
-import { NEXT_ITEM_DELAY_MS, useRoundAudio } from './useRoundAudio.ts';
+import { useRoundAudio } from './useRoundAudio.ts';
 
 export interface ChoiceItem {
   target: string;
@@ -77,14 +77,13 @@ export function useChoiceRound<T extends ChoiceItem>({ round, onAnswer, onComple
     if (option === item.target) {
       log(option, true, mistake ? 2 : 1);
       setSolved(true);
-      void audio.praise();
-      setTimeout(() => {
+      await audio.praiseThen(() => {
         if (index + 1 >= items.length) return onComplete();
         setIndex(index + 1);
         setFaded([]);
         setMistake(false);
         setSolved(false);
-      }, NEXT_ITEM_DELAY_MS);
+      });
       return;
     }
     const soundsRight = cfg.current.soundsRight?.(item, option) ?? false;

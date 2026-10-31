@@ -12,7 +12,7 @@ import { makeAnswer, wordItemId } from '../answer.ts';
 import type { ExerciseProps } from '../types.ts';
 import { Hand, useDemo, useOpensWithInstruction } from './demo.tsx';
 import { useDragOrTap } from './useDragOrTap.ts';
-import { NEXT_ITEM_DELAY_MS, useRoundAudio } from './useRoundAudio.ts';
+import { useRoundAudio } from './useRoundAudio.ts';
 
 export interface OrderTile {
   id: string;
@@ -110,13 +110,12 @@ export function OrderExercise({ round, onAnswer, onComplete, exerciseId, tileCla
     if (next.length < item.parts.length) return;
 
     log(item.text, true, mistake ? 2 : 1);
-    void audio.praise();
-    setTimeout(() => {
+    await audio.praiseThen(() => {
       if (index + 1 >= items.length) return onComplete();
       setIndex(index + 1);
       setPlaced([]);
       setMistake(false);
-    }, NEXT_ITEM_DELAY_MS);
+    });
   };
 
   return (

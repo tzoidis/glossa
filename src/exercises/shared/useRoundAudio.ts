@@ -1,6 +1,7 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useApp } from '../../app/AppContext.tsx';
 import { praiseKeys } from '../../audio/recordings.ts';
+import { afterClip } from './afterClip.ts';
 
 /** Audio actions every exercise needs. */
 export function useRoundAudio() {
@@ -25,8 +26,25 @@ export function useRoundAudio() {
     [audio],
   );
 
+  const mounted = useRef(true);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+  /**
+   * Praise for a right answer, then `next` once the clip has ended (and at least
+   * NEXT_ITEM_DELAY_MS, so the glow is seen): moving on earlier would cut it off.
+   * Not after the screen is gone (the child left mid-praise).
+   */
+  const praiseThen = useCallback((next: () => void) => afterClip(praise(), NEXT_ITEM_DELAY_MS, () => mounted.current, next), [praise]);
+
   // stable across renders: effects that depend on it must not restart the sound
-  return useMemo(() => ({ instruction, word, syllable, praise, stop, sequence, replay }), [instruction, word, syllable, praise, stop, sequence, replay]);
+  return useMemo(
+    () => ({ instruction, word, syllable, praise, praiseThen, stop, sequence, replay }),
+    [instruction, word, syllable, praise, praiseThen, stop, sequence, replay],
+  );
 }
 
 export const NEXT_ITEM_DELAY_MS = 1100;
