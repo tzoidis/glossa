@@ -47,6 +47,11 @@
   "skill.diaeresis": "Διαλυτικά (καΐκι, κοροϊδεύω)",
 
   "parent.section.exercises": "Παιχνίδια",
+  "parent.section.about": "Σχετικά",
+  "parent.about.app": "Glossa: παιχνίδια ανάγνωσης για την Α' Δημοτικού, γράμμα γράμμα με το βιβλίο «Η γλώσσα μας». Δουλεύει χωρίς σύνδεση και δεν στέλνει πουθενά κανένα δεδομένο.",
+  "parent.about.pictures": "Εικόνες: OpenMoji, το ανοιχτό έργο emoji και εικονιδίων (openmoji.org), με άδεια CC BY-SA 4.0, χωρίς αλλαγές.",
+  "parent.about.font": "Γραμματοσειρά: «Glossa Reading», υποσύνολο της Andika © SIL International, με άδεια SIL Open Font License 1.1 (licenses/OFL.txt).",
+  "parent.about.voice": "Φωνή: «Eleni» από την ElevenLabs.",
   "exercise.first-letter": "Με τι αρχίζει;",
   "exercise.join-syllables": "Ενώνω συλλαβές",
   "exercise.syllable-count": "Πόσες συλλαβές;",

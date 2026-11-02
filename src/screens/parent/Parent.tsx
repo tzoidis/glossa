@@ -9,6 +9,7 @@ import { t } from '../../i18n.ts';
 import { backupDue } from '../../storage/backupFile.ts';
 import { IconButton } from '../../ui/IconButton.tsx';
 import { HomeIcon } from '../../ui/Icons.tsx';
+import { AboutSection } from './AboutSection.tsx';
 import { AudioSection } from './AudioSection.tsx';
 import { BackupSection } from './BackupSection.tsx';
 import { ExercisesSection } from './ExercisesSection.tsx';
@@ -92,6 +93,7 @@ export function Parent({ onClose }: { onClose(): void }) {
           <FlagsSection />
           <OtherSection />
           <BackupSection />
+          <AboutSection />
         </>
       )}
     </main>

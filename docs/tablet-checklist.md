@@ -9,7 +9,7 @@ Tablet: ____________________   OS: ____________   Date: ____________
 | 1 | Installs to the home screen | iPad: Safari → Share → «Προσθήκη στην οθόνη Αφετηρίας». Android: Chrome → ⋮ → «Εγκατάσταση εφαρμογής». The hedgehog icon appears; the app opens full screen. | |
 | 2 | Storage is permanent | Open the installed app → lock (top left) → parent screen. It says «Η αποθήκευση είναι μόνιμη». | |
 | 3 | Sound unlocks on «Πάμε!» | Tap «Πάμε!». The welcome instruction plays. | |
-| 4 | Local Greek voice | Parent screen → Ήχος shows a Greek voice. 👂 and 👏 stations appear. | |
+| 4 | Pictures and font | Stations and word pictures are the OpenMoji drawings (same as on the PC), not the tablet's own emoji. Letters use the reading font (single-storey «α»). | |
 | 5 | Recording and playback | Parent screen → Ήχος → Οδηγίες → «Ηχογράφηση» on one line, «Τέλος», then «Άκουσε». Allow the microphone when asked. | |
 | 6 | Recording survives closing the app | Close the app fully (swipe it away), reopen, play the same recording. | |
 | 7 | Offline | Turn on airplane mode. Open the app from the home screen. Play a whole session (3 rounds). | |

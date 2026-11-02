@@ -57,7 +57,8 @@ Node ≥ 22.18 (scripts in `scripts/` run as plain `.ts` via Node type stripping
 - First-time demo: `RoundPlayer` wraps one practice item in `DemoProvider`; components render `<Hand />` on the right target when `useDemo()` is true. Drags use `useDragOrTap` so a tap always works too.
 - `AnswerLog.itemId` is also the review-queue key: `word:<wordId>` or `grapheme:<g>` (helpers in `src/exercises/answer.ts`). Exercises leave `childId` empty; the session fills it.
 - The pure session flow is `src/engine/session.ts`; persistence of answers, review queue, village items and stars is `src/storage/progress.ts`.
-- `Picture` renders the OpenMoji code with the device emoji font until the OpenMoji subset is bundled.
+- `Picture` shows the bundled OpenMoji SVG (`src/assets/openmoji/<code>.svg`, unchanged, CC BY-SA 4.0); a code without one falls back to the device emoji font. After adding a word or an icon, run `node scripts/build-openmoji-subset.ts` (`src/ui/Picture.test.ts` fails until every word and station has its SVG).
+- The reading font is «Glossa Reading», an Andika subset renamed as the OFL requires (`scripts/fonts/build.py`). Credits for pictures, font and voice are in the parent screen's «Σχετικά»; keep them when an asset changes.
 
 ## Layout
 

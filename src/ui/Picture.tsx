@@ -1,5 +1,14 @@
-// Word pictures. Until the OpenMoji subset is bundled (build-openmoji-subset),
-// this renders the same code point with the device's emoji font.
+// Word pictures: the OpenMoji SVGs bundled by scripts/build-openmoji-subset.ts
+// (src/assets/openmoji/<code>.svg), so they look the same on every device. A code
+// without a bundled picture falls back to the device's emoji font.
+
+const files = import.meta.glob('../assets/openmoji/*.svg', { eager: true, query: '?url', import: 'default' }) as Record<string, string>;
+
+const BY_CODE = new Map(Object.entries(files).map(([path, url]) => [path.replace(/^.*\/|\.svg$/g, ''), url]));
+
+export function pictureUrl(code: string): string | undefined {
+  return BY_CODE.get(code);
+}
 
 const TEXT_DEFAULT_BELOW = 0x1f000; // older symbols need VS16 to render as emoji
 
@@ -10,9 +19,10 @@ export function emojiFromCode(code: string): string {
 }
 
 export function Picture({ imageId, size = 120, className }: { imageId: string; size?: number; className?: string }) {
+  const url = pictureUrl(imageId);
   return (
     <span className={`picture ${className ?? ''}`} style={{ fontSize: size * 0.8, width: size, height: size }} aria-hidden>
-      {emojiFromCode(imageId)}
+      {url ? <img src={url} alt="" width={size} height={size} draggable={false} /> : emojiFromCode(imageId)}
     </span>
   );
 }

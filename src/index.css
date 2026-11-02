@@ -1,3 +1,18 @@
+/* Reading font: Andika (SIL, OFL 1.1), subset and renamed by scripts/fonts/build.py */
+@font-face {
+  font-family: 'Glossa Reading';
+  src: url('./assets/fonts/GlossaReading-Regular.woff2') format('woff2');
+  font-weight: 400 500;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'Glossa Reading';
+  src: url('./assets/fonts/GlossaReading-Bold.woff2') format('woff2');
+  font-weight: 600 700;
+  font-display: block;
+}
+
 :root {
   --bg: #fdf8ee;
   --ink: #1f2a37;
@@ -58,6 +73,13 @@ button {
   justify-content: center;
   line-height: 1;
   font-family: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif;
+}
+
+/* taps and drags belong to the tile or item around the picture */
+.picture img {
+  display: block;
+  pointer-events: none;
+  user-select: none;
 }
 
 /* ---------- layout ---------- */
@@ -236,6 +258,12 @@ button {
   line-height: 1.5;
 }
 
+.credits {
+  margin: 0;
+  padding-left: 20px;
+  line-height: 1.5;
+}
+
 .parent-list {
   list-style: none;
   margin: 0;
@@ -337,7 +365,7 @@ button {
   border-radius: 12px;
   border: 2px solid var(--card-edge);
   background: var(--bg);
-  font-family: 'Andika', system-ui, sans-serif;
+  font-family: 'Glossa Reading', system-ui, sans-serif;
   font-size: 24px;
 }
 
@@ -386,7 +414,7 @@ button {
 
 .recording-text {
   flex: 1 1 200px;
-  font-family: 'Andika', system-ui, sans-serif;
+  font-family: 'Glossa Reading', system-ui, sans-serif;
 }
 
 .button-row {
@@ -659,7 +687,7 @@ button {
   background: var(--card);
   color: var(--ink);
   box-shadow: 0 6px 0 var(--card-edge);
-  font-family: 'Andika', system-ui, sans-serif;
+  font-family: 'Glossa Reading', system-ui, sans-serif;
   font-size: 72px;
   line-height: 1;
   display: inline-flex;
@@ -719,7 +747,7 @@ button {
 }
 
 .reading-word {
-  font-family: 'Andika', system-ui, sans-serif;
+  font-family: 'Glossa Reading', system-ui, sans-serif;
   font-size: 88px;
   line-height: 1.1;
   padding: 8px 32px;
@@ -812,7 +840,7 @@ button {
   border-radius: 28px;
   border: 4px dashed var(--card-edge);
   background: var(--card);
-  font-family: 'Andika', system-ui, sans-serif;
+  font-family: 'Glossa Reading', system-ui, sans-serif;
   font-size: 56px;
   display: flex;
   align-items: center;
