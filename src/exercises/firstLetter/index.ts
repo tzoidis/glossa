@@ -4,7 +4,8 @@ import { FIRST_LETTER_ID, generateFirstLetter } from './generate.ts';
 
 export const firstLetter: ExerciseModule = {
   id: FIRST_LETTER_ID,
-  requires: { skills: [], minGraphemes: 2, needs: ['image', 'localTTS'] },
+  // every bank word ships as a clip (src/audio/files/word/), so no local voice is needed
+  requires: { skills: [], minGraphemes: 2, needs: ['image'] },
   generate: generateFirstLetter,
   Component: FirstLetter,
 };

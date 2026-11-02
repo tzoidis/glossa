@@ -14,8 +14,9 @@ Offline PWA with Greek reading games for a first-grade child, following the book
 - `npm run word-list` – regenerates `docs/word-list.md` (the parent's approval list) from `words.json`
 - `npm run build && npm run preview` – production build with the service worker (the dev server has no service worker)
 - `bash scripts/icons/render.sh` – re-renders the PNG app icons from `public/icon.svg` with headless Edge
-- `python scripts/voice/generate.py` – re-creates the instruction and praise clips (`src/audio/files/`) from `audio.json` with the Microsoft neural voice el-GR-AthinaNeural, 10% slower; needs `pip install edge-tts` in a separate venv and network. Run it after changing a phrase in `audio.json`.
-- `node scripts/voice/syllable-list.ts > syllables.json` then `python scripts/voice/generate.py --syllables syllables.json --skip-existing` – makes the syllable clips (`src/audio/files/syllable/<sound key>.mp3`); run after adding words or letters. The service drops requests, so rerun until nothing is missing.
+- `python scripts/voice/generate.py` – re-creates the instruction and praise clips (`src/audio/files/`) from `audio.json` with the ElevenLabs voice «Eleni» (eleven_multilingual_v2, 24 kHz / 48 kbps); needs `pip install requests` in a separate venv, network, and the parent's paid-plan key in `~/.elevenlabs-key` (never in the repo). `--engine edge` uses the old free Athina voice. Run it after changing a phrase in `audio.json`.
+- `python scripts/voice/generate.py --words [--only <id>]` – the word clips (`src/audio/files/word/<id>.mp3`); run after adding a word (`src/audio/bundled.test.ts` fails until every bank word has one).
+- `node scripts/voice/syllable-list.ts > syllables.json` then `python scripts/voice/generate.py --syllables syllables.json --skip-existing` – makes the syllable clips (`src/audio/files/syllable/<sound key>.mp3`); run after adding words or letters. Rerun until nothing is missing.
 
 Node ≥ 22.18 (scripts in `scripts/` run as plain `.ts` via Node type stripping, so use only erasable TS syntax there: no enums, namespaces or parameter properties).
 
@@ -30,7 +31,7 @@ Node ≥ 22.18 (scripts in `scripts/` run as plain `.ts` via Node type stripping
 - **The allowed-words rule (PRD §3) applies to every string that reaches the screen**: words, sentences, wrong choices, keyboard keys.
 - **Every new exercise needs:** `requires`, a seeded property test, an audio instruction (file, not TTS), a first-time demo, and a tap alternative to every drag.
 - The sound games use **syllables, not phonemes**: synthetic phonemes sound wrong (tried). Syllable clips are keyed by sound (`syllableSoundKey`: «τή», «τι» → `syllable/τι`) so homophone spellings share one clip.
-- Device TTS is only for words, sentences and syllables without a clip, only with a local `el-GR` voice; never for phonemes or letter names.
+- Every bank word, syllable, instruction and praise ships as a clip in one voice (Eleni). Device TTS is only a fallback for text without a clip (future sentences), only with a local `el-GR` voice; never for phonemes or letter names.
 - Reading material is never played automatically.
 
 ## PWA

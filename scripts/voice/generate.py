@@ -1,16 +1,22 @@
-"""Creates the instruction and praise clips from src/content/audio.json, and the
-syllable clips, with a Microsoft neural voice (edge-tts), into
+"""Creates the instruction and praise clips from src/content/audio.json, the
+word clips from words.json and the syllable clips, into
 src/audio/files/<kind>/<key>.mp3.
 
-Runs once on the PC, never in the app. Needs network and `pip install edge-tts`
-(keep it in a separate venv). Phonemes are not made here: a voice cannot say a
-bare sound (PRD §6), so those stay real recordings.
+Runs once on the PC, never in the app. Needs network and, in a separate venv,
+`pip install requests` (ElevenLabs, the default) or `pip install edge-tts`
+(--engine edge, the Microsoft Athina voice used before). ElevenLabs reads its
+key from ~/.elevenlabs-key (one line, outside the repo); the voice is a library
+voice, so the account needs a paid plan (Starter is enough, and its licence
+covers the app). Phonemes are not made here: a voice cannot say a bare sound
+(PRD §6), so those stay real recordings.
 
-    python scripts/voice/generate.py [--voice el-GR-AthinaNeural] [--rate -10%] [--only welcome,1]
+    python scripts/voice/generate.py [--only welcome,1]          # instructions and praise
+    python scripts/voice/generate.py --words [--only duck,pie]
     node scripts/voice/syllable-list.ts > syllables.json
     python scripts/voice/generate.py --syllables syllables.json [--skip-existing]
 
-Syllables are stored by sound (syllableSoundKey: «τή», «τι» → τι.mp3).
+Words are stored by id (word/duck.mp3), syllables by sound (syllableSoundKey:
+«τή», «τι» → syllable/τι.mp3).
 """
 
 import argparse
@@ -19,11 +25,22 @@ import json
 import unicodedata
 from pathlib import Path
 
-import edge_tts
-
 ROOT = Path(__file__).resolve().parents[2]
 AUDIO = ROOT / "src" / "content" / "audio.json"
+WORDS = ROOT / "src" / "content" / "words.json"
 OUT = ROOT / "src" / "audio" / "files"
+
+# «Eleni – a calm female youthful voice», chosen by the parent over Athina
+ELEVEN_VOICE = "aTP4J5SJLQl74WTSRXKW"
+ELEVEN_MODEL = "eleven_multilingual_v2"
+# Alone, multilingual v2 says some syllables wrong («γκε» as «γε»); turbo v2.5
+# told the language is Greek says these right (checked by ear by the parent).
+TURBO = ("eleven_turbo_v2_5", "el")
+MODEL_FOR = {k: TURBO for k in ["γκε", "γκι", "γο", "αρ", "γου", "λι", "ου", "πια", "τζου", "τσου", "χου"]}
+# «γό» still came out as «γκο»; with a capital it does not
+TEXT_FOR = {"γο": "Γό"}
+# 24 kHz, 48 kbps (as the Athina clips were) keeps all clips near 2 MB (PRD §8: first load under 3 MB)
+ELEVEN_FORMAT = "mp3_24000_48"
 
 
 ACCENT = dict(zip("αεηιουω", "άέήίόύώ"))
@@ -42,7 +59,13 @@ def stressed(text):
 
 def syllable_clips(path):
     for key, text in json.loads(Path(path).read_text(encoding="utf-8")).items():
-        yield "syllable", key, stressed(unicodedata.normalize("NFC", text))
+        key = unicodedata.normalize("NFC", key)
+        yield "syllable", key, TEXT_FOR.get(key) or stressed(unicodedata.normalize("NFC", text))
+
+
+def word_clips():
+    for w in json.loads(WORDS.read_text(encoding="utf-8")):
+        yield "word", w["id"], w["text"]
 
 
 def clips():
@@ -53,18 +76,60 @@ def clips():
         yield "praise", str(i), text
 
 
+async def edge(text, path, args):
+    import edge_tts
+
+    for attempt in range(1, 9):
+        try:
+            await edge_tts.Communicate(text, args.voice or "el-GR-AthinaNeural", rate=args.rate, pitch=args.pitch).save(str(path))
+            return True
+        except edge_tts.exceptions.NoAudioReceived:
+            # the service drops some requests; wait and retry
+            path.unlink(missing_ok=True)
+            await asyncio.sleep(2 * attempt)
+    return False
+
+
+def eleven(text, path, args, clip_key):
+    import requests
+
+    api_key = (Path.home() / ".elevenlabs-key").read_text(encoding="utf-8").strip()
+    model, language = MODEL_FOR.get(clip_key, (ELEVEN_MODEL, None))
+    body = {"text": text, "model_id": model}
+    if language:
+        body["language_code"] = language
+    for attempt in range(1, 5):
+        r = requests.post(
+            f"https://api.elevenlabs.io/v1/text-to-speech/{args.voice or ELEVEN_VOICE}",
+            params={"output_format": ELEVEN_FORMAT},
+            headers={"xi-api-key": api_key},
+            json=body,
+            timeout=60,
+        )
+        if r.status_code == 200:
+            path.write_bytes(r.content)
+            return True
+        print(f"  {r.status_code} {r.text[:200]}", flush=True)
+        if r.status_code not in (429, 500, 502, 503):
+            return False
+    return False
+
+
 async def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--voice", default="el-GR-AthinaNeural")
-    parser.add_argument("--rate", default="-10%", help="slower for a 6-year-old")
-    parser.add_argument("--pitch", default="+0Hz")
+    parser.add_argument("--engine", choices=["eleven", "edge"], default="eleven")
+    parser.add_argument("--voice", default="", help="ElevenLabs voice id or edge voice name")
+    parser.add_argument("--rate", default="-10%", help="edge only: slower for a 6-year-old")
+    parser.add_argument("--pitch", default="+0Hz", help="edge only")
     parser.add_argument("--only", default="", help="comma-separated keys")
     parser.add_argument("--syllables", default="", help="JSON from scripts/voice/syllable-list.ts")
+    parser.add_argument("--words", action="store_true", help="one clip per word of words.json")
     parser.add_argument("--skip-existing", action="store_true")
     args = parser.parse_args()
     only = {k for k in args.only.split(",") if k}
 
-    for kind, key, text in syllable_clips(args.syllables) if args.syllables else clips():
+    source = syllable_clips(args.syllables) if args.syllables else word_clips() if args.words else clips()
+    for kind, key, text in source:
         if only and key not in only:
             continue
         path = OUT / kind / f"{key}.mp3"
@@ -72,19 +137,8 @@ async def main():
             continue
         path.parent.mkdir(parents=True, exist_ok=True)
         text = unicodedata.normalize("NFC", text)
-        for attempt in range(1, 9):
-            try:
-                await edge_tts.Communicate(text, args.voice, rate=args.rate, pitch=args.pitch).save(str(path))
-                break
-            except edge_tts.exceptions.NoAudioReceived:
-                # the service drops some requests; wait and retry
-                path.unlink(missing_ok=True)
-                if attempt == 8:
-                    print(f"FAILED {kind}/{key}", flush=True)
-                    break
-                await asyncio.sleep(2 * attempt)
-        if path.exists():
-            print(f"{kind}/{key}.mp3  {text}", flush=True)
+        ok = await edge(text, path, args) if args.engine == "edge" else eleven(text, path, args, key)
+        print(f"{kind}/{key}.mp3  {text}" if ok else f"FAILED {kind}/{key}", flush=True)
 
 
 asyncio.run(main())
