@@ -10,6 +10,7 @@
     "first-letter": { "from": 2, "shows": "first-grapheme", "needsImage": true },
     "join-syllables": { "from": 3, "shows": "word", "needsImage": true, "minSyllables": 2 },
     "build-word": { "from": 4, "shows": "word", "needsImage": true, "minLetters": 2, "maxLetters": 4 },
-    "word-picture": { "from": 4, "shows": "word", "needsImage": true }
+    "word-picture": { "from": 4, "shows": "word", "needsImage": true },
+    "missing-letter": { "from": 4, "shows": "word", "needsImage": true }
   }
 }
