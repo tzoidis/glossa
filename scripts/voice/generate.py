@@ -36,10 +36,11 @@ ELEVEN_MODEL = "eleven_multilingual_v2"
 # Alone, multilingual v2 says some syllables wrong («γκε» as «γε»); turbo v2.5
 # told the language is Greek says these right (checked by ear by the parent).
 TURBO = ("eleven_turbo_v2_5", "el")
-MODEL_FOR = {k: TURBO for k in ["γκε", "γκι", "γο", "αρ", "γου", "λι", "ου", "πια", "τζου", "τσου", "χου"]}
-# «γό» still came out as «γκο»; with a capital it does not
-TEXT_FOR = {"γο": "Γό"}
-# 24 kHz, 48 kbps (as the Athina clips were) keeps all clips near 2 MB (PRD §8: first load under 3 MB)
+MODEL_FOR = {k: TURBO for k in ["γκε", "γκι", "γο", "αρ", "γου", "λι", "ου", "πια", "τζου", "τσου", "χου", "δελ"]}
+# «γό» still came out as «γκο»; with a capital it does not. «δέλ» came out as «ντελ»;
+# trailing dots keep the δ soft
+TEXT_FOR = {"γο": "Γό", "δελ": "δέλ…"}
+# 24 kHz, 48 kbps (as the Athina clips were) keeps the whole app near 3.4 MB (PRD §8: first load under 4 MB)
 ELEVEN_FORMAT = "mp3_24000_48"
 
 

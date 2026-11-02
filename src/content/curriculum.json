@@ -30,7 +30,7 @@
       "title": "Ενότητα 3",
       "graphemes": ["γ", "θ", "χ", "ζ", "φ", "ξ", "ψ", "οι", "ει"],
       "sightWords": [],
-      "unlocksFlags": [],
+      "unlocksFlags": ["soft-g-ch", "synizesis"],
       "skills": []
     },
     {
@@ -38,7 +38,7 @@
       "title": "Ενότητα 4",
       "graphemes": ["αι", "μπ", "ντ", "γκ", "γγ", "αυ", "ευ", "τσ", "τζ"],
       "sightWords": [],
-      "unlocksFlags": [],
+      "unlocksFlags": ["cluster", "double-consonant"],
       "skills": []
     },
     {
