@@ -10,6 +10,7 @@ import { missingLetter } from './missingLetter/index.ts';
 import { NotEnoughContent } from './pool.ts';
 import { syllableCount } from './syllableCount/index.ts';
 import { whichSyllable } from './whichSyllable/index.ts';
+import { whichWord } from './whichWord/index.ts';
 import { wordPicture } from './wordPicture/index.ts';
 import type { ExerciseModule, GenerateContext } from './types.ts';
 
@@ -31,6 +32,7 @@ export const EXERCISES: ExerciseEntry[] = [
   { module: blendSounds, mechanism: 'listen-image', icon: '1F50A' },
   { module: findAll, mechanism: 'tap-many', icon: '1F50D' },
   { module: missingLetter, mechanism: 'tap-choice', icon: '270F' },
+  { module: whichWord, mechanism: 'tap-choice', icon: '1F5E3' },
 ];
 
 export interface Availability {
