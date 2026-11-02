@@ -3,6 +3,7 @@
 
 import { blendSounds } from './blendSounds/index.ts';
 import { buildWord } from './buildWord/index.ts';
+import { findAll } from './findAll/index.ts';
 import { firstLetter } from './firstLetter/index.ts';
 import { joinSyllables } from './joinSyllables/index.ts';
 import { NotEnoughContent } from './pool.ts';
@@ -11,7 +12,7 @@ import { whichSyllable } from './whichSyllable/index.ts';
 import { wordPicture } from './wordPicture/index.ts';
 import type { ExerciseModule, GenerateContext } from './types.ts';
 
-export type Mechanism = 'tap-choice' | 'order' | 'listen-image' | 'trace';
+export type Mechanism = 'tap-choice' | 'tap-many' | 'order' | 'listen-image' | 'trace';
 
 export interface ExerciseEntry {
   module: ExerciseModule;
@@ -27,6 +28,7 @@ export const EXERCISES: ExerciseEntry[] = [
   { module: buildWord, mechanism: 'order', icon: '1F9F1' },
   { module: whichSyllable, mechanism: 'tap-choice', icon: '1F4E3' },
   { module: blendSounds, mechanism: 'listen-image', icon: '1F50A' },
+  { module: findAll, mechanism: 'tap-many', icon: '1F50D' },
 ];
 
 export interface Availability {

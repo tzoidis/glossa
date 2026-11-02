@@ -922,8 +922,28 @@ button {
   }
 }
 
+/* «Βρες όλες»: 4 pictures in two rows of 2, 6 in two rows of 3 (three rows of 2 on a phone) */
+.find-all-grid {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 20px;
+}
+
+.find-all-grid--6 {
+  grid-template-columns: repeat(3, auto);
+}
+
+.find-all .picture-tile {
+  min-width: 128px;
+  height: 128px;
+}
+
 @media (max-width: 600px) {
   :root {
     --gutter: 16px;
+  }
+
+  .find-all-grid--6 {
+    grid-template-columns: repeat(2, auto);
   }
 }
