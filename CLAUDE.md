@@ -16,6 +16,7 @@ Offline PWA with Greek reading games for a first-grade child, following the book
 - `bash scripts/icons/render.sh` – re-renders the PNG app icons from `public/icon.svg` with headless Edge
 - `python scripts/voice/generate.py` – re-creates the instruction and praise clips (`src/audio/files/`) from `audio.json` with the ElevenLabs voice «Eleni» (eleven_multilingual_v2, 24 kHz / 48 kbps); needs `pip install requests` in a separate venv, network, and the parent's paid-plan key in `~/.elevenlabs-key` (never in the repo). `--engine edge` uses the old free Athina voice. Run it after changing a phrase in `audio.json`.
 - `python scripts/voice/generate.py --words [--only <id>]` – the word clips (`src/audio/files/word/<id>.mp3`); run after adding a word (`src/audio/bundled.test.ts` fails until every bank word has one).
+- `python scripts/voice/generate.py --sentences [--only <id>]` – the sentence clips (`src/audio/files/sentence/<id>.mp3`), heard only when the child asks or after a mistake; run after adding a sentence.
 - `node scripts/voice/syllable-list.ts > syllables.json` then `python scripts/voice/generate.py --syllables syllables.json --skip-existing` – makes the syllable clips (`src/audio/files/syllable/<sound key>.mp3`); run after adding words or letters. Rerun until nothing is missing.
 
 Node ≥ 22.18 (scripts in `scripts/` run as plain `.ts` via Node type stripping, so use only erasable TS syntax there: no enums, namespaces or parameter properties).

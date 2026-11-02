@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import audio from '../content/audio.json' with { type: 'json' };
+import sentences from '../content/sentences.json' with { type: 'json' };
 import words from '../content/words.json' with { type: 'json' };
 import { bundledUrl } from './bundled.ts';
 import { audioKey } from './recordings.ts';
@@ -17,6 +18,10 @@ describe('bundled clips', () => {
 
   it('every bank word', () => {
     expect(words.map((w) => audioKey('word', w.id)).filter((k) => !bundledUrl(k))).toEqual([]);
+  });
+
+  it('every sentence', () => {
+    expect(sentences.map((s) => audioKey('sentence', s.id)).filter((k) => !bundledUrl(k))).toEqual([]);
   });
 
   it('every syllable of a bank word', () => {

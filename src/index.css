@@ -986,6 +986,23 @@ button {
   height: 128px;
 }
 
+/* «Σωστό ή λάθος;»: a picture and the sentence to read; on a phone the sentence goes under the picture */
+.true-false .prompt {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.reading-sentence {
+  font-family: 'Glossa Reading', system-ui, sans-serif;
+  font-size: 56px;
+  line-height: 1.2;
+  padding: 12px 28px;
+  border-radius: 28px;
+  background: var(--card);
+  border: 4px solid var(--card-edge);
+  max-width: min(90vw, 900px);
+}
+
 @media (max-width: 600px) {
   :root {
     --gutter: 16px;
@@ -994,4 +1011,10 @@ button {
   .find-all-grid--6 {
     grid-template-columns: repeat(2, auto);
   }
+
+  .reading-sentence {
+    font-size: 36px;
+    padding: 8px 16px;
+  }
 }
+

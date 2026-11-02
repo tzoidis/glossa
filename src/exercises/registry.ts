@@ -9,6 +9,7 @@ import { joinSyllables } from './joinSyllables/index.ts';
 import { missingLetter } from './missingLetter/index.ts';
 import { NotEnoughContent } from './pool.ts';
 import { syllableCount } from './syllableCount/index.ts';
+import { trueFalse } from './trueFalse/index.ts';
 import { whichSyllable } from './whichSyllable/index.ts';
 import { whichWord } from './whichWord/index.ts';
 import { wordPicture } from './wordPicture/index.ts';
@@ -33,6 +34,7 @@ export const EXERCISES: ExerciseEntry[] = [
   { module: findAll, mechanism: 'tap-many', icon: '1F50D' },
   { module: missingLetter, mechanism: 'tap-choice', icon: '270F' },
   { module: whichWord, mechanism: 'tap-choice', icon: '1F5E3' },
+  { module: trueFalse, mechanism: 'tap-choice', icon: '1F914' },
 ];
 
 export interface Availability {

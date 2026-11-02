@@ -11,6 +11,8 @@ export function useRoundAudio() {
   const word = useCallback((id: string, text: string, slow = false) => audio.play({ kind: 'word', key: id, text, slow }), [audio]);
   // bundled clip by sound (src/audio/files/syllable/), else the local voice
   const syllable = useCallback((s: string, slow = false) => audio.play({ kind: 'syllable', key: s, text: s, slow }), [audio]);
+  // bundled clip (src/audio/files/sentence/<id>.mp3), else the local voice
+  const sentence = useCallback((id: string, text: string, slow = false) => audio.play({ kind: 'sentence', key: id, text, slow }), [audio]);
   const praise = useCallback(() => {
     const keys = praiseKeys();
     return audio.play({ kind: 'praise', key: keys[Math.floor(Math.random() * keys.length)]! });
@@ -42,8 +44,8 @@ export function useRoundAudio() {
 
   // stable across renders: effects that depend on it must not restart the sound
   return useMemo(
-    () => ({ instruction, word, syllable, praise, praiseThen, stop, sequence, replay }),
-    [instruction, word, syllable, praise, praiseThen, stop, sequence, replay],
+    () => ({ instruction, word, syllable, sentence, praise, praiseThen, stop, sequence, replay }),
+    [instruction, word, syllable, sentence, praise, praiseThen, stop, sequence, replay],
   );
 }
 
