@@ -1,5 +1,6 @@
 // What a session writes: answers, review queue, village items, stars.
 
+import { nextLevel, readyForNextLetter } from '../engine/adaptive.ts';
 import { dueKeys, reviewId, updateReview } from '../engine/reviewQueue.ts';
 import type { AnswerLog } from '../engine/types.ts';
 import { wordIdOf } from '../exercises/answer.ts';
@@ -29,12 +30,22 @@ export async function recordAnswer(db: GlossaDb, answer: AnswerLog, roundCounter
   });
 }
 
-/** A star for finishing the round, whatever the accuracy (PRD §5). */
-export async function completeRound(db: GlossaDb, childId: string): Promise<Child | undefined> {
+/**
+ * A star for finishing the round, whatever the accuracy (PRD §5). The
+ * first-attempt share, when given, moves that exercise's difficulty level.
+ */
+export async function completeRound(
+  db: GlossaDb,
+  childId: string,
+  result?: { exerciseId: string; share: number | null },
+): Promise<Child | undefined> {
   return db.transaction('rw', db.children, async () => {
     const child = await db.children.get(childId);
     if (!child) return undefined;
-    const updated = { ...child, stars: child.stars + 1, roundsPlayed: (child.roundsPlayed ?? 0) + 1 };
+    const updated: Child = { ...child, stars: child.stars + 1, roundsPlayed: (child.roundsPlayed ?? 0) + 1 };
+    if (result && result.share !== null) {
+      updated.levels = { ...child.levels, [result.exerciseId]: nextLevel(child.levels?.[result.exerciseId], result.share) };
+    }
     await db.children.put(updated);
     return updated;
   });
@@ -60,4 +71,10 @@ export async function worldItems(db: GlossaDb, childId: string): Promise<WorldIt
 
 export async function placeWorldItem(db: GlossaDb, id: string, x: number, y: number): Promise<void> {
   await db.world.update(id, { x, y });
+}
+
+/** Should the parent be reminded to check whether the class moved to the next letter? */
+export async function nextLetterDue(db: GlossaDb, childId: string, since: number, position: number, lastPosition: number): Promise<boolean> {
+  const answers = await db.answers.where('[childId+ts]').between([childId, since], [childId, Infinity]).toArray();
+  return readyForNextLetter(answers, position, lastPosition);
 }

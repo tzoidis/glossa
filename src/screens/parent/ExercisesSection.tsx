@@ -41,6 +41,7 @@ export function ExercisesSection() {
                 <input type="checkbox" checked={enabled.includes(id)} onChange={(e) => toggle(id, e.target.checked)} />
                 <Picture imageId={entry.icon} size={32} />
                 <span className="grow-text">{t(`exercise.${id}` as UiKey)}</span>
+                {status === 'ok' && <span className="status">{t('exercise.level', { n: app.child.levels?.[id]?.level ?? 1 })}</span>}
                 <span className={`status status--${status === 'ok' ? 'ok' : 'warn'}`}>{t(`exercise.status.${status}` as UiKey)}</span>
               </label>
             </li>

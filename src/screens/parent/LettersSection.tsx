@@ -1,4 +1,5 @@
 import { useApp } from '../../app/AppContext.tsx';
+import { useNextLetterDue } from '../../app/useNextLetterDue.ts';
 import { allowedWords, makeContext, unitReached } from '../../engine/allowedWords.ts';
 import { t } from '../../i18n.ts';
 import { useUpdateSettings } from './useSettings.ts';
@@ -8,6 +9,9 @@ export function LettersSection() {
   const update = useUpdateSettings();
   const { curriculum, order } = content;
   const position = settings.upToPosition;
+  const nextLetter = useNextLetterDue();
+  // a new letter, or «not yet», starts the count for the reminder again
+  const setPosition = (p: number) => void update({ upToPosition: p, letterCheckFrom: Date.now() });
 
   const readable = allowedWords(
     content.words,
@@ -19,7 +23,15 @@ export function LettersSection() {
     <section className="parent-card">
       <h2>{t('parent.section.letters')}</h2>
       <p className="help">{t('parent.letters.help')}</p>
-      <button type="button" className={`parent-chip ${position === 0 ? 'selected' : ''}`} onClick={() => void update({ upToPosition: 0 })}>
+      {nextLetter && (
+        <p className="warn-text">
+          {t('parent.letters.nextHint')}{' '}
+          <button type="button" className="parent-button subtle" onClick={() => void update({ letterCheckFrom: Date.now() })}>
+            {t('parent.letters.notYet')}
+          </button>
+        </p>
+      )}
+      <button type="button" className={`parent-chip ${position === 0 ? 'selected' : ''}`} onClick={() => setPosition(0)}>
         {t('parent.letters.none')}
       </button>
       {curriculum.units
@@ -38,7 +50,7 @@ export function LettersSection() {
                       type="button"
                       className={`letter-chip ${p <= position ? 'taught' : ''} ${p === position ? 'selected' : ''}`}
                       aria-pressed={p === position}
-                      onClick={() => void update({ upToPosition: p })}
+                      onClick={() => setPosition(p)}
                     >
                       {g}
                     </button>

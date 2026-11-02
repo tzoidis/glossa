@@ -2,7 +2,7 @@ import 'fake-indexeddb/auto';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { AnswerLog } from '../engine/types.ts';
 import { ensureChild, openDb, type GlossaDb } from './db.ts';
-import { completeRound, dueReviewKeys, placeWorldItem, recentWordIds, recordAnswer, worldItems } from './progress.ts';
+import { completeRound, dueReviewKeys, nextLetterDue, placeWorldItem, recentWordIds, recordAnswer, worldItems } from './progress.ts';
 import { DEFAULT_CHILD_ID } from './schema.ts';
 
 let n = 0;
@@ -70,5 +70,25 @@ describe('completeRound', () => {
     await completeRound(db, DEFAULT_CHILD_ID);
     const child = await completeRound(db, DEFAULT_CHILD_ID);
     expect(child).toMatchObject({ stars: 2, roundsPlayed: 2 });
+  });
+
+  it('moves the level of the exercise played, and keeps it across reads', async () => {
+    const db = await freshDb();
+    await completeRound(db, DEFAULT_CHILD_ID, { exerciseId: 'first-letter', share: 1 });
+    await completeRound(db, DEFAULT_CHILD_ID, { exerciseId: 'first-letter', share: 1 });
+    await completeRound(db, DEFAULT_CHILD_ID, { exerciseId: 'word-picture', share: null });
+    const child = await db.children.get(DEFAULT_CHILD_ID);
+    expect(child?.levels).toEqual({ 'first-letter': { level: 2, goodRounds: 0 } });
+    expect(child?.stars).toBe(3);
+  });
+});
+
+describe('nextLetterDue', () => {
+  it('counts only answers since the letter changed', async () => {
+    const db = await freshDb();
+    const start = ts;
+    for (let i = 0; i < 30; i++) await recordAnswer(db, answer(`word:w${i}`, true), 0);
+    expect(await nextLetterDue(db, DEFAULT_CHILD_ID, 0, 5, 20)).toBe(true);
+    expect(await nextLetterDue(db, DEFAULT_CHILD_ID, start + 2, 5, 20)).toBe(false);
   });
 });

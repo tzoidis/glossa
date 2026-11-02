@@ -5,8 +5,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useApp } from '../app/AppContext.tsx';
 import { buildGenerateContext } from '../app/generateContext.ts';
+import { firstAttemptShare } from '../engine/adaptive.ts';
 import { newSeed } from '../engine/rng.ts';
-import type { AnswerLog, Round } from '../engine/types.ts';
+import type { AnswerLog, Level, Round } from '../engine/types.ts';
 import { findExercise } from '../exercises/registry.ts';
 import { DemoProvider, InstructionHeard } from '../exercises/shared/demo.tsx';
 import { completeRound, dueReviewKeys, recentWordIds, recordAnswer } from '../storage/progress.ts';
@@ -26,6 +27,7 @@ export function RoundPlayer({ exerciseId, onComplete }: { exerciseId: string; on
   const [demoDone, setDemoDone] = useState(() => app.settings.seenDemos.includes(exerciseId));
   const demoShown = useRef(!demoDone);
   const finished = useRef(false);
+  const answers = useRef<AnswerLog[]>([]);
 
   useEffect(() => {
     if (!entry) return;
@@ -35,17 +37,24 @@ export function RoundPlayer({ exerciseId, onComplete }: { exerciseId: string; on
       const inputs = {
         content: app.content,
         allow: app.allow,
-        level: 1 as const,
         recentWordIds: await recentWordIds(db, child.id),
         reviewQueue: await dueReviewKeys(db, child.id, child.roundsPlayed),
       };
       try {
-        const r = entry.module.generate(buildGenerateContext({ ...inputs, seed }));
+        // the child's level for this exercise; a lower one if the words run short there
+        let r: Round | undefined;
+        for (let level: number = child.levels?.[exerciseId]?.level ?? 1; !r; level--) {
+          try {
+            r = entry.module.generate(buildGenerateContext({ ...inputs, level: level as Level, seed }));
+          } catch (e) {
+            if (level === 1) throw e;
+          }
+        }
         if (!cancelled) setRound({ ...r, seed });
         if (!demoDone) {
-          // practice on a word the real round does not use, if there is one
+          // practice on a word the real round does not use, if there is one; always at level 1
           const used = new Set(r.items.map(wordIdOfItem));
-          const extra = entry.module.generate(buildGenerateContext({ ...inputs, recentWordIds: [...used], seed: seed ^ 0x9e3779b9 }));
+          const extra = entry.module.generate(buildGenerateContext({ ...inputs, level: 1, recentWordIds: [...used], seed: seed ^ 0x9e3779b9 }));
           const first = wordIdOfItem(r.items[0]);
           const item =
             extra.items.find((i) => !used.has(wordIdOfItem(i))) ?? // a word the round does not use
@@ -84,13 +93,14 @@ export function RoundPlayer({ exerciseId, onComplete }: { exerciseId: string; on
   }
 
   const onAnswer = (a: AnswerLog) => {
+    answers.current.push(a);
     void recordAnswer(db, { ...a, childId: child.id }, child.roundsPlayed).catch((e) => console.error('recordAnswer', e));
   };
 
   const complete = () => {
     if (finished.current) return;
     finished.current = true;
-    void completeRound(db, child.id)
+    void completeRound(db, child.id, { exerciseId, share: firstAttemptShare(answers.current) })
       .then(() => app.refresh())
       .finally(onComplete);
   };

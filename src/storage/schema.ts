@@ -1,5 +1,6 @@
 // Stored records (PRD §8 Dexie tables). AnswerLog is the PRD schema itself.
 
+import type { ExerciseLevel } from '../engine/adaptive.ts';
 import type { Flag } from '../engine/types.ts';
 
 export const DEFAULT_CHILD_ID = 'child-1';
@@ -13,6 +14,8 @@ export interface Child {
   stars: number;
   /** rounds completed ever; the review queue's clock */
   roundsPlayed: number;
+  /** difficulty per exercise id (PRD §5); missing = level 1 */
+  levels?: Record<string, ExerciseLevel>;
 }
 
 export interface Settings {
@@ -30,6 +33,8 @@ export interface Settings {
   /** exercise ids whose first-time demo has been shown */
   seenDemos: string[];
   lastBackupAt: number | null;
+  /** answers from this time on count for the next-letter reminder; set when the letter changes or the reminder is put off (missing = all) */
+  letterCheckFrom?: number;
 }
 
 export interface ReviewItem {
