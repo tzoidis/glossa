@@ -1003,6 +1003,20 @@ button {
   max-width: min(90vw, 900px);
 }
 
+/* «Φτιάχνω πρόταση»: whole words as tiles; a long sentence wraps */
+.build-sentence .syllable-tile,
+.build-sentence .slot {
+  font-size: 44px;
+  height: 88px;
+  min-width: 88px;
+}
+
+.build-sentence .slots {
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: min(94vw, 1000px);
+}
+
 @media (max-width: 600px) {
   :root {
     --gutter: 16px;

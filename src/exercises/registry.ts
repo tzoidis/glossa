@@ -2,6 +2,7 @@
 // mechanism twice in a row); the icon is the station's picture (OpenMoji code).
 
 import { blendSounds } from './blendSounds/index.ts';
+import { buildSentence } from './buildSentence/index.ts';
 import { buildWord } from './buildWord/index.ts';
 import { findAll } from './findAll/index.ts';
 import { firstLetter } from './firstLetter/index.ts';
@@ -35,6 +36,7 @@ export const EXERCISES: ExerciseEntry[] = [
   { module: missingLetter, mechanism: 'tap-choice', icon: '270F' },
   { module: whichWord, mechanism: 'tap-choice', icon: '1F5E3' },
   { module: trueFalse, mechanism: 'tap-choice', icon: '1F914' },
+  { module: buildSentence, mechanism: 'order', icon: '1F4DD' },
 ];
 
 export interface Availability {

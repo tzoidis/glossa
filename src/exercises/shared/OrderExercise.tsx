@@ -1,4 +1,4 @@
-// Shared "put the pieces in order" exercise (syllables, letters). Slots fill left to
+// Shared "put the pieces in order" exercise (syllables, letters, words of a sentence). Slots fill left to
 // right; a wrong piece bounces back. Drag or tap (PRD §4).
 
 import { useEffect, useRef, useState } from 'react';
@@ -8,7 +8,7 @@ import { t } from '../../i18n.ts';
 import { IconButton } from '../../ui/IconButton.tsx';
 import { CheckIcon, SpeakerIcon } from '../../ui/Icons.tsx';
 import { Picture } from '../../ui/Picture.tsx';
-import { makeAnswer, wordItemId } from '../answer.ts';
+import { makeAnswer, sentenceItemId, wordItemId } from '../answer.ts';
 import type { ExerciseProps } from '../types.ts';
 import { Hand, useDemo, useOpensWithInstruction } from './demo.tsx';
 import { useDragOrTap } from './useDragOrTap.ts';
@@ -21,6 +21,8 @@ export interface OrderTile {
 
 export interface OrderItem {
   wordId: string;
+  /** set when the pieces are the words of a sentence: then it is logged and heard as one */
+  sentenceId?: string;
   text: string;
   imageId: string;
   /** the pieces in the right order, as shown */
@@ -49,7 +51,14 @@ function Tile({ tile, className, onUse, showHand }: { tile: OrderTile; className
   );
 }
 
-export function OrderExercise({ round, onAnswer, onComplete, exerciseId, tileClass }: ExerciseProps & { exerciseId: string; tileClass: string }) {
+export function OrderExercise({
+  round,
+  onAnswer,
+  onComplete,
+  exerciseId,
+  tileClass,
+  stageClass = '',
+}: ExerciseProps & { exerciseId: string; tileClass: string; stageClass?: string }) {
   const items = (round as Round).items as OrderItem[];
   const audio = useRoundAudio();
   const demo = useDemo();
@@ -66,6 +75,8 @@ export function OrderExercise({ round, onAnswer, onComplete, exerciseId, tileCla
   const nextCorrect = expected === undefined ? undefined : unplaced.find((tile) => same(tile.text, expected));
 
   const withInstruction = useOpensWithInstruction(index);
+  const say = (slow = false) => (item.sentenceId ? audio.sentence(item.sentenceId, item.text, slow) : audio.word(item.wordId, item.text, slow));
+  const sep = item.sentenceId ? ' ' : '';
 
   useEffect(() => {
     shownAt.current = Date.now();
@@ -78,7 +89,7 @@ export function OrderExercise({ round, onAnswer, onComplete, exerciseId, tileCla
   const log = (given: string, correct: boolean, attempt: 1 | 2, soundsRight = false) =>
     onAnswer(
       makeAnswer(round, {
-        itemId: wordItemId(item.wordId),
+        itemId: item.sentenceId ? sentenceItemId(item.sentenceId) : wordItemId(item.wordId),
         target: item.text,
         given,
         correct,
@@ -95,14 +106,14 @@ export function OrderExercise({ round, onAnswer, onComplete, exerciseId, tileCla
     if (!same(tile.text, expected)) {
       // «πώδι» for «πόδι»: right sound, wrong spelling gets its own gentle message
       const soundsRight = wordsSoundSame(tile.text, expected);
-      if (!mistake) log([...placed.map((p) => p.text), tile.text].join(''), false, 1, soundsRight);
+      if (!mistake) log([...placed.map((p) => p.text), tile.text].join(sep), false, 1, soundsRight);
       setMistake(true);
       setShaking(tile.id);
       setTimeout(() => setShaking(null), 500);
       audio.stop();
       const run = audio.sequence();
       if (soundsRight) await audio.instruction('sounds-right');
-      if (run.alive()) void audio.word(item.wordId, item.text, true);
+      if (run.alive()) void say(true);
       return;
     }
     const next = [...placed, tile];
@@ -119,14 +130,14 @@ export function OrderExercise({ round, onAnswer, onComplete, exerciseId, tileCla
   };
 
   return (
-    <div className="exercise-stage order-exercise">
+    <div className={`exercise-stage order-exercise ${stageClass}`}>
       <div className="prompt">
         <Picture imageId={item.imageId} size={180} />
         <IconButton
           label={t('exercise.listen')}
           onClick={() => {
             usedListen.current = true; // hearing the word is help on a reading exercise (PRD §4)
-            audio.replay(() => audio.word(item.wordId, item.text));
+            audio.replay(() => say());
           }}
         >
           <SpeakerIcon />
