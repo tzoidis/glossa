@@ -155,7 +155,7 @@
   { "id": "glove", "text": "γάντι", "article": "το", "syllables": ["γά", "ντι"], "category": "ρούχα", "imageId": "1F9E4", "flags": [], "tags": [] },
   { "id": "snail", "text": "σαλιγκάρι", "article": "το", "syllables": ["σα", "λι", "γκά", "ρι"], "category": "ζώα", "imageId": "1F40C", "flags": [], "tags": [] },
   { "id": "full-moon", "text": "φεγγάρι", "article": "το", "syllables": ["φε", "γγά", "ρι"], "category": "φύση", "imageId": "1F315", "flags": [], "tags": [] },
-  { "id": "kangaroo", "text": "κάγκουρο", "article": "το", "syllables": ["κά", "γκου", "ρο"], "category": "ζώα", "imageId": "1F998", "flags": [], "tags": [] },
+  { "id": "kangaroo", "text": "καγκουρό", "article": "το", "syllables": ["κα", "γκου", "ρό"], "category": "ζώα", "imageId": "1F998", "flags": [], "tags": [] },
   { "id": "penguin", "text": "πιγκουίνος", "article": "ο", "syllables": ["πι", "γκου", "ί", "νος"], "category": "ζώα", "imageId": "1F427", "flags": [], "tags": [] },
   { "id": "cucumber", "text": "αγγούρι", "article": "το", "syllables": ["α", "γγού", "ρι"], "category": "φαγητό", "imageId": "1F952", "flags": [], "tags": [] },
   { "id": "anchor", "text": "άγκυρα", "article": "η", "syllables": ["ά", "γκυ", "ρα"], "category": "μεταφορικά", "imageId": "2693", "flags": [], "tags": [] },
