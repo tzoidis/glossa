@@ -14,6 +14,7 @@ import { readStory } from './readStory/index.ts';
 import { NotEnoughContent } from './pool.ts';
 import { stress } from './stress/index.ts';
 import { syllableCount } from './syllableCount/index.ts';
+import { trace } from './trace/index.ts';
 import { trueFalse } from './trueFalse/index.ts';
 import { upperLower } from './upperLower/index.ts';
 import { whichSyllable } from './whichSyllable/index.ts';
@@ -47,6 +48,7 @@ export const EXERCISES: ExerciseEntry[] = [
   { module: stress, mechanism: 'tap-choice', icon: '1F4CC' },
   { module: lastSyllable, mechanism: 'tap-choice', icon: '1F3C1' },
   { module: upperLower, mechanism: 'memory', icon: '1F3B4' },
+  { module: trace, mechanism: 'trace', icon: '270D' },
 ];
 
 export interface Availability {

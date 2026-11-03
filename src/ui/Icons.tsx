@@ -40,6 +40,14 @@ export const SpeakerIcon = () => (
   </svg>
 );
 
+/** «show me again»: a circling arrow */
+export const ReplayIcon = () => (
+  <svg {...common} aria-hidden>
+    <path d="M4 12a8 8 0 1 0 2.5-5.8" />
+    <path d="M4 4v4h4" />
+  </svg>
+);
+
 export const CheckIcon = () => (
   <svg {...common} aria-hidden>
     <path d="m5 12 5 5 9-10" />

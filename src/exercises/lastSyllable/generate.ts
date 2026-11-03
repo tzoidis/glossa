@@ -9,7 +9,7 @@ import { graphemes } from '../../engine/greekTokenizer.ts';
 import { syllableSoundKey } from '../../engine/homophones.ts';
 import { detectFlags } from '../../engine/pronunciationFlags.ts';
 import { shuffle } from '../../engine/rng.ts';
-import type { Round, Word } from '../../engine/types.ts';
+import type { Flag, Round, Word } from '../../engine/types.ts';
 import { syllableItemId } from '../answer.ts';
 import { areTaught, isEasyPosition, NotEnoughContent, pickWords } from '../pool.ts';
 import { withoutAccent } from '../stress/generate.ts';
@@ -27,15 +27,37 @@ export interface LastSyllableItem {
   options: string[];
 }
 
-const lastOf = (w: Word) => withoutAccent(w.syllables.at(-1)!.toLocaleLowerCase('el'));
+// a few hundred syllables, looked at thousands of times: worked out once
+const lastCache = new WeakMap<Word, string>();
+const lastOf = (w: Word) => {
+  let s = lastCache.get(w);
+  if (s === undefined) lastCache.set(w, (s = withoutAccent(w.syllables.at(-1)!.toLocaleLowerCase('el'))));
+  return s;
+};
+const partsCache = new Map<string, { gs: string[]; flags: string[]; sound: string }>();
+const partsOf = (s: string) => {
+  let p = partsCache.get(s);
+  if (!p) partsCache.set(s, (p = { gs: graphemes(s), flags: detectFlags(s), sound: syllableSoundKey(s) }));
+  return p;
+};
+const syllablesCache = new Map<string, string[]>();
+const syllablesFor = (ctx: GenerateContext) => {
+  const key = `${[...ctx.allowedGraphemes].join(',')}|${[...ctx.unlockedFlags].join(',')}`;
+  let s = syllablesCache.get(key);
+  if (!s) syllablesCache.set(key, (s = allowedSyllables(ctx)));
+  return s;
+};
 
 /** a syllable may go on screen: taught letters, no locked pronunciation flag */
-const showable = (s: string, ctx: GenerateContext) => areTaught(graphemes(s), ctx) && detectFlags(s).every((f) => ctx.unlockedFlags.has(f));
+const showable = (s: string, ctx: GenerateContext) => {
+  const p = partsOf(s);
+  return areTaught(p.gs, ctx) && p.flags.every((f) => ctx.unlockedFlags.has(f as Flag));
+};
 
 export function generateLastSyllable(ctx: GenerateContext): Round {
   const pool = ctx.wordPool.filter((w) => w.imageId && w.syllables.length >= 2 && showable(lastOf(w), ctx));
   const words = pickWords(pool, ctx);
-  const spare = [...new Set([...allowedSyllables(ctx), ...pool.map(lastOf)])];
+  const spare = [...new Set([...syllablesFor(ctx), ...pool.map(lastOf)])];
 
   const items: LastSyllableItem[] = words.map((w, i) => {
     const target = lastOf(w);
@@ -45,8 +67,14 @@ export function generateLastSyllable(ctx: GenerateContext): Round {
       const first = withoutAccent(w.syllables[0]!.toLocaleLowerCase('el'));
       if (showable(first, ctx)) others = [first, ...others];
     }
-    const seen = new Set([syllableSoundKey(target)]);
-    const wrong = others.filter((s) => !seen.has(syllableSoundKey(s)) && seen.add(syllableSoundKey(s))).slice(0, (hard ? 4 : 3) - 1);
+    const count = (hard ? 4 : 3) - 1;
+    const seen = new Set([partsOf(target).sound]);
+    const wrong: string[] = [];
+    for (const s of others) {
+      if (wrong.length >= count) break;
+      const sound = partsOf(s).sound;
+      if (!seen.has(sound)) wrong.push(s), seen.add(sound);
+    }
     if (wrong.length < 2) throw new NotEnoughContent('too few syllables that sound different');
     return { wordId: w.id, text: w.text, imageId: w.imageId!, target, options: shuffle([target, ...wrong], ctx.rng) };
   });

@@ -1107,6 +1107,117 @@ button {
   background: #e6f4ea;
 }
 
+/* «Γράφω με το δάχτυλο»: the model on top, the writing box under it */
+.trace {
+  gap: 20px;
+}
+
+.trace-model {
+  width: 120px;
+  height: 120px;
+  background: var(--card);
+  border: 4px solid var(--card-edge);
+  border-radius: 24px;
+}
+
+.trace-board {
+  position: relative;
+  width: min(80vw, 54vh, 460px);
+  aspect-ratio: 1;
+}
+
+.trace-pad {
+  width: 100%;
+  height: 100%;
+  background: var(--card);
+  border: 4px solid var(--card-edge);
+  border-radius: 32px;
+  touch-action: none;
+}
+
+.trace-ghost,
+.trace-guide {
+  fill: none;
+  stroke: #cfc6b2;
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.trace-ghost {
+  stroke: #ece6d8;
+}
+
+.trace-lines line {
+  stroke: #e8dfcb;
+  stroke-width: 0.6;
+  stroke-dasharray: 2 2;
+}
+
+.trace-ink,
+.trace-hint {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.trace-hint {
+  stroke: #e8833a;
+  opacity: 0.7;
+}
+
+.trace-done,
+.trace-user {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.trace-user {
+  stroke: #3b6fd6;
+}
+
+.trace-user.fading {
+  opacity: 0.3;
+  stroke-dasharray: 3 3;
+}
+
+.trace-dot circle {
+  fill: #e8833a;
+}
+
+.trace-dot.armed circle {
+  fill: var(--accent);
+}
+
+.trace-dot text {
+  font-size: 8px;
+  font-weight: 700;
+  fill: #fff;
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+.trace-end {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-dasharray: 2 2;
+}
+
+.trace-hand {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
 @media (max-width: 600px) {
   :root {
     --gutter: 16px;
