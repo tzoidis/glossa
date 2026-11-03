@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { useApp } from '../app/AppContext.tsx';
+import { hasTouchScreen } from '../app/device.ts';
 import { buildGenerateContext } from '../app/generateContext.ts';
 import { pickStations } from '../engine/session.ts';
 import { availableExercises, canGenerate, EXERCISES, findExercise } from '../exercises/registry.ts';
@@ -13,6 +14,7 @@ export function useStations() {
         position: settings.upToPosition,
         enabledExercises: settings.enabledExercises,
         hasLocalVoice: voice !== null,
+        hasTouch: hasTouchScreen(),
       })
         .filter((e) => canGenerate(e.module, buildGenerateContext({ content, allow, level: 1, recentWordIds: [], reviewQueue: [], seed: 1 })))
         .map((e) => ({ id: e.module.id, mechanism: e.mechanism })),

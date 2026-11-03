@@ -100,6 +100,7 @@
   "exercise.status.off": "απενεργοποιημένο",
   "exercise.status.later": "από επόμενο γράμμα",
   "exercise.status.noVoice": "χρειάζεται τοπική ελληνική φωνή στη συσκευή",
+  "exercise.status.noTouch": "μόνο σε οθόνη αφής (tablet)",
   "exercise.status.noContent": "δεν υπάρχουν ακόμα αρκετές λέξεις",
 
   "parent.section.time": "Χρόνος ανά ημέρα",

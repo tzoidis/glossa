@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useApp } from '../app/AppContext.tsx';
 import { buildGenerateContext } from '../app/generateContext.ts';
 import { isLocalGreek } from '../audio/AudioService.ts';
+import { hasTouchScreen } from '../app/device.ts';
 import { availableExercises, canGenerate, EXERCISES } from '../exercises/registry.ts';
 
 export function DevDebug() {
@@ -19,7 +20,7 @@ export function DevDebug() {
     return () => clearInterval(id);
   }, []);
 
-  const availability = { position: app.settings.upToPosition, enabledExercises: app.settings.enabledExercises, hasLocalVoice: app.voice !== null };
+  const availability = { position: app.settings.upToPosition, enabledExercises: app.settings.enabledExercises, hasLocalVoice: app.voice !== null, hasTouch: hasTouchScreen() };
   const offered = new Set(availableExercises(EXERCISES, availability).map((e) => e.module.id));
   const ctx = () => buildGenerateContext({ content: app.content, allow: app.allow, level: 1, recentWordIds: [], reviewQueue: [], seed: 1 });
 

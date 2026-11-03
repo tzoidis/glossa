@@ -28,6 +28,8 @@ export interface ExerciseEntry {
   module: ExerciseModule;
   mechanism: Mechanism;
   icon: string;
+  /** practises the hand's movement: pointless with a mouse, so hidden without a touch screen */
+  touchOnly?: boolean;
 }
 
 export const EXERCISES: ExerciseEntry[] = [
@@ -48,17 +50,19 @@ export const EXERCISES: ExerciseEntry[] = [
   { module: stress, mechanism: 'tap-choice', icon: '1F4CC' },
   { module: lastSyllable, mechanism: 'tap-choice', icon: '1F3C1' },
   { module: upperLower, mechanism: 'memory', icon: '1F3B4' },
-  { module: trace, mechanism: 'trace', icon: '270D' },
+  { module: trace, mechanism: 'trace', icon: '270D', touchOnly: true },
 ];
 
 export interface Availability {
   position: number;
   enabledExercises: string[] | null;
   hasLocalVoice: boolean;
+  hasTouch: boolean;
 }
 
 export function availableExercises(entries: ExerciseEntry[], a: Availability): ExerciseEntry[] {
-  return entries.filter(({ module: m }) => {
+  return entries.filter(({ module: m, touchOnly }) => {
+    if (touchOnly && !a.hasTouch) return false;
     if (a.enabledExercises && !a.enabledExercises.includes(m.id)) return false;
     if (m.requires.minGraphemes > a.position) return false;
     if (m.requires.needs.includes('localTTS') && !a.hasLocalVoice) return false;
