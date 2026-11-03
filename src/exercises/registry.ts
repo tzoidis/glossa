@@ -1,23 +1,27 @@
 // All exercise types. The mechanism drives station variety (PRD §5: never the same
 // mechanism twice in a row); the icon is the station's picture (OpenMoji code).
 
+import { article } from './article/index.ts';
 import { blendSounds } from './blendSounds/index.ts';
 import { buildSentence } from './buildSentence/index.ts';
 import { buildWord } from './buildWord/index.ts';
 import { findAll } from './findAll/index.ts';
 import { firstLetter } from './firstLetter/index.ts';
 import { joinSyllables } from './joinSyllables/index.ts';
+import { lastSyllable } from './lastSyllable/index.ts';
 import { missingLetter } from './missingLetter/index.ts';
 import { readStory } from './readStory/index.ts';
 import { NotEnoughContent } from './pool.ts';
+import { stress } from './stress/index.ts';
 import { syllableCount } from './syllableCount/index.ts';
 import { trueFalse } from './trueFalse/index.ts';
+import { upperLower } from './upperLower/index.ts';
 import { whichSyllable } from './whichSyllable/index.ts';
 import { whichWord } from './whichWord/index.ts';
 import { wordPicture } from './wordPicture/index.ts';
 import type { ExerciseModule, GenerateContext } from './types.ts';
 
-export type Mechanism = 'tap-choice' | 'tap-many' | 'order' | 'listen-image' | 'trace';
+export type Mechanism = 'tap-choice' | 'tap-many' | 'order' | 'listen-image' | 'memory' | 'trace';
 
 export interface ExerciseEntry {
   module: ExerciseModule;
@@ -39,6 +43,10 @@ export const EXERCISES: ExerciseEntry[] = [
   { module: trueFalse, mechanism: 'tap-choice', icon: '1F914' },
   { module: buildSentence, mechanism: 'order', icon: '1F4DD' },
   { module: readStory, mechanism: 'listen-image', icon: '1F4DA' },
+  { module: article, mechanism: 'tap-choice', icon: '1F3F7' },
+  { module: stress, mechanism: 'tap-choice', icon: '1F4CC' },
+  { module: lastSyllable, mechanism: 'tap-choice', icon: '1F3C1' },
+  { module: upperLower, mechanism: 'memory', icon: '1F3B4' },
 ];
 
 export interface Availability {
