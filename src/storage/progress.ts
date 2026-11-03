@@ -1,7 +1,7 @@
 // What a session writes: answers, review queue, village items, stars.
 
 import { nextLevel, readyForNextLetter } from '../engine/adaptive.ts';
-import { dueKeys, reviewId, updateReview } from '../engine/reviewQueue.ts';
+import { dueKeys, MAX_INTERVAL, reviewId, updateReview } from '../engine/reviewQueue.ts';
 import type { AnswerLog } from '../engine/types.ts';
 import { wordIdOf } from '../exercises/answer.ts';
 import type { GlossaDb } from './db.ts';
@@ -63,6 +63,17 @@ export async function recentWordIds(db: GlossaDb, childId: string): Promise<stri
 
 export async function dueReviewKeys(db: GlossaDb, childId: string, roundCounter: number): Promise<string[]> {
   return dueKeys(await db.reviewQueue.where('childId').equals(childId).toArray(), roundCounter);
+}
+
+/** «Εξάσκηση σε αυτό» (PRD §7): these items become due now, ahead of the rest of the queue. */
+export async function practiceSoon(db: GlossaDb, childId: string, keys: string[], roundCounter: number, now = Date.now()): Promise<void> {
+  await db.transaction('rw', db.reviewQueue, async () => {
+    for (const key of keys) {
+      const prev = await db.reviewQueue.get(reviewId(childId, key));
+      const base = prev ?? updateReview(undefined, childId, key, false, roundCounter, now);
+      await db.reviewQueue.put({ ...base, interval: 1, dueRound: roundCounter - MAX_INTERVAL });
+    }
+  });
 }
 
 export async function worldItems(db: GlossaDb, childId: string): Promise<WorldItem[]> {

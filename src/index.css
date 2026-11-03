@@ -1043,6 +1043,34 @@ button {
   font-weight: 700;
 }
 
+/* parent «Πρόοδος» */
+.progress-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.progress-table th,
+.progress-table td {
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--card-edge);
+}
+
+.parent-card h3 {
+  margin: 16px 0 6px;
+  font-size: 1rem;
+}
+
+.progress-hard {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.reading-chip {
+  font-family: 'Glossa Reading', system-ui, sans-serif;
+  font-size: 1.3em;
+}
+
 @media (max-width: 600px) {
   :root {
     --gutter: 16px;

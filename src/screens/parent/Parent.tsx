@@ -16,6 +16,7 @@ import { ExercisesSection } from './ExercisesSection.tsx';
 import { GuideSection } from './GuideSection.tsx';
 import { LettersSection } from './LettersSection.tsx';
 import { ParentGate } from './ParentGate.tsx';
+import { ProgressSection } from './ProgressSection.tsx';
 import { FlagsSection, OtherSection, TimeSection } from './SettingsSections.tsx';
 
 function StorageStatus() {
@@ -87,6 +88,7 @@ export function Parent({ onClose }: { onClose(): void }) {
           {backupDue(settings.lastBackupAt, hasProgress) && <p className="warn-text">{t('parent.backupDue')}</p>}
           <GuideSection open={!hasProgress} />
           <LettersSection />
+          {hasProgress && <ProgressSection />}
           <ExercisesSection />
           <TimeSection />
           <AudioSection />

@@ -2,7 +2,7 @@ import 'fake-indexeddb/auto';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { AnswerLog } from '../engine/types.ts';
 import { ensureChild, openDb, type GlossaDb } from './db.ts';
-import { completeRound, dueReviewKeys, nextLetterDue, placeWorldItem, recentWordIds, recordAnswer, worldItems } from './progress.ts';
+import { completeRound, dueReviewKeys, nextLetterDue, placeWorldItem, practiceSoon, recentWordIds, recordAnswer, worldItems } from './progress.ts';
 import { DEFAULT_CHILD_ID } from './schema.ts';
 
 let n = 0;
@@ -90,5 +90,14 @@ describe('nextLetterDue', () => {
     for (let i = 0; i < 30; i++) await recordAnswer(db, answer(`word:w${i}`, true), 0);
     expect(await nextLetterDue(db, DEFAULT_CHILD_ID, 0, 5, 20)).toBe(true);
     expect(await nextLetterDue(db, DEFAULT_CHILD_ID, start + 2, 5, 20)).toBe(false);
+  });
+});
+
+describe('practiceSoon', () => {
+  it('puts the chosen items first in the next round, even ones never missed', async () => {
+    const db = await freshDb();
+    for (const id of ['word:pie', 'word:duck', 'word:hen']) await recordAnswer(db, { ...answer(id, false), ts: Date.now() }, 0);
+    await practiceSoon(db, DEFAULT_CHILD_ID, ['word:apple', 'grapheme:ω'], 3);
+    expect((await dueReviewKeys(db, DEFAULT_CHILD_ID, 3)).slice(0, 2).sort()).toEqual(['grapheme:ω', 'word:apple']);
   });
 });
