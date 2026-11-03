@@ -8,6 +8,7 @@ import { findAll } from './findAll/index.ts';
 import { firstLetter } from './firstLetter/index.ts';
 import { joinSyllables } from './joinSyllables/index.ts';
 import { missingLetter } from './missingLetter/index.ts';
+import { readStory } from './readStory/index.ts';
 import { NotEnoughContent } from './pool.ts';
 import { syllableCount } from './syllableCount/index.ts';
 import { trueFalse } from './trueFalse/index.ts';
@@ -37,6 +38,7 @@ export const EXERCISES: ExerciseEntry[] = [
   { module: whichWord, mechanism: 'tap-choice', icon: '1F5E3' },
   { module: trueFalse, mechanism: 'tap-choice', icon: '1F914' },
   { module: buildSentence, mechanism: 'order', icon: '1F4DD' },
+  { module: readStory, mechanism: 'listen-image', icon: '1F4DA' },
 ];
 
 export interface Availability {

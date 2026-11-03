@@ -1,5 +1,6 @@
 // Copies into src/assets/openmoji/ only the OpenMoji pictures the app shows (PRD §8):
-// every word's imageId in words.json, plus the picture codes written in app code
+// every word's imageId in words.json, the story question pictures in stories.json,
+// plus the picture codes written in app code
 // (station icons, the clap). Unchanged colour SVGs from the tagged release, so the
 // CC BY-SA 4.0 credit on the parent screen is all the licence asks.
 //
@@ -10,6 +11,7 @@
 
 import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import stories from '../src/content/stories.json' with { type: 'json' };
 import words from '../src/content/words.json' with { type: 'json' };
 
 const RELEASE = '17.0.0';
@@ -29,7 +31,10 @@ function codesInSource(dir: string): string[] {
   });
 }
 
-const fromWords = new Set(words.map((w) => w.imageId).filter((id): id is string => Boolean(id)));
+const fromWords = new Set([
+  ...words.map((w) => w.imageId).filter((id): id is string => Boolean(id)),
+  ...stories.flatMap((s) => s.questions.flatMap((q) => q.imageChoices)),
+]);
 const wanted = new Set([...fromWords, ...codesInSource(join(root, 'src'))]);
 mkdirSync(outDir, { recursive: true });
 

@@ -1017,6 +1017,32 @@ button {
   max-width: min(94vw, 1000px);
 }
 
+/* «Διαβάζω μια ιστορία»: the story stays on top, the question under it */
+.read-story {
+  gap: 20px;
+}
+
+.read-story .story {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.story-lines {
+  font-size: 34px;
+  padding: 8px 24px;
+}
+
+.story-lines p {
+  margin: 4px 0;
+}
+
+.story-question {
+  font-family: 'Glossa Reading', system-ui, sans-serif;
+  font-size: 38px;
+  font-weight: 700;
+}
+
 @media (max-width: 600px) {
   :root {
     --gutter: 16px;
@@ -1029,6 +1055,11 @@ button {
   .reading-sentence {
     font-size: 36px;
     padding: 8px 16px;
+  }
+
+  .story-lines,
+  .story-question {
+    font-size: 30px;
   }
 }
 

@@ -20,7 +20,7 @@ export function buildGenerateContext({ content, allow, level, recentWordIds, rev
     wordPool: content.words,
     // the context carries no sight words, so texts are filtered here: only what can be read now
     sentencePool: content.sentences.filter((x) => isTextAllowed(x.tokens.join(' '), allow)),
-    storyPool: content.stories.filter((x) => x.sentences.every((line) => isTextAllowed(line, allow))),
+    storyPool: content.stories.filter((x) => [...x.sentences, ...x.questions.map((q) => q.prompt)].every((line) => isTextAllowed(line, allow))),
     level,
     recentWordIds,
     reviewQueue,

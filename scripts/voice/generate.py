@@ -13,6 +13,7 @@ covers the app). Phonemes are not made here: a voice cannot say a bare sound
     python scripts/voice/generate.py [--only welcome,1]          # instructions and praise
     python scripts/voice/generate.py --words [--only duck,pie]
     python scripts/voice/generate.py --sentences [--only bird-yes]
+    python scripts/voice/generate.py --stories [--only story-cat-fish]
     node scripts/voice/syllable-list.ts > syllables.json
     python scripts/voice/generate.py --syllables syllables.json [--skip-existing]
 
@@ -30,6 +31,7 @@ ROOT = Path(__file__).resolve().parents[2]
 AUDIO = ROOT / "src" / "content" / "audio.json"
 WORDS = ROOT / "src" / "content" / "words.json"
 SENTENCES = ROOT / "src" / "content" / "sentences.json"
+STORIES = ROOT / "src" / "content" / "stories.json"
 OUT = ROOT / "src" / "audio" / "files"
 
 # «Eleni – a calm female youthful voice», chosen by the parent over Athina
@@ -77,6 +79,14 @@ def sentence_clips():
         for tok in s["tokens"]:  # as sentenceText in src/exercises/trueFalse/generate.ts
             text += f" {tok}" if text and tok[0].isalpha() else tok
         yield "sentence", s["id"], text
+
+
+def story_clips():
+    # keys as storyClipKey / questionClipKey in src/exercises/readStory/generate.ts
+    for s in json.loads(STORIES.read_text(encoding="utf-8")):
+        yield "sentence", f"story-{s['id']}", " ".join(s["sentences"])
+        for i, q in enumerate(s["questions"], start=1):
+            yield "sentence", f"story-{s['id']}-q{i}", q["prompt"]
 
 
 def clips():
@@ -136,11 +146,12 @@ async def main():
     parser.add_argument("--syllables", default="", help="JSON from scripts/voice/syllable-list.ts")
     parser.add_argument("--words", action="store_true", help="one clip per word of words.json")
     parser.add_argument("--sentences", action="store_true", help="one clip per sentence of sentences.json")
+    parser.add_argument("--stories", action="store_true", help="one clip per story and per question of stories.json")
     parser.add_argument("--skip-existing", action="store_true")
     args = parser.parse_args()
     only = {k for k in args.only.split(",") if k}
 
-    source = syllable_clips(args.syllables) if args.syllables else word_clips() if args.words else sentence_clips() if args.sentences else clips()
+    source = syllable_clips(args.syllables) if args.syllables else word_clips() if args.words else sentence_clips() if args.sentences else story_clips() if args.stories else clips()
     for kind, key, text in source:
         if only and key not in only:
             continue

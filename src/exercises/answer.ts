@@ -9,7 +9,7 @@ export function newId(): string {
 
 /**
  * Builds an AnswerLog from inside an exercise. The session fills childId.
- * itemId doubles as the review-queue key: "word:<wordId>", "grapheme:<g>", "syllable:<s>" or "sentence:<id>".
+ * itemId doubles as the review-queue key: "word:<wordId>", "grapheme:<g>", "syllable:<s>", "sentence:<id>" or "story:<id>:<question>".
  */
 export function makeAnswer(
   round: Round,
@@ -32,6 +32,7 @@ export const wordItemId = (wordId: string) => `word:${wordId}`;
 export const graphemeItemId = (g: string) => `grapheme:${g}`;
 export const syllableItemId = (s: string) => `syllable:${s}`;
 export const sentenceItemId = (id: string) => `sentence:${id}`;
+export const storyItemId = (id: string, question: number) => `story:${id}:${question}`;
 
 export function wordIdOf(itemId: string): string | null {
   return itemId.startsWith('word:') ? itemId.slice(5) : null;

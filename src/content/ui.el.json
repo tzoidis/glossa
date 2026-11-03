@@ -66,6 +66,7 @@
   "exercise.true-false.yes": "Σωστό",
   "exercise.true-false.no": "Λάθος",
   "exercise.build-sentence": "Φτιάχνω πρόταση",
+  "exercise.read-story": "Διαβάζω μια ιστορία",
   "exercise.level": "επίπεδο {n} από 3",
   "exercise.status.ok": "διαθέσιμο",
   "exercise.status.off": "απενεργοποιημένο",

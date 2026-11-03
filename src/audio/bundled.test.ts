@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import audio from '../content/audio.json' with { type: 'json' };
 import sentences from '../content/sentences.json' with { type: 'json' };
+import stories from '../content/stories.json' with { type: 'json' };
 import words from '../content/words.json' with { type: 'json' };
 import { bundledUrl } from './bundled.ts';
 import { audioKey } from './recordings.ts';
@@ -18,6 +19,11 @@ describe('bundled clips', () => {
 
   it('every bank word', () => {
     expect(words.map((w) => audioKey('word', w.id)).filter((k) => !bundledUrl(k))).toEqual([]);
+  });
+
+  it('every story and story question', () => {
+    const keys = stories.flatMap((s) => [`story-${s.id}`, ...s.questions.map((_, i) => `story-${s.id}-q${i + 1}`)]);
+    expect(keys.map((k) => audioKey('sentence', k)).filter((k) => !bundledUrl(k))).toEqual([]);
   });
 
   it('every sentence', () => {

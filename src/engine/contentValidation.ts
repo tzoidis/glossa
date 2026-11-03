@@ -100,6 +100,7 @@ export function validateTexts(sentences: Sentence[], stories: Story[], curriculu
   for (const st of stories) {
     st.sentences.forEach((s) => check(`story ${st.id}`, s));
     st.questions.forEach((q, i) => {
+      check(`story ${st.id} question ${i}`, q.prompt);
       if (q.answer < 0 || q.answer >= q.imageChoices.length) errors.push(`story ${st.id} question ${i}: answer out of range`);
     });
   }

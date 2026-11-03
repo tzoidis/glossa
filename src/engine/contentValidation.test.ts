@@ -75,7 +75,7 @@ describe('validateTexts', () => {
   it('reports graphemes outside the curriculum and bad story answers', () => {
     const errors = validateTexts(
       [{ id: 's1', tokens: ['Η', 'Τίνα', 'έχει', 'νεράντζι', '.'] }],
-      [{ id: 'st1', sentences: ['Η Τίνα.'], questions: [{ prompt: 'p', imageChoices: ['a'], answer: 1 }] }],
+      [{ id: 'st1', sentences: ['Η Τίνα.'], questions: [{ prompt: 'Η Τίνα;', imageChoices: ['a'], answer: 1 }] }],
       book,
     );
     expect(errors).toHaveLength(2);
