@@ -6,6 +6,7 @@ import { article } from './article/index.ts';
 import { blendSounds } from './blendSounds/index.ts';
 import { buildSentence } from './buildSentence/index.ts';
 import { buildWord } from './buildWord/index.ts';
+import { dictation } from './dictation/index.ts';
 import { digraph } from './digraph/index.ts';
 import { findAll } from './findAll/index.ts';
 import { firstLetter } from './firstLetter/index.ts';
@@ -55,6 +56,7 @@ export const EXERCISES: ExerciseEntry[] = [
   { module: trace, mechanism: 'trace', icon: '270D', touchOnly: true },
   { module: alphabet, mechanism: 'order', icon: '1F522' },
   { module: digraph, mechanism: 'tap-choice', icon: '1F91D' },
+  { module: dictation, mechanism: 'order', icon: '1F3A7' },
 ];
 
 export interface Availability {

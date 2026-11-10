@@ -40,6 +40,14 @@ export const SpeakerIcon = () => (
   </svg>
 );
 
+/** erase the last letter: a key with a cross */
+export const BackspaceIcon = () => (
+  <svg {...common} aria-hidden>
+    <path d="M21 5H9l-6 7 6 7h12z" />
+    <path d="m12 9 6 6M18 9l-6 6" />
+  </svg>
+);
+
 /** «show me again»: a circling arrow */
 export const ReplayIcon = () => (
   <svg {...common} aria-hidden>

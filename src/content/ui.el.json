@@ -98,6 +98,8 @@
   "exercise.digraph": "Δίψηφο ή σύμπλεγμα;",
   "exercise.digraph.one": "δίψηφο",
   "exercise.digraph.two": "σύμπλεγμα",
+  "exercise.dictation": "Υπαγόρευση",
+  "exercise.dictation.erase": "Σβήσε",
   "exercise.trace.again": "Δείξε μου ξανά",
   "exercise.level": "επίπεδο {n} από 3",
   "exercise.status.ok": "διαθέσιμο",
