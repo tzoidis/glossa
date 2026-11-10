@@ -1,10 +1,12 @@
 // All exercise types. The mechanism drives station variety (PRD §5: never the same
 // mechanism twice in a row); the icon is the station's picture (OpenMoji code).
 
+import { alphabet } from './alphabet/index.ts';
 import { article } from './article/index.ts';
 import { blendSounds } from './blendSounds/index.ts';
 import { buildSentence } from './buildSentence/index.ts';
 import { buildWord } from './buildWord/index.ts';
+import { digraph } from './digraph/index.ts';
 import { findAll } from './findAll/index.ts';
 import { firstLetter } from './firstLetter/index.ts';
 import { joinSyllables } from './joinSyllables/index.ts';
@@ -51,6 +53,8 @@ export const EXERCISES: ExerciseEntry[] = [
   { module: lastSyllable, mechanism: 'tap-choice', icon: '1F3C1' },
   { module: upperLower, mechanism: 'memory', icon: '1F3B4' },
   { module: trace, mechanism: 'trace', icon: '270D', touchOnly: true },
+  { module: alphabet, mechanism: 'order', icon: '1F522' },
+  { module: digraph, mechanism: 'tap-choice', icon: '1F91D' },
 ];
 
 export interface Availability {

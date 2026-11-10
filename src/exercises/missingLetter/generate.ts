@@ -27,19 +27,27 @@ export interface MissingLetterItem {
   options: string[];
 }
 
+// the same for every round: tokenized once per word
+const tokensCache = new WeakMap<Word, ReturnType<typeof tokenize>>();
+function tokensOf(w: Word) {
+  let t = tokensCache.get(w);
+  if (!t) tokensCache.set(w, (t = tokenize(w.text)));
+  return t;
+}
+
 /** graphemes that may be left out: plain, so the choices show them exactly as written */
 function gapsOf(w: Word): number[] {
-  return tokenize(w.text).flatMap((t, i) => (!t.accent && !t.diaeresis && t.surface === t.g ? [i] : []));
+  return tokensOf(w).flatMap((t, i) => (!t.accent && !t.diaeresis && t.surface === t.g ? [i] : []));
 }
 
 export function generateMissingLetter(ctx: GenerateContext): Round {
   const letters = [...ctx.allowedGraphemes];
   const pool = ctx.wordPool.filter((w) => w.imageId && isReadable(w, ctx) && gapsOf(w).length > 0);
-  const fitting = pool.filter((w) => tokenize(w.text).length <= MAX_GRAPHEMES[ctx.level]);
+  const fitting = pool.filter((w) => tokensOf(w).length <= MAX_GRAPHEMES[ctx.level]);
   const words = pickWords(fitting.length >= MIN_DISTINCT_WORDS ? fitting : pool, ctx);
 
   const items: MissingLetterItem[] = words.map((w, i) => {
-    const tokens = tokenize(w.text);
+    const tokens = tokensOf(w);
     const hard = ctx.level > 1 && !isEasyPosition(i);
     const count = hard ? 4 : 3;
     // a gap with enough different-sounding choices

@@ -24,7 +24,10 @@ export interface OrderItem {
   /** set when the pieces are the words of a sentence: then it is logged and heard as one */
   sentenceId?: string;
   text: string;
-  imageId: string;
+  /** none for pieces that are not a word (letters in alphabetical order) */
+  imageId?: string;
+  /** review-queue key when the item is neither a word nor a sentence */
+  itemId?: string;
   /** the pieces in the right order, as shown */
   parts: string[];
   tiles: OrderTile[];
@@ -75,7 +78,12 @@ export function OrderExercise({
   const nextCorrect = expected === undefined ? undefined : unplaced.find((tile) => same(tile.text, expected));
 
   const withInstruction = useOpensWithInstruction(index);
-  const say = (slow = false) => (item.sentenceId ? audio.sentence(item.sentenceId, item.text, slow) : audio.word(item.wordId, item.text, slow));
+  // letters in alphabetical order are not a word: nothing to hear
+  const voiced = Boolean(item.sentenceId || item.wordId);
+  const say = async (slow = false) => {
+    if (item.sentenceId) await audio.sentence(item.sentenceId, item.text, slow);
+    else if (item.wordId) await audio.word(item.wordId, item.text, slow);
+  };
   const sep = item.sentenceId ? ' ' : '';
 
   useEffect(() => {
@@ -89,7 +97,7 @@ export function OrderExercise({
   const log = (given: string, correct: boolean, attempt: 1 | 2, soundsRight = false) =>
     onAnswer(
       makeAnswer(round, {
-        itemId: item.sentenceId ? sentenceItemId(item.sentenceId) : wordItemId(item.wordId),
+        itemId: item.itemId ?? (item.sentenceId ? sentenceItemId(item.sentenceId) : wordItemId(item.wordId)),
         target: item.text,
         given,
         correct,
@@ -105,7 +113,7 @@ export function OrderExercise({
     if (solved || expected === undefined) return;
     if (!same(tile.text, expected)) {
       // «πώδι» for «πόδι»: right sound, wrong spelling gets its own gentle message
-      const soundsRight = wordsSoundSame(tile.text, expected);
+      const soundsRight = voiced && wordsSoundSame(tile.text, expected);
       if (!mistake) log([...placed.map((p) => p.text), tile.text].join(sep), false, 1, soundsRight);
       setMistake(true);
       setShaking(tile.id);
@@ -131,18 +139,22 @@ export function OrderExercise({
 
   return (
     <div className={`exercise-stage order-exercise ${stageClass}`}>
-      <div className="prompt">
-        <Picture imageId={item.imageId} size={180} />
-        <IconButton
-          label={t('exercise.listen')}
-          onClick={() => {
-            usedListen.current = true; // hearing the word is help on a reading exercise (PRD §4)
-            audio.replay(() => say());
-          }}
-        >
-          <SpeakerIcon />
-        </IconButton>
-      </div>
+      {(item.imageId || voiced) && (
+        <div className="prompt">
+          {item.imageId && <Picture imageId={item.imageId} size={180} />}
+          {voiced && (
+            <IconButton
+              label={t('exercise.listen')}
+              onClick={() => {
+                usedListen.current = true; // hearing the word is help on a reading exercise (PRD §4)
+                audio.replay(() => say());
+              }}
+            >
+              <SpeakerIcon />
+            </IconButton>
+          )}
+        </div>
+      )}
 
       <div className={`slots ${solved ? 'correct' : ''}`}>
         {item.parts.map((_, k) => (

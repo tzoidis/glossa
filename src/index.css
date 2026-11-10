@@ -1218,6 +1218,22 @@ button {
   pointer-events: none;
 }
 
+/* «Δίψηφο ή σύμπλεγμα;»: the two letters in question, and word labels on the tiles */
+.pair-mark {
+  color: #c2571b;
+  background: #fde9d6;
+  border-radius: 12px;
+  padding: 0 4px;
+}
+
+.digraph .choice-word {
+  font-size: 44px;
+}
+
+.digraph .letter-tile {
+  padding: 0 28px;
+}
+
 @media (max-width: 600px) {
   :root {
     --gutter: 16px;

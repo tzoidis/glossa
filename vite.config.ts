@@ -41,7 +41,8 @@ export default defineConfig({
   ],
   test: {
     include: ['src/**/*.test.{ts,tsx}', 'scripts/**/*.test.ts'],
-    // property tests sweep every position × level × seed
-    testTimeout: 30_000,
+    // property tests sweep every position × level × seed; with 20 games sweeping in
+    // parallel, a busy laptop takes 10-30 s per file, so leave room
+    testTimeout: 60_000,
   },
 });
