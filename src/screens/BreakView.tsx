@@ -6,7 +6,7 @@ import { t } from '../i18n.ts';
 import { placeWorldItem, worldItems } from '../storage/progress.ts';
 import type { WorldItem } from '../storage/schema.ts';
 import { IconButton } from '../ui/IconButton.tsx';
-import { NextIcon } from '../ui/Icons.tsx';
+import { NextIcon, VillageIcon } from '../ui/Icons.tsx';
 import { Mascot } from '../ui/Mascot.tsx';
 import { Picture } from '../ui/Picture.tsx';
 
@@ -45,6 +45,8 @@ export function BreakView({ onContinue }: { onContinue(): void }) {
   const { audio } = useApp();
   const { items, place } = useUnplaced();
   const label = useItemLabel();
+  // what was placed in this break, shown arriving in the village (UI review: it used to just vanish)
+  const [arrived, setArrived] = useState<WorldItem[]>([]);
 
   useEffect(() => {
     void audio.play({ kind: 'instruction', key: 'break' });
@@ -54,9 +56,26 @@ export function BreakView({ onContinue }: { onContinue(): void }) {
   return (
     <div className="break">
       <Mascot mood="happy" size={180} />
+      <div className="break-village" aria-hidden>
+        <VillageIcon />
+        {arrived.map((item) => (
+          <span key={item.id} className="arrived-item">
+            <WorldItemPicture item={item} size={56} />
+          </span>
+        ))}
+      </div>
       <div className="tray">
         {items.map((item) => (
-          <button key={item.id} type="button" className="tray-item" aria-label={label(item)} onClick={() => void place(item)}>
+          <button
+            key={item.id}
+            type="button"
+            className="tray-item"
+            aria-label={label(item)}
+            onClick={() => {
+              setArrived((a) => [...a, item]);
+              void place(item);
+            }}
+          >
             <WorldItemPicture item={item} size={88} />
           </button>
         ))}

@@ -11,6 +11,7 @@ import type { AnswerLog, Level, Round } from '../engine/types.ts';
 import { findExercise } from '../exercises/registry.ts';
 import { DemoProvider, InstructionHeard } from '../exercises/shared/demo.tsx';
 import { completeRound, dueReviewKeys, recentWordIds, recordAnswer } from '../storage/progress.ts';
+import { RoundBar } from './RoundBar.tsx';
 
 /** what a question is about: its word, or its target for questions without one (a syllable) */
 const wordIdOfItem = (item: unknown) => {
@@ -18,7 +19,10 @@ const wordIdOfItem = (item: unknown) => {
   return i.wordId ?? String(i.target ?? '');
 };
 
-export function RoundPlayer({ exerciseId, onComplete }: { exerciseId: string; onComplete(): void }) {
+/** memory logs one answer per pair, not per board: no pebbles there */
+const NO_PEBBLES = new Set(['upper-lower']);
+
+export function RoundPlayer({ exerciseId, onComplete, onLeave }: { exerciseId: string; onComplete(): void; onLeave(): void }) {
   const app = useApp();
   const { db, child } = app;
   const entry = findExercise(exerciseId);
@@ -28,6 +32,8 @@ export function RoundPlayer({ exerciseId, onComplete }: { exerciseId: string; on
   const demoShown = useRef(!demoDone);
   const finished = useRef(false);
   const answers = useRef<AnswerLog[]>([]);
+  // questions solved so far: one right answer ends each question
+  const [solved, setSolved] = useState(0);
 
   useEffect(() => {
     if (!entry) return;
@@ -75,6 +81,9 @@ export function RoundPlayer({ exerciseId, onComplete }: { exerciseId: string; on
   }, []);
 
   if (!entry) return null;
+  const bar = (inDemo: boolean) => (
+    <RoundBar exerciseId={exerciseId} total={inDemo || !round || NO_PEBBLES.has(exerciseId) ? null : round.items.length} done={solved} onLeave={onLeave} />
+  );
   if (!round) return <div className="exercise-stage" />;
   const { Component } = entry.module;
 
@@ -86,14 +95,18 @@ export function RoundPlayer({ exerciseId, onComplete }: { exerciseId: string; on
       setDemoDone(true);
     };
     return (
-      <DemoProvider>
-        <Component key="demo" round={practice} onAnswer={() => {}} onComplete={() => void finishDemo()} />
-      </DemoProvider>
+      <>
+        {bar(true)}
+        <DemoProvider>
+          <Component key="demo" round={practice} onAnswer={() => {}} onComplete={() => void finishDemo()} />
+        </DemoProvider>
+      </>
     );
   }
 
   const onAnswer = (a: AnswerLog) => {
     answers.current.push(a);
+    if (a.correct) setSolved((n) => n + 1);
     void recordAnswer(db, { ...a, childId: child.id }, child.roundsPlayed).catch((e) => console.error('recordAnswer', e));
   };
 
@@ -107,5 +120,10 @@ export function RoundPlayer({ exerciseId, onComplete }: { exerciseId: string; on
 
   const real = <Component key="round" round={round} onAnswer={onAnswer} onComplete={complete} />;
   // the demo just played the instruction: do not repeat it
-  return demoShown.current ? <InstructionHeard>{real}</InstructionHeard> : real;
+  return (
+    <>
+      {bar(false)}
+      {demoShown.current ? <InstructionHeard>{real}</InstructionHeard> : real}
+    </>
+  );
 }

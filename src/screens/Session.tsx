@@ -44,7 +44,7 @@ export function Session({ firstExerciseId, onHome, onVillage }: { firstExerciseI
     case 'play':
       return (
         <main className="screen session">
-          <RoundPlayer key={state.round} exerciseId={phase.exerciseId} onComplete={() => dispatch({ type: 'roundComplete' })} />
+          <RoundPlayer key={state.round} exerciseId={phase.exerciseId} onComplete={() => dispatch({ type: 'roundComplete' })} onLeave={onHome} />
         </main>
       );
 

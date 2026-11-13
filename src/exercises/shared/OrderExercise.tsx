@@ -69,6 +69,8 @@ export function OrderExercise({
   const [placed, setPlaced] = useState<OrderTile[]>([]);
   const [shaking, setShaking] = useState<string | null>(null);
   const [mistake, setMistake] = useState(false);
+  // after a mistake only the next right piece glows; the child tries the ones after it alone
+  const [hinting, setHinting] = useState(false);
   const usedListen = useRef(false);
   const shownAt = useRef(Date.now());
   const item = items[index]!;
@@ -116,6 +118,7 @@ export function OrderExercise({
       const soundsRight = voiced && wordsSoundSame(tile.text, expected);
       if (!mistake) log([...placed.map((p) => p.text), tile.text].join(sep), false, 1, soundsRight);
       setMistake(true);
+      setHinting(true);
       setShaking(tile.id);
       setTimeout(() => setShaking(null), 500);
       audio.stop();
@@ -126,6 +129,7 @@ export function OrderExercise({
     }
     const next = [...placed, tile];
     setPlaced(next);
+    setHinting(false);
     if (next.length < item.parts.length) return;
 
     log(item.text, true, mistake ? 2 : 1);
@@ -174,7 +178,7 @@ export function OrderExercise({
           <Tile
             key={tile.id}
             tile={tile}
-            className={`${tileClass} ${shaking === tile.id ? 'shake' : mistake && tile === nextCorrect ? 'hint' : ''}`}
+            className={`${tileClass} ${shaking === tile.id ? 'shake' : hinting && tile === nextCorrect ? 'hint' : ''}`}
             onUse={() => void use(tile)}
             showHand={demo && tile === nextCorrect}
           />

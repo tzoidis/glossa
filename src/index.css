@@ -19,7 +19,9 @@
   --accent: #2f7d4a;
   --accent-ink: #ffffff;
   --card: #ffffff;
-  --card-edge: #e8dcc4;
+  --card-edge: #d4c29c;
+  /* empty slots, pebbles: about 3:1 on the page, so they read without colour vision */
+  --slot-edge: #a8956b;
   --station-0: #fde7c8;
   --station-1: #d6ecf7;
   --station-2: #e3f2d3;
@@ -495,16 +497,25 @@ button {
   font-size: 52cqw !important;
 }
 
-.station--0 {
-  background: var(--station-0);
+/* one colour per kind of game, the same every time */
+.station--sounds {
+  background: #fde7c8;
 }
 
-.station--1 {
-  background: var(--station-1);
+.station--letters {
+  background: #d6ecf7;
 }
 
-.station--2 {
-  background: var(--station-2);
+.station--words {
+  background: #e3f2d3;
+}
+
+.station--sentences {
+  background: #ece1f7;
+}
+
+.station--writing {
+  background: #fbf3c4;
 }
 
 /* ---------- session ---------- */
@@ -870,7 +881,7 @@ button {
   height: 104px;
   padding: 0 16px;
   border-radius: 28px;
-  border: 4px dashed var(--card-edge);
+  border: 4px dashed var(--slot-edge);
   background: var(--card);
   font-family: 'Glossa Reading', system-ui, sans-serif;
   font-size: 56px;
@@ -929,7 +940,8 @@ button {
   .stations .station--1 {
     animation-delay: 1.2s;
   }
-  .village-item {
+  .village-item,
+  .arrived-item {
     animation: pop-in 400ms ease-out;
   }
   .letter-tile.shake,
@@ -1009,7 +1021,8 @@ button {
 .reading-sentence {
   font-family: 'Glossa Reading', system-ui, sans-serif;
   font-size: 56px;
-  line-height: 1.2;
+  line-height: 1.5;
+  word-spacing: 0.15em;
   padding: 12px 28px;
   border-radius: 28px;
   background: var(--card);
@@ -1037,13 +1050,15 @@ button {
 }
 
 .read-story .story {
+  flex-wrap: wrap;
+  justify-content: center;
   display: flex;
   align-items: center;
   gap: 16px;
 }
 
 .story-lines {
-  font-size: 34px;
+  font-size: 38px;
   padding: 8px 24px;
 }
 
@@ -1152,14 +1167,14 @@ button {
 .trace-ghost,
 .trace-guide {
   fill: none;
-  stroke: #cfc6b2;
+  stroke: #b8a988;
   stroke-width: 8;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
 .trace-ghost {
-  stroke: #ece6d8;
+  stroke: #d2c6a8;
 }
 
 .trace-lines line {
@@ -1318,6 +1333,104 @@ button {
   border-radius: 10px;
 }
 
+/* the strip above every game: help, progress, hold to leave */
+.round-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.round-bar .icon-button,
+.hold-home {
+  width: 64px;
+  height: 64px;
+}
+
+.pebbles {
+  display: flex;
+  gap: 12px;
+}
+
+.pebble {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 3px solid var(--slot-edge);
+  background: var(--card);
+}
+
+.pebble--done {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.hold-home {
+  position: relative;
+  overflow: hidden;
+  border-radius: 50%;
+  border: 3px solid var(--card-edge);
+  background: var(--card);
+  color: var(--ink);
+  opacity: 0.7;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.hold-home svg {
+  position: relative;
+}
+
+/* fills up while held; let go before it is full and nothing happens */
+.hold-home::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(47, 125, 74, 0.35);
+  transform: scale(0);
+}
+
+.hold-home--holding {
+  opacity: 1;
+}
+
+.hold-home--holding::before {
+  animation: hold-fill 1.2s linear forwards;
+}
+
+@keyframes hold-fill {
+  to {
+    transform: scale(1);
+  }
+}
+
+/* tracing: the demo paw beside the start dot, not on it */
+.trace-hand .demo-hand {
+  right: -76px;
+  bottom: -76px;
+}
+
+/* the break: what the child places pops into a small village strip */
+.arrived-item {
+  display: inline-flex;
+}
+
+.break-village {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 80px;
+  padding: 8px 16px;
+  border-radius: 24px;
+  background: #e3f2d3;
+  border: 3px solid var(--card-edge);
+}
+
 @media (max-width: 600px) {
   :root {
     --gutter: 16px;
@@ -1348,9 +1461,9 @@ button {
   }
 
   .key {
-    width: 52px;
-    height: 56px;
-    font-size: 32px;
+    width: 60px;
+    height: 60px;
+    font-size: 34px;
     border-radius: 14px;
   }
 

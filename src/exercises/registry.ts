@@ -27,36 +27,40 @@ import type { ExerciseModule, GenerateContext } from './types.ts';
 
 export type Mechanism = 'tap-choice' | 'tap-many' | 'order' | 'listen-image' | 'memory' | 'trace';
 
+export type Family = 'sounds' | 'letters' | 'words' | 'sentences' | 'writing';
+
 export interface ExerciseEntry {
   module: ExerciseModule;
   mechanism: Mechanism;
   icon: string;
+  /** what it practises; gives the station its colour, the same every time (UI review) */
+  family: Family;
   /** practises the hand's movement: pointless with a mouse, so hidden without a touch screen */
   touchOnly?: boolean;
 }
 
 export const EXERCISES: ExerciseEntry[] = [
-  { module: firstLetter, mechanism: 'tap-choice', icon: '1F442' },
-  { module: joinSyllables, mechanism: 'order', icon: '1F9E9' },
-  { module: syllableCount, mechanism: 'tap-choice', icon: '1F44F' },
-  { module: wordPicture, mechanism: 'listen-image', icon: '1F4D6' },
-  { module: buildWord, mechanism: 'order', icon: '1F9F1' },
-  { module: whichSyllable, mechanism: 'tap-choice', icon: '1F4E3' },
-  { module: blendSounds, mechanism: 'listen-image', icon: '1F50A' },
-  { module: findAll, mechanism: 'tap-many', icon: '1F50D' },
-  { module: missingLetter, mechanism: 'tap-choice', icon: '270F' },
-  { module: whichWord, mechanism: 'tap-choice', icon: '1F5E3' },
-  { module: trueFalse, mechanism: 'tap-choice', icon: '1F914' },
-  { module: buildSentence, mechanism: 'order', icon: '1F4DD' },
-  { module: readStory, mechanism: 'listen-image', icon: '1F4DA' },
-  { module: article, mechanism: 'tap-choice', icon: '1F3F7' },
-  { module: stress, mechanism: 'tap-choice', icon: '1F4CC' },
-  { module: lastSyllable, mechanism: 'tap-choice', icon: '1F3C1' },
-  { module: upperLower, mechanism: 'memory', icon: '1F3B4' },
-  { module: trace, mechanism: 'trace', icon: '270D', touchOnly: true },
-  { module: alphabet, mechanism: 'order', icon: '1F522' },
-  { module: digraph, mechanism: 'tap-choice', icon: '1F91D' },
-  { module: dictation, mechanism: 'order', icon: '1F3A7' },
+  { module: firstLetter, mechanism: 'tap-choice', icon: '1F442', family: 'letters' },
+  { module: joinSyllables, mechanism: 'order', icon: '1F9E9', family: 'words' },
+  { module: syllableCount, mechanism: 'tap-choice', icon: '1F44F', family: 'sounds' },
+  { module: wordPicture, mechanism: 'listen-image', icon: '1F4D6', family: 'words' },
+  { module: buildWord, mechanism: 'order', icon: '1F9F1', family: 'words' },
+  { module: whichSyllable, mechanism: 'tap-choice', icon: '1F4E3', family: 'sounds' },
+  { module: blendSounds, mechanism: 'listen-image', icon: '1F9F2', family: 'sounds' },
+  { module: findAll, mechanism: 'tap-many', icon: '1F50D', family: 'sounds' },
+  { module: missingLetter, mechanism: 'tap-choice', icon: '1F573', family: 'letters' },
+  { module: whichWord, mechanism: 'tap-choice', icon: '1F440', family: 'words' },
+  { module: trueFalse, mechanism: 'tap-choice', icon: '1F914', family: 'sentences' },
+  { module: buildSentence, mechanism: 'order', icon: '1F682', family: 'sentences' },
+  { module: readStory, mechanism: 'listen-image', icon: '1F4DA', family: 'sentences' },
+  { module: article, mechanism: 'tap-choice', icon: '1F3F7', family: 'words' },
+  { module: stress, mechanism: 'tap-choice', icon: '1F4AA', family: 'words' },
+  { module: lastSyllable, mechanism: 'tap-choice', icon: '1F3C1', family: 'sounds' },
+  { module: upperLower, mechanism: 'memory', icon: '1F3B4', family: 'letters' },
+  { module: trace, mechanism: 'trace', icon: '270D', family: 'writing', touchOnly: true },
+  { module: alphabet, mechanism: 'order', icon: '1F522', family: 'letters' },
+  { module: digraph, mechanism: 'tap-choice', icon: '1F91D', family: 'letters' },
+  { module: dictation, mechanism: 'order', icon: '1F4DD', family: 'writing' },
 ];
 
 export interface Availability {

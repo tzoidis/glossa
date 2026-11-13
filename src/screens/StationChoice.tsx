@@ -11,7 +11,7 @@ export function StationChoice({ options, onPick }: { options: string[]; onPick(i
         const entry = findExercise(id);
         if (!entry) return null;
         return (
-          <button key={id} type="button" className={`station station--${i}`} aria-label={`${t('session.station')} ${i + 1}`} onClick={() => onPick(id)}>
+          <button key={id} type="button" className={`station station--${entry.family}`} aria-label={`${t('session.station')} ${i + 1}`} onClick={() => onPick(id)}>
             <Picture imageId={entry.icon} size={140} />
           </button>
         );
