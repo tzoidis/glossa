@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import curriculum from '../content/curriculum.json' with { type: 'json' };
-import { analyzeWord, graphemeOrder, isTextAllowed, isWordAllowed, makeContext, type Progress } from './allowedWords.ts';
+import { CONTENT } from '../app/content.ts';
+import { analyzeWord, graphemeOrder, isTextAllowed, isWordAllowed, makeContext, unitReached, type Progress } from './allowedWords.ts';
 import type { Curriculum, Word } from './types.ts';
 
 const book = curriculum as Curriculum;
@@ -77,5 +78,27 @@ describe('analyzeWord', () => {
     const w = analyzeWord({ id: 'p', text: 'πάπια', article: 'η', syllables: ['πά', 'πια'], category: 'ζώα', flags: ['synizesis'], tags: [] }, order);
     expect(w.graphemes).toEqual(['π', 'α', 'π', 'ι', 'α']);
     expect(w.minPosition).toBe(pos('π'));
+  });
+});
+
+describe('thematic units 5-7', () => {
+  const book = CONTENT.curriculum;
+  const order = graphemeOrder(book);
+  it('take one position each after the last letter', () => {
+    expect(order.maxPosition).toBe(order.order.length + 3);
+    const unit = (id: number) => book.units.find((u) => u.id === id)!;
+    expect(unitReached(unit(5), order, order.order.length)).toBe(false);
+    expect(unitReached(unit(5), order, order.order.length + 1)).toBe(true);
+    expect(unitReached(unit(6), order, order.order.length + 1)).toBe(false);
+    expect(unitReached(unit(7), order, order.order.length + 3)).toBe(true);
+    expect(unitReached(unit(0), order, 0)).toBe(true);
+  });
+
+  it('unlock their skills only when reached', () => {
+    const at = (p: number) => makeContext(book, { position: p }).skills;
+    expect(at(order.order.length).has('question-mark')).toBe(false);
+    expect(at(order.order.length + 1).has('question-mark')).toBe(true);
+    expect(at(order.order.length + 2).has('exclamation-mark')).toBe(false);
+    expect(at(order.order.length + 3).has('exclamation-mark')).toBe(true);
   });
 });

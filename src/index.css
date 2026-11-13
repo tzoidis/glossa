@@ -1431,6 +1431,29 @@ button {
   border: 3px solid var(--card-edge);
 }
 
+/* «Τι μπαίνει στο τέλος;» and «Ποιο γράφεται σωστά;» */
+.end-gap {
+  display: inline-block;
+  min-width: 0.8em;
+  margin-left: 0.1em;
+  border-bottom: 6px solid var(--accent);
+  text-align: center;
+}
+
+.mark {
+  font-size: 80px;
+  line-height: 1;
+}
+
+.spelling .choice-word {
+  font-family: 'Glossa Reading', system-ui, sans-serif;
+  font-size: 48px;
+}
+
+.spelling .letter-tile {
+  padding: 0 28px;
+}
+
 @media (max-width: 600px) {
   :root {
     --gutter: 16px;

@@ -13,6 +13,7 @@ export function exerciseStatus({ module: m, touchOnly }: ExerciseEntry, app: App
   const { settings } = app;
   if (!isEnabled(m.id, settings)) return 'off';
   if (m.requires.minGraphemes > settings.upToPosition) return 'later';
+  if (!m.requires.skills.every((s) => app.allow.skills.has(s))) return 'later';
   if (m.requires.needs.includes('localTTS') && !app.voice) return 'noVoice';
   if (touchOnly && !hasTouch) return 'noTouch';
   const ctx = buildGenerateContext({ content: app.content, allow: app.allow, level: 1, recentWordIds: [], reviewQueue: [], seed: 1 });

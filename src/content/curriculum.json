@@ -47,7 +47,7 @@
       "graphemes": [],
       "sightWords": [],
       "unlocksFlags": [],
-      "skills": []
+      "skills": ["question-mark", "noun-endings"]
     },
     {
       "id": 6,
@@ -63,7 +63,7 @@
       "graphemes": [],
       "sightWords": [],
       "unlocksFlags": [],
-      "skills": []
+      "skills": ["exclamation-mark"]
     }
   ]
 }

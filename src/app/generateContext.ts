@@ -15,6 +15,10 @@ export interface GenerateInputs {
 
 type Readable = Pick<GenerateContext, 'allowedGraphemes' | 'sentencePool' | 'storyPool'>;
 
+/** a sentence ending in «;» or «!» waits for the unit that teaches it (5 and 7) */
+const MARK_SKILL: Record<string, string> = { ';': 'question-mark', '!': 'exclamation-mark' };
+const marksTaught = (tokens: string[], allow: AllowContext) => tokens.every((t) => !MARK_SKILL[t] || allow.skills.has(MARK_SKILL[t]!));
+
 // The same for every round at one position: worked out once per allow context
 // (the app keeps one per position; the property tests sweep thousands of rounds).
 const readableCache = new WeakMap<AllowContext, WeakMap<Content, Readable>>();
@@ -27,7 +31,7 @@ function readableNow(content: Content, allow: AllowContext): Readable {
     r = {
       allowedGraphemes: new Set(content.order.order.slice(0, allow.position)),
       // the context carries no sight words, so texts are filtered here: only what can be read now
-      sentencePool: content.sentences.filter((x) => isTextAllowed(x.tokens.join(' '), allow)),
+      sentencePool: content.sentences.filter((x) => isTextAllowed(x.tokens.join(' '), allow) && marksTaught(x.tokens, allow)),
       storyPool: content.stories.filter((x) => [...x.sentences, ...x.questions.map((q) => q.prompt)].every((line) => isTextAllowed(line, allow))),
     };
     byContent.set(content, r);

@@ -8,12 +8,14 @@ import { availableExercises, canGenerate, EXERCISES, findExercise } from '../exe
 /** Picks the next stations (STATIONS_PER_CHOICE) from the exercises available right now. */
 export function useStations() {
   const { settings, voice, content, allow } = useApp();
+  // (skills come from the units reached: «question-mark» in unit 5 and so on)
   const available = useMemo(
     () =>
       availableExercises(EXERCISES, {
         position: settings.upToPosition,
         enabledExercises: settings.enabledExercises,
         knownExercises: settings.knownExercises,
+        skills: allow.skills,
         hasLocalVoice: voice !== null,
         hasTouch: hasTouchScreen(),
       })

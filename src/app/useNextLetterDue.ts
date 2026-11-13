@@ -10,7 +10,7 @@ export function useNextLetterDue(): boolean {
   const [due, setDue] = useState(false);
   const since = settings.letterCheckFrom ?? 0;
   const position = settings.upToPosition;
-  const last = content.order.order.length;
+  const last = content.order.maxPosition;
 
   useEffect(() => {
     let live = true;

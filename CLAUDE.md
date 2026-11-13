@@ -45,7 +45,7 @@ Node ≥ 22.18 (scripts in `scripts/` run as plain `.ts` via Node type stripping
 
 ## Engine conventions
 
-- **Position** = number of graphemes taught, counted along `curriculum.json` order (0 = transition only, 1 = «α» taught, …). `Word.minPosition` uses the same scale.
+- **Position** = number of graphemes taught, counted along `curriculum.json` order (0 = transition only, 1 = «α» taught, …). `Word.minPosition` uses the same scale. The thematic units 5-7 (no graphemes) take one position each after the last letter (`GraphemeOrder.thematic`, `maxPosition`); their `skills` (question-mark, noun-endings, exclamation-mark) gate the exercises that need them (`requires.skills`) and the sentences ending in «;» or «!».
 - Linguistic tables (multigraphs, vowels, homophone groups, flag triggers) live in `src/content/greek.json`, not in code.
 - Sight words bypass both grapheme and flag checks (they are read whole; «έχει» has soft-g-ch). Diaeresis is a separate skill, `diaeresis`.
 - Flags of bank words come from `words.json` and must match `detectFlags(text, syllables)`; `validate-content` reports a mismatch, and you ask before changing either. Free text uses detection without syllables, which errs on the strict side.

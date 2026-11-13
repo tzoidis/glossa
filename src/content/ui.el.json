@@ -101,6 +101,8 @@
   "exercise.digraph.one": "δίψηφο",
   "exercise.digraph.two": "σύμπλεγμα",
   "exercise.dictation": "Υπαγόρευση",
+  "exercise.end-mark": "Τι μπαίνει στο τέλος;",
+  "exercise.spelling": "Ποιο γράφεται σωστά;",
   "exercise.dictation.erase": "Σβήσε",
   "exercise.trace.again": "Δείξε μου ξανά",
   "exercise.level": "επίπεδο {n} από 3",

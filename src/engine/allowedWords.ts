@@ -5,7 +5,9 @@
 // Diaeresis is a separate skill, locked until enabled.
 //
 // "Position" is the number of graphemes taught, counting along the book order of
-// curriculum.json: 0 = transition only, 1 = first letter taught, and so on.
+// curriculum.json: 0 = transition only, 1 = first letter taught, and so on. The
+// thematic units after the last letter (5-7, no new graphemes) take one position
+// each, so the parent can say «the class is in unit 6».
 
 import { graphemes, lowerKey, splitWords, tokenize } from './greekTokenizer.ts';
 import { detectFlags } from './pronunciationFlags.ts';
@@ -17,14 +19,19 @@ export interface GraphemeOrder {
   order: string[];
   /** grapheme -> position at which it becomes taught (1-based) */
   positionOf: Map<string, number>;
-  /** unit id -> number of graphemes taught before the unit starts */
+  /** unit id -> position before the unit starts */
   unitStart: Map<number, number>;
+  /** units without graphemes that come after the letters (5-7): one position each */
+  thematic: Set<number>;
+  /** the last position: every letter taught and every thematic unit reached */
+  maxPosition: number;
 }
 
 export function graphemeOrder(curriculum: Curriculum): GraphemeOrder {
   const order: string[] = [];
   const positionOf = new Map<string, number>();
   const unitStart = new Map<number, number>();
+  const thematic = new Set<number>();
   for (const unit of curriculum.units) {
     unitStart.set(unit.id, order.length);
     for (const g of unit.graphemes) {
@@ -32,13 +39,23 @@ export function graphemeOrder(curriculum: Curriculum): GraphemeOrder {
       positionOf.set(g, order.length);
     }
   }
-  return { order, positionOf, unitStart };
+  // thematic units follow the letters, one position each
+  let extra = 0;
+  for (const unit of curriculum.units) {
+    if (unit.graphemes.length > 0 || order.length === 0 || (unitStart.get(unit.id) ?? 0) < order.length) continue;
+    unitStart.set(unit.id, order.length + extra++);
+    thematic.add(unit.id);
+  }
+  return { order, positionOf, unitStart, thematic, maxPosition: order.length + extra };
 }
 
-/** A unit is reached once its first grapheme is taught; units without graphemes once all before them are. */
+/**
+ * A unit is reached once its first grapheme is taught, a thematic unit once its own
+ * position is chosen, the transition (no graphemes, before the letters) from the start.
+ */
 export function unitReached(unit: Unit, order: GraphemeOrder, position: number): boolean {
   const start = order.unitStart.get(unit.id) ?? Infinity;
-  return unit.graphemes.length > 0 ? position > start : position >= start;
+  return unit.graphemes.length > 0 || order.thematic.has(unit.id) ? position > start : position >= start;
 }
 
 /** Position from which these graphemes are all taught; Infinity if any is not in the curriculum. */

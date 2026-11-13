@@ -36,19 +36,24 @@ describe('true-false property test', () => {
 });
 
 describe('sentences', () => {
-  it('read as written: capital first, full stop at the end', () => {
+  it('read as written: capital first, a mark at the end', () => {
     expect(sentenceText({ id: 'x', tokens: ['Το', 'πουλί', 'πετά', '.'] })).toBe('Το πουλί πετά.');
     for (const s of CONTENT.sentences) {
       const text = sentenceText(s);
-      expect(text[0], s.id).toBe(text[0]!.toLocaleUpperCase('el'));
+      // a capital, accent or not («Έλα»)
+      expect(text[0], s.id).not.toBe(text[0]!.toLocaleLowerCase('el'));
       expect(text, s.id).toMatch(/[.!;]$/);
     }
   });
 
-  it('each has a bundled picture and a truth value', () => {
+  it('with a picture: a bundled one and a truth value; without: a question, an exclamation or a plain statement', () => {
     for (const s of CONTENT.sentences) {
-      expect(pictureUrl(s.imageId!), s.id).toBeDefined();
-      expect(typeof s.isTrueForImage, s.id).toBe('boolean');
+      if (s.imageId) {
+        expect(pictureUrl(s.imageId), s.id).toBeDefined();
+        expect(typeof s.isTrueForImage, s.id).toBe('boolean');
+      } else {
+        expect(s.isTrueForImage, s.id).toBeUndefined();
+      }
     }
   });
 });

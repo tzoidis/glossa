@@ -60,6 +60,23 @@ export function LettersSection() {
             </div>
           );
         })}
+      {curriculum.units
+        .filter((u) => order.thematic.has(u.id))
+        .map((unit) => {
+          // a thematic unit (5-7): no new letters, one step of its own
+          const p = (order.unitStart.get(unit.id) ?? 0) + 1;
+          return (
+            <button
+              key={unit.id}
+              type="button"
+              className={`parent-chip ${p <= position ? 'taught' : ''} ${p === position ? 'selected' : ''}`}
+              aria-pressed={p === position}
+              onClick={() => setPosition(p)}
+            >
+              {unit.title}
+            </button>
+          );
+        })}
       <p>{t('parent.letters.words', { n: readable })}</p>
       <p className="help">{sightWords.length ? t('parent.sightWords', { list: sightWords.join(', ') }) : t('parent.sightWords.none')}</p>
     </section>

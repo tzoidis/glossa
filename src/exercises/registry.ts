@@ -8,6 +8,7 @@ import { buildSentence } from './buildSentence/index.ts';
 import { buildWord } from './buildWord/index.ts';
 import { dictation } from './dictation/index.ts';
 import { digraph } from './digraph/index.ts';
+import { endMark } from './endMark/index.ts';
 import { findAll } from './findAll/index.ts';
 import { firstLetter } from './firstLetter/index.ts';
 import { joinSyllables } from './joinSyllables/index.ts';
@@ -15,6 +16,7 @@ import { lastSyllable } from './lastSyllable/index.ts';
 import { missingLetter } from './missingLetter/index.ts';
 import { readStory } from './readStory/index.ts';
 import { NotEnoughContent } from './pool.ts';
+import { spelling } from './spelling/index.ts';
 import { stress } from './stress/index.ts';
 import { syllableCount } from './syllableCount/index.ts';
 import { trace } from './trace/index.ts';
@@ -61,12 +63,16 @@ export const EXERCISES: ExerciseEntry[] = [
   { module: alphabet, mechanism: 'order', icon: '1F522', family: 'letters' },
   { module: digraph, mechanism: 'tap-choice', icon: '1F91D', family: 'letters' },
   { module: dictation, mechanism: 'order', icon: '1F4DD', family: 'writing' },
+  { module: endMark, mechanism: 'tap-choice', icon: '2753', family: 'sentences' },
+  { module: spelling, mechanism: 'tap-choice', icon: '1F58A', family: 'writing' },
 ];
 
 export interface Availability {
   position: number;
   enabledExercises: string[] | null;
   knownExercises?: string[];
+  /** skills of the units reached (allow.skills); an exercise needing others waits */
+  skills?: ReadonlySet<string>;
   hasLocalVoice: boolean;
   hasTouch: boolean;
 }
@@ -84,6 +90,7 @@ export function availableExercises(entries: ExerciseEntry[], a: Availability): E
   return entries.filter(({ module: m, touchOnly }) => {
     if (touchOnly && !a.hasTouch) return false;
     if (!isEnabled(m.id, a)) return false;
+    if (a.skills && !m.requires.skills.every((s) => a.skills!.has(s))) return false;
     if (m.requires.minGraphemes > a.position) return false;
     if (m.requires.needs.includes('localTTS') && !a.hasLocalVoice) return false;
     return true;

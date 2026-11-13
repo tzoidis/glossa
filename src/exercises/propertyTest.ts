@@ -19,7 +19,7 @@ export interface Case {
 }
 
 export function* cases(recentWordIds: string[] = []): Generator<Case> {
-  for (let position = 0; position <= CONTENT.order.order.length; position++) {
+  for (let position = 0; position <= CONTENT.order.maxPosition; position++) {
     const allow = makeContext(CONTENT.curriculum, { position }, CONTENT.words);
     for (const level of LEVELS) {
       for (let s = 0; s < SEEDS_PER_CASE; s++) {
