@@ -44,7 +44,7 @@ MODEL_FOR = {k: TURBO for k in ["γκε", "γκι", "γο", "αρ", "γου", "�
 # «γό» still came out as «γκο»; with a capital it does not. «δέλ» came out as «ντελ»;
 # trailing dots keep the δ soft
 TEXT_FOR = {"γο": "Γό", "δελ": "δέλ…"}
-# 24 kHz, 48 kbps (as the Athina clips were) keeps the whole app small (PRD §8: first load under 6 MB)
+# 24 kHz, 48 kbps (as the Athina clips were) keeps the whole app small (PRD §8: first load under 8 MB)
 ELEVEN_FORMAT = "mp3_24000_48"
 
 
