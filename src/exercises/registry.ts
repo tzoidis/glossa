@@ -31,6 +31,19 @@ export type Mechanism = 'tap-choice' | 'tap-many' | 'order' | 'listen-image' | '
 
 export type Family = 'sounds' | 'letters' | 'words' | 'sentences' | 'writing';
 
+export type Stage = 'transition' | 'early' | 'reading';
+
+/**
+ * How often each kind of game comes up (pedagogy review): sound games lead before
+ * the letters, letters and words in units 1-2, then words, sentences and writing,
+ * with the sound games now and then as review.
+ */
+export const STAGE_WEIGHTS: Record<Stage, Record<Family, number>> = {
+  transition: { sounds: 1, letters: 1, words: 1, sentences: 1, writing: 1 },
+  early: { sounds: 0.5, letters: 1, words: 1, sentences: 0.7, writing: 0.7 },
+  reading: { sounds: 0.2, letters: 0.6, words: 1, sentences: 1, writing: 1 },
+};
+
 export interface ExerciseEntry {
   module: ExerciseModule;
   mechanism: Mechanism;

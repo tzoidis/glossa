@@ -22,7 +22,7 @@ const wordIdOfItem = (item: unknown) => {
 /** memory logs one answer per pair, not per board: no pebbles there */
 const NO_PEBBLES = new Set(['upper-lower']);
 
-export function RoundPlayer({ exerciseId, onComplete, onLeave }: { exerciseId: string; onComplete(): void; onLeave(): void }) {
+export function RoundPlayer({ exerciseId, onComplete, onSkip, onLeave }: { exerciseId: string; onComplete(): void; onSkip(): void; onLeave(): void }) {
   const app = useApp();
   const { db, child } = app;
   const entry = findExercise(exerciseId);
@@ -58,20 +58,27 @@ export function RoundPlayer({ exerciseId, onComplete, onLeave }: { exerciseId: s
         }
         if (!cancelled) setRound({ ...r, seed });
         if (!demoDone) {
-          // practice on a word the real round does not use, if there is one; always at level 1
+          // practice on a word the real round does not use, if there is one; always at level 1;
+          // if that fails, the round's own first question is the practice (the round stays)
           const used = new Set(r.items.map(wordIdOfItem));
-          const extra = entry.module.generate(buildGenerateContext({ ...inputs, level: 1, recentWordIds: [...used], seed: seed ^ 0x9e3779b9 }));
-          const first = wordIdOfItem(r.items[0]);
-          const item =
-            extra.items.find((i) => !used.has(wordIdOfItem(i))) ?? // a word the round does not use
-            extra.items.find((i) => wordIdOfItem(i) !== first) ?? // at least not the round's first question
-            r.items[0];
+          let item: unknown = r.items[0];
+          let extra: Round = r;
+          try {
+            extra = entry.module.generate(buildGenerateContext({ ...inputs, level: 1, recentWordIds: [...used], seed: seed ^ 0x9e3779b9 }));
+            const first = wordIdOfItem(r.items[0]);
+            item =
+              extra.items.find((i) => !used.has(wordIdOfItem(i))) ?? // a word the round does not use
+              extra.items.find((i) => wordIdOfItem(i) !== first) ?? // at least not the round's first question
+              r.items[0];
+          } catch (e) {
+            console.error(`practice ${exerciseId} seed=${seed}`, e);
+          }
           if (!cancelled) setPractice({ ...extra, id: `${extra.id}-demo`, items: [item] });
         }
       } catch (e) {
         // not enough content right now: skip the round (no star), never show a locked word
         console.error(`generate ${exerciseId} seed=${seed}`, e);
-        if (!cancelled) onComplete();
+        if (!cancelled) onSkip();
       }
     })();
     return () => {
@@ -90,8 +97,13 @@ export function RoundPlayer({ exerciseId, onComplete, onLeave }: { exerciseId: s
   if (!demoDone) {
     if (!practice) return <div className="exercise-stage" />;
     const finishDemo = async () => {
-      await db.settings.update(child.id, { seenDemos: [...app.settings.seenDemos, exerciseId] });
-      await app.refresh();
+      try {
+        await db.settings.update(child.id, { seenDemos: [...app.settings.seenDemos, exerciseId] });
+        await app.refresh();
+      } catch (e) {
+        // the demo may show again next time; the round must go on now
+        console.error('finishDemo', e);
+      }
       setDemoDone(true);
     };
     return (

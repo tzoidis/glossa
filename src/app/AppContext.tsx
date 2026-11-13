@@ -6,6 +6,8 @@ import { bundledUrl } from '../audio/bundled.ts';
 import { makeContext, type AllowContext } from '../engine/allowedWords.ts';
 import { ensureChild, openDb, type GlossaDb } from '../storage/db.ts';
 import { DEFAULT_CHILD_ID, type Child, type Settings } from '../storage/schema.ts';
+import { t } from '../i18n.ts';
+import { Mascot } from '../ui/Mascot.tsx';
 import { CONTENT, defaultPosition, type Content } from './content.ts';
 
 export interface App {
@@ -46,22 +48,46 @@ export interface AppProviderProps {
   fallback: ReactNode;
 }
 
+/** how long opening the database may take before the parent is told (another window may block it) */
+const OPEN_TIMEOUT_MS = 15_000;
+
+/** Shown instead of a mascot that thinks forever when the data cannot be opened (full device, blocked). */
+function OpenFailed() {
+  return (
+    <main className="screen screen--center">
+      <Mascot mood="thinking" size={160} />
+      <p className="open-failed">{t('app.openFailed')}</p>
+      <button type="button" className="parent-button primary" onClick={() => location.reload()}>
+        {t('app.retry')}
+      </button>
+    </main>
+  );
+}
+
 export function AppProvider({ children, audio, dbName, fallback }: AppProviderProps) {
   const [loaded, setLoaded] = useState<Loaded | null>(null);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
+    const timer = setTimeout(() => !cancelled && setFailed(true), OPEN_TIMEOUT_MS);
     (async () => {
       const db = await openDb(dbName ? { name: dbName } : {});
       const settings = await ensureChild(db, defaultPosition());
       const child = (await db.children.get(DEFAULT_CHILD_ID))!;
       const service = audio ?? createBrowserAudioService(async (key) => (await db.recordings.get(key))?.blob, bundledUrl);
+      clearTimeout(timer);
       if (!cancelled) setLoaded({ db, audio: service, child, settings, voice: null });
       const voice = await service.voice();
       if (!cancelled) setLoaded((l) => l && { ...l, voice });
-    })();
+    })().catch((e) => {
+      console.error('open database', e);
+      clearTimeout(timer);
+      if (!cancelled) setFailed(true);
+    });
     return () => {
       cancelled = true;
+      clearTimeout(timer);
     };
   }, [audio, dbName]);
 
@@ -86,6 +112,6 @@ export function AppProvider({ children, audio, dbName, fallback }: AppProviderPr
     return { ...loaded, content: CONTENT, allow, refresh, recheckVoice };
   }, [loaded, refresh, recheckVoice]);
 
-  if (!app) return <>{fallback}</>;
+  if (!app) return failed ? <OpenFailed /> : <>{fallback}</>;
   return <AppContext.Provider value={app}>{children}</AppContext.Provider>;
 }

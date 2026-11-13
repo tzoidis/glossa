@@ -3,6 +3,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useApp } from '../app/AppContext.tsx';
+import { installUpdate, useUpdateReady } from '../app/appUpdate.ts';
 import { t } from '../i18n.ts';
 import { getDailyTime } from '../storage/db.ts';
 import { IconButton } from '../ui/IconButton.tsx';
@@ -26,6 +27,11 @@ export function Home({
 }) {
   const { db, child, settings, audio } = useApp();
   const nextStations = useStations();
+  // no round runs here: a version found while the app sat in the background goes in now
+  const updateReady = useUpdateReady();
+  useEffect(() => {
+    if (updateReady) installUpdate();
+  }, [updateReady]);
   // Re-pick when availability changes (the voice check can finish after Home opens).
   const options = useMemo(() => nextStations(), [nextStations]);
   const [limitReached, setLimitReached] = useState<boolean | null>(null);

@@ -8,6 +8,7 @@ import type { Round } from '../../engine/types.ts';
 import { t } from '../../i18n.ts';
 import { caseItemId, makeAnswer } from '../answer.ts';
 import { Hand, useDemo, useOpensWithInstruction } from '../shared/demo.tsx';
+import { useLater } from '../shared/useLater.ts';
 import { useRoundAudio } from '../shared/useRoundAudio.ts';
 import type { ExerciseProps } from '../types.ts';
 import { UPPER_LOWER_ID, type MemoryCard, type UpperLowerItem } from './generate.ts';
@@ -18,6 +19,7 @@ export function UpperLower({ round, onAnswer, onComplete }: ExerciseProps) {
   const items = (round as Round).items as UpperLowerItem[];
   const audio = useRoundAudio();
   const demo = useDemo();
+  const later = useLater();
   const [index, setIndex] = useState(0);
   const [open, setOpen] = useState<string[]>([]);
   const [matched, setMatched] = useState<string[]>([]);
@@ -86,7 +88,7 @@ export function UpperLower({ round, onAnswer, onComplete }: ExerciseProps) {
       log(first.letter, card.letter, false, 1);
     }
     busy.current = true;
-    setTimeout(() => {
+    later(() => {
       busy.current = false;
       setOpen([]);
     }, TURN_BACK_MS);

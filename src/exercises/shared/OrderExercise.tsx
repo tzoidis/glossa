@@ -12,6 +12,7 @@ import { makeAnswer, sentenceItemId, wordItemId } from '../answer.ts';
 import type { ExerciseProps } from '../types.ts';
 import { Hand, useDemo, useOpensWithInstruction } from './demo.tsx';
 import { useDragOrTap } from './useDragOrTap.ts';
+import { useLater } from './useLater.ts';
 import { useRoundAudio } from './useRoundAudio.ts';
 
 export interface OrderTile {
@@ -65,6 +66,7 @@ export function OrderExercise({
   const items = (round as Round).items as OrderItem[];
   const audio = useRoundAudio();
   const demo = useDemo();
+  const later = useLater();
   const [index, setIndex] = useState(0);
   const [placed, setPlaced] = useState<OrderTile[]>([]);
   const [shaking, setShaking] = useState<string | null>(null);
@@ -120,7 +122,7 @@ export function OrderExercise({
       setMistake(true);
       setHinting(true);
       setShaking(tile.id);
-      setTimeout(() => setShaking(null), 500);
+      later(() => setShaking(null), 500);
       audio.stop();
       const run = audio.sequence();
       if (soundsRight) await audio.instruction('sounds-right');

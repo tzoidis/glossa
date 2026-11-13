@@ -1454,6 +1454,13 @@ button {
   padding: 0 28px;
 }
 
+/* the database could not be opened: a note for the parent */
+.open-failed {
+  max-width: 520px;
+  text-align: center;
+  font-size: 1.15rem;
+}
+
 @media (max-width: 600px) {
   :root {
     --gutter: 16px;

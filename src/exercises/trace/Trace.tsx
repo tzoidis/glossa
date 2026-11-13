@@ -11,6 +11,7 @@ import { IconButton } from '../../ui/IconButton.tsx';
 import { ReplayIcon } from '../../ui/Icons.tsx';
 import { makeAnswer, traceItemId } from '../answer.ts';
 import { Hand, useDemo, useOpensWithInstruction } from '../shared/demo.tsx';
+import { useLater } from '../shared/useLater.ts';
 import { useRoundAudio } from '../shared/useRoundAudio.ts';
 import type { ExerciseProps } from '../types.ts';
 import { TOLERANCE, TRACE_ID, type TraceItem } from './generate.ts';
@@ -50,6 +51,9 @@ export function Trace({ round, onAnswer, onComplete }: ExerciseProps) {
   const level = r.level;
   const audio = useRoundAudio();
   const demo = useDemo();
+  const later = useLater();
+  // the finger that is drawing: a palm resting on the screen must not join the stroke
+  const pointer = useRef<number | null>(null);
   const [index, setIndex] = useState(0);
   const [done, setDone] = useState(0);
   const [drawing, setDrawing] = useState<Point[]>([]);
@@ -120,7 +124,7 @@ export function Trace({ round, onAnswer, onComplete }: ExerciseProps) {
     mistake.current = true;
     setArmed(false);
     setFading(traced);
-    setTimeout(() => setFading(null), 700);
+    later(() => setFading(null), 700);
     setHintRun(Date.now());
   };
 
@@ -139,9 +143,10 @@ export function Trace({ round, onAnswer, onComplete }: ExerciseProps) {
   };
 
   const onDown = (e: PointerEvent<SVGSVGElement>) => {
-    if (busy.current || done >= item.strokes.length) return;
+    if (busy.current || done >= item.strokes.length || pointer.current !== null) return;
     const p = toBox(e);
     if (!p) return;
+    pointer.current = e.pointerId;
     try {
       e.currentTarget.setPointerCapture(e.pointerId);
     } catch {
@@ -151,19 +156,28 @@ export function Trace({ round, onAnswer, onComplete }: ExerciseProps) {
     setDrawing(points.current);
   };
   const onMove = (e: PointerEvent<SVGSVGElement>) => {
-    if (points.current.length === 0) return;
+    if (points.current.length === 0 || e.pointerId !== pointer.current) return;
     const p = toBox(e);
     if (!p) return;
     points.current = [...points.current, p];
     setDrawing(points.current);
   };
   // the points live in a ref: a quick tap lifts before React has rendered the touch
-  const onUp = () => {
+  const onUp = (e: PointerEvent<SVGSVGElement>) => {
+    if (e.pointerId !== pointer.current) return;
+    pointer.current = null;
     const traced = points.current;
     if (traced.length === 0) return;
     points.current = [];
     setDrawing([]);
     finish(traced);
+  };
+  // the system took the touch (a swipe from the edge): drop the stroke, it is not a mistake
+  const onCancel = (e: PointerEvent<SVGSVGElement>) => {
+    if (e.pointerId !== pointer.current) return;
+    pointer.current = null;
+    points.current = [];
+    setDrawing([]);
   };
 
   const current = item.strokes[done];
@@ -196,7 +210,7 @@ export function Trace({ round, onAnswer, onComplete }: ExerciseProps) {
       </div>
 
       <div className="trace-board">
-        <svg ref={svg} viewBox="0 0 100 100" className="trace-pad" onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}>
+        <svg ref={svg} viewBox="0 0 100 100" className="trace-pad" onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onCancel}>
           {item.letterCase === 'lower' && (
             <g className="trace-lines">
               <line x1="4" x2="96" y1="36" y2="36" />

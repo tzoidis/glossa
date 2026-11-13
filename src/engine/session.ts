@@ -24,6 +24,8 @@ export interface SessionState {
 export type SessionAction =
   | { type: 'choose'; exerciseId: string }
   | { type: 'roundComplete' }
+  /** the round could not be made (no content): no star, the child picks again */
+  | { type: 'roundSkipped'; options: string[] }
   | { type: 'limitReached' }
   /** leave the break; options are the next stations */
   | { type: 'continue'; options: string[] };
@@ -51,6 +53,11 @@ export function sessionReducer(state: SessionState, action: SessionAction): Sess
       return { ...state, round, played, phase: next };
     }
 
+    case 'roundSkipped':
+      if (phase.kind !== 'play') return state;
+      if (state.limitReached) return { ...state, phase: { kind: 'done', reason: 'limit' } };
+      return { ...state, phase: action.options.length ? { kind: 'choose', options: action.options } : { kind: 'done', reason: 'complete' } };
+
     case 'limitReached':
       if (phase.kind === 'play') return { ...state, limitReached: true };
       if (phase.kind === 'done') return state;
@@ -66,11 +73,14 @@ export function sessionReducer(state: SessionState, action: SessionAction): Sess
 export interface StationCandidate {
   id: string;
   mechanism: string;
+  /** how often it should come up at this stage (pedagogy review); default 1 */
+  weight?: number;
 }
 
 /**
  * Up to `count` stations: never the previous mechanism (unless nothing else is available),
- * least-played first, and as many different mechanisms as possible.
+ * least-played first, and as many different mechanisms as possible. Among equals a
+ * station with twice the weight is about twice as likely to come first.
  */
 export function pickStations(
   candidates: StationCandidate[],
@@ -83,8 +93,9 @@ export function pickStations(
   const pool = fresh.length > 0 ? fresh : candidates;
   const timesPlayed = (id: string) => played.filter((p) => p === id).length;
   const ranked = pool
-    .map((c) => ({ c, r: rng() }))
-    .sort((a, b) => timesPlayed(a.c.id) - timesPlayed(b.c.id) || a.r - b.r)
+    // weighted random order: the key r^(1/w) puts heavier stations first more often
+    .map((c) => ({ c, r: rng() ** (1 / Math.max(c.weight ?? 1, 0.01)) }))
+    .sort((a, b) => timesPlayed(a.c.id) - timesPlayed(b.c.id) || b.r - a.r)
     .map((x) => x.c);
 
   const picked: StationCandidate[] = [];

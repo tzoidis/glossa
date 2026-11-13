@@ -54,6 +54,11 @@ describe('backup file', () => {
     const db = await freshDb();
     await expect(importBackup(db, { hello: 1 })).rejects.toBeInstanceOf(InvalidBackup);
     await expect(importBackup(db, { app: 'glossa', schemaVersion: 999, tables: {} })).rejects.toBeInstanceOf(InvalidBackup);
+    // a file with no child, or a settings row missing fields, would break the next start
+    await expect(importBackup(db, { app: 'glossa', schemaVersion: 1, tables: {} })).rejects.toBeInstanceOf(InvalidBackup);
+    await expect(
+      importBackup(db, { app: 'glossa', schemaVersion: 1, tables: { children: [{ id: 'c', stars: 0 }], settings: [{ childId: 'c' }] } }),
+    ).rejects.toBeInstanceOf(InvalidBackup);
   });
 
   it('names files by date and reminds monthly', () => {

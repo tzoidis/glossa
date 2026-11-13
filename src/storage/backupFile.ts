@@ -52,6 +52,31 @@ export async function exportBackup(db: Dexie, { includeRecordings, now = Date.no
 
 export class InvalidBackup extends Error {}
 
+/**
+ * The rows the app cannot start without: a child and its settings, with the fields
+ * every screen reads. A partial or hand-edited file is refused before anything is
+ * replaced (the restore itself is all or nothing).
+ */
+function checkCoreRows(tables: Snapshot): void {
+  const children = tables.children as Record<string, unknown>[] | undefined;
+  const settings = tables.settings as Record<string, unknown>[] | undefined;
+  if (!children?.length || !settings?.length) throw new InvalidBackup('no child or settings in the file');
+  for (const c of children) {
+    if (typeof c.id !== 'string' || typeof c.stars !== 'number') throw new InvalidBackup('a child row is incomplete');
+  }
+  for (const s of settings) {
+    const ok =
+      typeof s.childId === 'string' &&
+      typeof s.upToPosition === 'number' &&
+      typeof s.dailyLimitMinutes === 'number' &&
+      typeof s.leftHanded === 'boolean' &&
+      Array.isArray(s.seenDemos) &&
+      Array.isArray(s.extraFlags) &&
+      Array.isArray(s.extraSkills);
+    if (!ok) throw new InvalidBackup('a settings row is incomplete');
+  }
+}
+
 /** Validates and restores a backup. Tables missing from the file (e.g. recordings) are left as they are. */
 export async function importBackup(db: Dexie, file: unknown): Promise<void> {
   const f = file as Partial<BackupFile> | null;
@@ -69,6 +94,7 @@ export async function importBackup(db: Dexie, file: unknown): Promise<void> {
         ? (rows as { blob: unknown }[]).map((r) => ({ ...r, blob: isEncodedBlob(r.blob) ? base64ToBlob(r.blob.__blob, r.blob.type) : r.blob }))
         : rows;
   }
+  checkCoreRows(tables);
   await importTables(db, tables);
 }
 

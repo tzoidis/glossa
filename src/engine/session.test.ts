@@ -107,3 +107,26 @@ describe('review queue', () => {
     expect(dueKeys(items, 6)).toEqual(['b', 'a']);
   });
 });
+
+describe('pickStations weights', () => {
+  it('offers a heavier station first more often', () => {
+    const c = [
+      { id: 'heavy', mechanism: 'a', weight: 1 },
+      { id: 'light', mechanism: 'b', weight: 0.2 },
+    ];
+    let heavyFirst = 0;
+    for (let i = 0; i < 400; i++) if (pickStations(c, null, [], mulberry32(i), 1)[0] === 'heavy') heavyFirst++;
+    // with weights 1 and 0.2 the heavy one comes first about 5 times in 6
+    expect(heavyFirst).toBeGreaterThan(300);
+  });
+});
+
+describe('roundSkipped', () => {
+  it('gives no star and lets the child pick again', () => {
+    const s = sessionReducer(startSession('a'), { type: 'roundSkipped', options: ['b', 'c'] });
+    expect(s.played).toEqual([]);
+    expect(s.round).toBe(0);
+    expect(s.phase).toEqual({ kind: 'choose', options: ['b', 'c'] });
+    expect(sessionReducer(startSession('a'), { type: 'roundSkipped', options: [] }).phase).toEqual({ kind: 'done', reason: 'complete' });
+  });
+});

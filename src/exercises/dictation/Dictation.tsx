@@ -15,6 +15,7 @@ import { BackspaceIcon, CheckIcon, SpeakerIcon } from '../../ui/Icons.tsx';
 import { Picture } from '../../ui/Picture.tsx';
 import { makeAnswer, wordItemId } from '../answer.ts';
 import { Hand, useDemo, useOpensWithInstruction } from '../shared/demo.tsx';
+import { useLater } from '../shared/useLater.ts';
 import { useRoundAudio } from '../shared/useRoundAudio.ts';
 import type { ExerciseProps } from '../types.ts';
 import { DICTATION_ID, type DictationItem } from './generate.ts';
@@ -26,6 +27,7 @@ export function Dictation({ round, onAnswer, onComplete }: ExerciseProps) {
   const items = (round as Round).items as DictationItem[];
   const audio = useRoundAudio();
   const demo = useDemo();
+  const later = useLater();
   const [index, setIndex] = useState(0);
   const [typed, setTyped] = useState<string[]>([]);
   const [mistake, setMistake] = useState(false);
@@ -82,7 +84,7 @@ export function Dictation({ round, onAnswer, onComplete }: ExerciseProps) {
     // once guided, a wrong key only shakes: the right one glows
     if (nextKey !== undefined && key !== nextKey) {
       setShaking(key);
-      setTimeout(() => setShaking(null), 500);
+      later(() => setShaking(null), 500);
       return;
     }
     const next = [...typed, key];
@@ -98,7 +100,7 @@ export function Dictation({ round, onAnswer, onComplete }: ExerciseProps) {
     let keep = 0;
     while (next[keep] === item.letters[keep]) keep++;
     busy.current = true;
-    setTimeout(async () => {
+    later(async () => {
       setTyped(next.slice(0, keep));
       busy.current = false;
       const run = audio.sequence();
