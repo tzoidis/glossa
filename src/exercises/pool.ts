@@ -29,6 +29,38 @@ export function areTaught(gs: string[], ctx: GenerateContext): boolean {
   return gs.every((g) => ctx.allowedGraphemes.has(g));
 }
 
+/**
+ * Letters due for review (grapheme:<g>) bring back a word that has them, through the
+ * word review pickWords already does: one word per letter, `letterOf` says where.
+ */
+export function withLetterReview(ctx: GenerateContext, pool: Word[], letterOf: (w: Word) => string[]): GenerateContext {
+  const due = ctx.reviewQueue.filter((k) => k.startsWith('grapheme:')).map((k) => k.slice('grapheme:'.length));
+  if (due.length === 0) return ctx;
+  const extra = due.flatMap((g) => {
+    const w = pool.find((x) => letterOf(x).includes(g));
+    return w ? [`word:${w.id}`] : [];
+  });
+  return { ...ctx, reviewQueue: [...ctx.reviewQueue, ...extra] };
+}
+
+/** How many of the latest letters count as «the letters of the week». */
+export const NEWEST = 2;
+
+/** The letters the class is learning now: the last taught (allowedGraphemes keeps book order). */
+export function newestGraphemes(ctx: GenerateContext): Set<string> {
+  return new Set([...ctx.allowedGraphemes].slice(-NEWEST));
+}
+
+/** a0, b0, a1, b1, …, then what is left of the longer list */
+function alternate<T>(a: T[], b: T[]): T[] {
+  const out: T[] = [];
+  for (let i = 0; i < Math.max(a.length, b.length); i++) {
+    if (i < a.length) out.push(a[i]!);
+    if (i < b.length) out.push(b[i]!);
+  }
+  return out;
+}
+
 /** Is item i one of the easy ones? Rounds open with 2 easy items and end with a sure success. */
 export function isEasyPosition(i: number, size = ROUND_SIZE): boolean {
   return i < 2 || i === size - 1;
@@ -44,7 +76,11 @@ export function pickWords(pool: Word[], ctx: GenerateContext, size = ROUND_SIZE)
   const recent = new Set(ctx.recentWordIds);
   const review = shuffle(pool.filter((w) => reviewIds.has(w.id)), ctx.rng).slice(0, 2);
   const others = pool.filter((w) => !reviewIds.has(w.id));
-  const fresh = [...shuffle(others.filter((w) => !recent.has(w.id)), ctx.rng), ...shuffle(others.filter((w) => recent.has(w.id)), ctx.rng)];
+  const byRecency = [...shuffle(others.filter((w) => !recent.has(w.id)), ctx.rng), ...shuffle(others.filter((w) => recent.has(w.id)), ctx.rng)];
+  // every other word has one of the letters the class is learning now
+  const newest = newestGraphemes(ctx);
+  const hasNew = (w: Word) => wordGraphemes(w).some((g) => newest.has(g));
+  const fresh = alternate(byRecency.filter(hasNew), byRecency.filter((w) => !hasNew(w)));
 
   const distinct = review.length + fresh.length;
   if (distinct < MIN_DISTINCT_WORDS) throw new NotEnoughContent(`only ${distinct} words`);

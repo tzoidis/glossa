@@ -2,7 +2,7 @@ import { t } from '../../i18n.ts';
 import { IconButton } from '../../ui/IconButton.tsx';
 import { SpeakerIcon } from '../../ui/Icons.tsx';
 import { Picture } from '../../ui/Picture.tsx';
-import { wordItemId } from '../answer.ts';
+import { graphemeItemId } from '../answer.ts';
 import { ChoiceTile } from '../shared/ChoiceTile.tsx';
 import { useChoiceRound } from '../shared/useChoiceRound.ts';
 import { useRoundAudio } from '../shared/useRoundAudio.ts';
@@ -13,7 +13,7 @@ export function MissingLetter(props: ExerciseProps) {
   const audio = useRoundAudio();
   const { item, pick, stateOf, showHand, solved, markListen } = useChoiceRound<MissingLetterItem>(props, {
     exerciseId: MISSING_LETTER_ID,
-    itemId: (i) => wordItemId(i.wordId),
+    itemId: (i) => graphemeItemId(i.target),
     // no prompt: the word is read, not heard; after a mistake it is heard slowly
     onWrong: (i) => audio.word(i.wordId, i.text, true),
   });

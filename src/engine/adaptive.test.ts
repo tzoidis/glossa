@@ -8,20 +8,26 @@ describe('firstAttemptShare', () => {
     expect(firstAttemptShare([a(false), a(true, 2), a(true), a(true), a(true)])).toBe(0.75);
     expect(firstAttemptShare([])).toBeNull();
   });
+
+  it('counts a right answer after listening as half', () => {
+    expect(firstAttemptShare([{ ...a(true), usedListen: true }, a(true)])).toBe(0.75);
+    expect(firstAttemptShare([{ ...a(false), usedListen: true }, a(true)])).toBe(0.5);
+  });
 });
 
 describe('nextLevel', () => {
-  it('goes up after two good rounds in a row', () => {
-    const one = nextLevel(undefined, 1);
+  it('goes up after a perfect round, or two good rounds in a row', () => {
+    expect(nextLevel(undefined, 1)).toEqual({ level: 2, goodRounds: 0 });
+    const one = nextLevel(undefined, 0.8); // 4 of 5
     expect(one).toEqual({ level: 1, goodRounds: 1 });
-    expect(nextLevel(one, 0.9)).toEqual({ level: 2, goodRounds: 0 });
+    expect(nextLevel(one, 0.8)).toEqual({ level: 2, goodRounds: 0 });
   });
 
   it('needs the two good rounds in a row', () => {
-    const one = nextLevel(undefined, 1);
-    const middling = nextLevel(one, 0.8); // 4 of 5 is below 85%
+    const one = nextLevel(undefined, 0.8);
+    const middling = nextLevel(one, 0.6); // 3 of 5 is below 80%
     expect(middling).toEqual({ level: 1, goodRounds: 0 });
-    expect(nextLevel(middling, 1)).toEqual({ level: 1, goodRounds: 1 });
+    expect(nextLevel(middling, 0.8)).toEqual({ level: 1, goodRounds: 1 });
   });
 
   it('goes down after a round below half, never under 1', () => {

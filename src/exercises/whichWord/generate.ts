@@ -1,7 +1,8 @@
 // «Ποια λέξη ακούς;»: a word is heard, the child taps it among 3 written words
 // (4 at higher levels). Every word on screen is readable (PRD §3), and none sounds
 // like the one heard (PRD §4: πόδι/πώδι would be two right answers).
-// Level 3: wrong words start with the same letter, so the whole word must be read.
+// From level 2, wrong words start with the same letter where possible, so the first
+// letter alone does not give the answer: the whole word must be read.
 
 import { soundOf } from '../../engine/homophones.ts';
 import { shuffle } from '../../engine/rng.ts';
@@ -41,7 +42,7 @@ export function generateWhichWord(ctx: GenerateContext): Round {
       ctx.rng,
     );
     const close = (o: Word) => wordGraphemes(o)[0] === first;
-    if (ctx.level === 3 && hard) others = [...others.filter(close), ...others.filter((o) => !close(o))];
+    if (hard) others = [...others.filter(close), ...others.filter((o) => !close(o))];
     // at most one written form per sound among the choices
     const picked: Word[] = [];
     for (const o of others) {

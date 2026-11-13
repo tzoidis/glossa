@@ -1,5 +1,6 @@
-// «Ο, η ή το;»: a picture and its written word with a gap before it («__ γάτα»);
-// the child picks the article. The word is reading material: heard only if the
+// «Ο, η ή το;»: a written word with a gap before it («__ γάτα»); the child picks
+// the article. The picture shows only once it is found: with it a native speaker
+// knows the article without reading the word. The word is reading material: heard only if the
 // child asks, or slowly after a mistake.
 // Levels: 1 words whose ending gives the article away (-α/-η, -ο/-ι, -ος/-ας/-ης);
 // 2 any; 3 mid-round, the ones whose ending says nothing (το κανό, η αλεπού).

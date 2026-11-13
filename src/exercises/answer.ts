@@ -30,6 +30,9 @@ export function makeAnswer(
 
 export const wordItemId = (wordId: string) => `word:${wordId}`;
 export const graphemeItemId = (g: string) => `grapheme:${g}`;
+/** tracing and memory have their own keys: a shaky stroke or a forgotten card is not a reading error */
+export const traceItemId = (letter: string) => `trace:${letter}`;
+export const caseItemId = (g: string) => `case:${g}`;
 export const syllableItemId = (s: string) => `syllable:${s}`;
 export const sentenceItemId = (id: string) => `sentence:${id}`;
 export const storyItemId = (id: string, question: number) => `story:${id}:${question}`;

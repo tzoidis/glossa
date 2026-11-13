@@ -32,7 +32,8 @@ export function generateTrace(ctx: GenerateContext): Round {
   // the final sigma is written with σ
   const small = taught.includes(greek.sigma) && strokesOf(greek.finalSigma, 'lower') ? [...taught, greek.finalSigma] : taught;
   const newest = taught.slice(-NEWEST);
-  const due = ctx.reviewQueue.filter((k) => k.startsWith('grapheme:')).map((k) => k.slice('grapheme:'.length)).filter((g) => small.includes(g));
+  // letters traced badly come back here only (trace:, not grapheme: — a motor slip is not a reading error)
+  const due = ctx.reviewQueue.filter((k) => k.startsWith('trace:')).map((k) => k.slice('trace:'.length)).filter((g) => small.includes(g));
 
   const items: TraceItem[] = [];
   const order = [...shuffle(due, ctx.rng), ...shuffle(newest, ctx.rng), ...shuffle(small, ctx.rng)];

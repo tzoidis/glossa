@@ -36,7 +36,7 @@ export function generateUpperLower(ctx: GenerateContext): Round {
   if (letters.length < 3) throw new NotEnoughContent('fewer than 3 letters');
   const size = Math.min(ctx.level === 1 ? 3 : 4, letters.length);
   const newest = letters.at(-1)!;
-  const due = new Set(ctx.reviewQueue.filter((k) => k.startsWith('grapheme:')).map((k) => k.slice('grapheme:'.length)));
+  const due = new Set(ctx.reviewQueue.filter((k) => k.startsWith('case:')).map((k) => k.slice('case:'.length)));
 
   const items: UpperLowerItem[] = [];
   for (let b = 0; b < BOARDS; b++) {

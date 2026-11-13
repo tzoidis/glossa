@@ -6,7 +6,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Round } from '../../engine/types.ts';
 import { t } from '../../i18n.ts';
-import { graphemeItemId, makeAnswer } from '../answer.ts';
+import { caseItemId, makeAnswer } from '../answer.ts';
 import { Hand, useDemo, useOpensWithInstruction } from '../shared/demo.tsx';
 import { useRoundAudio } from '../shared/useRoundAudio.ts';
 import type { ExerciseProps } from '../types.ts';
@@ -37,7 +37,7 @@ export function UpperLower({ round, onAnswer, onComplete }: ExerciseProps) {
   const log = (letter: string, given: string, correct: boolean, attempt: 1 | 2) =>
     onAnswer(
       makeAnswer(round, {
-        itemId: graphemeItemId(letter),
+        itemId: caseItemId(letter),
         target: letter,
         given,
         correct,

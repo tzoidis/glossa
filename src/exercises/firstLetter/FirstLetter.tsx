@@ -2,7 +2,7 @@ import { t } from '../../i18n.ts';
 import { IconButton } from '../../ui/IconButton.tsx';
 import { SpeakerIcon } from '../../ui/Icons.tsx';
 import { Picture } from '../../ui/Picture.tsx';
-import { wordItemId } from '../answer.ts';
+import { graphemeItemId } from '../answer.ts';
 import { ChoiceTile } from '../shared/ChoiceTile.tsx';
 import { useChoiceRound } from '../shared/useChoiceRound.ts';
 import { useRoundAudio } from '../shared/useRoundAudio.ts';
@@ -13,7 +13,8 @@ export function FirstLetter(props: ExerciseProps) {
   const audio = useRoundAudio();
   const { item, pick, stateOf, showHand } = useChoiceRound<FirstLetterItem>(props, {
     exerciseId: FIRST_LETTER_ID,
-    itemId: (i) => wordItemId(i.wordId),
+    // a π/τ mix-up is about the letter, so the letter comes back for review, not the word
+    itemId: (i) => graphemeItemId(i.target),
     prompt: (i, slow) => audio.word(i.wordId, i.text, slow),
     // hint: the first syllable; the word then replays slowly («νε… νερό»)
     onWrong: (i) => audio.syllable(i.firstSyllable),

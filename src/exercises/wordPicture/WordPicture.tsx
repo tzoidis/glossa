@@ -5,6 +5,7 @@ import { SpeakerIcon } from '../../ui/Icons.tsx';
 import { Picture } from '../../ui/Picture.tsx';
 import { wordItemId } from '../answer.ts';
 import { ChoiceTile } from '../shared/ChoiceTile.tsx';
+import { SyllableWord, useSyllableReplay } from '../shared/SyllableWord.tsx';
 import { useChoiceRound } from '../shared/useChoiceRound.ts';
 import { useRoundAudio } from '../shared/useRoundAudio.ts';
 import type { ExerciseProps } from '../types.ts';
@@ -13,17 +14,19 @@ import { WORD_PICTURE_ID, type WordPictureItem } from './generate.ts';
 export function WordPicture(props: ExerciseProps) {
   const audio = useRoundAudio();
   const { content } = useApp();
+  const syllables = useSyllableReplay();
   const { item, pick, stateOf, showHand, markListen } = useChoiceRound<WordPictureItem>(props, {
     exerciseId: WORD_PICTURE_ID,
     itemId: (i) => wordItemId(i.wordId),
-    // no prompt: the word is read, not heard; after a mistake it is heard slowly
-    onWrong: (i) => audio.word(i.wordId, i.text, true),
+    // no prompt: the word is read, not heard; after a mistake it is decoded aloud, syllable by syllable
+    onWrong: (i) => syllables.replay(content.wordsById.get(i.wordId)!),
   });
+  const word = content.wordsById.get(item.wordId)!;
 
   return (
     <div className="exercise-stage word-picture">
       <div className="prompt">
-        <span className="reading-word">{item.text}</span>
+        <SyllableWord word={word} lit={syllables.lit} />
         <IconButton
           label={t('exercise.listen')}
           onClick={() => {

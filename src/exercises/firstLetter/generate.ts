@@ -5,7 +5,7 @@
 import { distinctSounds } from '../../engine/homophones.ts';
 import { shuffle } from '../../engine/rng.ts';
 import type { Round } from '../../engine/types.ts';
-import { isEasyPosition, NotEnoughContent, pickWords, visuallySimilar, wordGraphemes } from '../pool.ts';
+import { isEasyPosition, NotEnoughContent, pickWords, visuallySimilar, withLetterReview, wordGraphemes } from '../pool.ts';
 import type { GenerateContext } from '../types.ts';
 
 export const FIRST_LETTER_ID = 'first-letter';
@@ -23,7 +23,7 @@ export interface FirstLetterItem {
 export function generateFirstLetter(ctx: GenerateContext): Round {
   const letters = [...ctx.allowedGraphemes];
   const pool = ctx.wordPool.filter((w) => w.imageId && ctx.allowedGraphemes.has(wordGraphemes(w)[0]!));
-  const words = pickWords(pool, ctx);
+  const words = pickWords(pool, withLetterReview(ctx, pool, (w) => [wordGraphemes(w)[0]!]));
 
   const items: FirstLetterItem[] = words.map((w, i) => {
     const target = wordGraphemes(w)[0]!;

@@ -1,6 +1,7 @@
 // «Λέξη και εικόνα»: read one written word, pick its picture from 3 (4 at higher
 // levels). The word is reading material, so it is not spoken unless the child asks
-// (and that counts as help). Level 3: wrong pictures start with the same letter.
+// (and that counts as help). From level 2, wrong pictures start with the same letter
+// where possible, so the first letter alone does not give the answer.
 
 import { shuffle } from '../../engine/rng.ts';
 import type { Round } from '../../engine/types.ts';
@@ -30,7 +31,7 @@ export function generateWordPicture(ctx: GenerateContext): Round {
       withImage.filter((o) => o.id !== w.id && o.imageId !== w.imageId),
       ctx.rng,
     );
-    if (ctx.level === 3 && hard) others = [...others.filter((o) => wordGraphemes(o)[0] === first), ...others.filter((o) => wordGraphemes(o)[0] !== first)];
+    if (hard) others = [...others.filter((o) => wordGraphemes(o)[0] === first), ...others.filter((o) => wordGraphemes(o)[0] !== first)];
     const options = shuffle([w.id, ...others.slice(0, count - 1).map((o) => o.id)], ctx.rng);
     return { wordId: w.id, text: w.text, options, target: w.id };
   });

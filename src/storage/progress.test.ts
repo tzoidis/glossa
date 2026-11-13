@@ -74,8 +74,8 @@ describe('completeRound', () => {
 
   it('moves the level of the exercise played, and keeps it across reads', async () => {
     const db = await freshDb();
-    await completeRound(db, DEFAULT_CHILD_ID, { exerciseId: 'first-letter', share: 1 });
-    await completeRound(db, DEFAULT_CHILD_ID, { exerciseId: 'first-letter', share: 1 });
+    await completeRound(db, DEFAULT_CHILD_ID, { exerciseId: 'first-letter', share: 0.8 });
+    await completeRound(db, DEFAULT_CHILD_ID, { exerciseId: 'first-letter', share: 0.8 });
     await completeRound(db, DEFAULT_CHILD_ID, { exerciseId: 'word-picture', share: null });
     const child = await db.children.get(DEFAULT_CHILD_ID);
     expect(child?.levels).toEqual({ 'first-letter': { level: 2, goodRounds: 0 } });

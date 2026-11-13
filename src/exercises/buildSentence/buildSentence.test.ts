@@ -21,7 +21,7 @@ describe('build-sentence property test', () => {
         expect(s.isTrueForImage, c.label).toBe(true);
         expect(item.imageId, c.label).toBe(s.imageId);
         expect(item.parts, c.label).toEqual(sentenceParts(s));
-        expect(item.parts.join(' '), c.label).toBe(item.text);
+        expect(item.parts.reduce((x, p) => (/^\p{L}/u.test(p) && x ? `${x} ${p}` : x + p), ''), c.label).toBe(item.text);
         for (const tile of item.tiles) expect(isTextAllowed(tile.text, allow), `${c.label}: «${tile.text}»`).toBe(true);
         const extra = item.tiles.length - item.parts.length;
         expect(extra, c.label).toBeLessThanOrEqual(c.level === 3 ? 1 : 0);
@@ -31,9 +31,9 @@ describe('build-sentence property test', () => {
     expect(generated).toBeGreaterThan(0);
   });
 
-  it('keeps the capital on the first word and the full stop on the last', () => {
+  it('keeps the capital on the first word and makes the full stop a piece of its own', () => {
     const s = CONTENT.sentences.find((x) => x.tokens.join(' ') === 'Το πουλί πετά .')!;
-    expect(sentenceParts(s)).toEqual(['Το', 'πουλί', 'πετά.']);
+    expect(sentenceParts(s)).toEqual(['Το', 'πουλί', 'πετά', '.']);
   });
 
   it('is offered by the end of unit 2', () => {

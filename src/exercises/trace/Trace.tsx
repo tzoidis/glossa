@@ -9,7 +9,7 @@ import type { Level, Round } from '../../engine/types.ts';
 import { t } from '../../i18n.ts';
 import { IconButton } from '../../ui/IconButton.tsx';
 import { ReplayIcon } from '../../ui/Icons.tsx';
-import { graphemeItemId, makeAnswer } from '../answer.ts';
+import { makeAnswer, traceItemId } from '../answer.ts';
 import { Hand, useDemo, useOpensWithInstruction } from '../shared/demo.tsx';
 import { useRoundAudio } from '../shared/useRoundAudio.ts';
 import type { ExerciseProps } from '../types.ts';
@@ -80,7 +80,7 @@ export function Trace({ round, onAnswer, onComplete }: ExerciseProps) {
   const log = (correct: boolean, attempt: 1 | 2, given: string) =>
     onAnswer(
       makeAnswer(round, {
-        itemId: graphemeItemId(item.target),
+        itemId: traceItemId(item.target),
         target: item.letter,
         given,
         correct,

@@ -1,9 +1,11 @@
 // «Φτιάχνω πρόταση»: the words of a sentence, shuffled, to put in order next to
-// its picture. The capital letter shows which word comes first and the full stop
-// (kept on the last word) which comes last, as in the book. Only sentences that
+// its picture. The capital letter shows which word comes first and the full stop,
+// a piece of its own, goes last, as in the book; the words in between must be read
+// (with the stop on the last word, a 3-word sentence solved itself). Only sentences that
 // are true for their picture, so the picture helps. The sentence is reading
 // material: heard only if the child asks, or slowly after a mistake.
-// Levels: 1 up to 3 words; 2 up to 4; 3 any length + one extra word mid-round.
+// Levels (words, not counting the stop): 1 up to 3; 2 up to 4; 3 any length + one
+// extra word mid-round.
 
 import { shuffle } from '../../engine/rng.ts';
 import type { Level, Round, Sentence } from '../../engine/types.ts';
@@ -16,10 +18,13 @@ export const BUILD_SENTENCE_ID = 'build-sentence';
 const MIN_SENTENCES = 4;
 const MAX_WORDS: Record<Level, number> = { 1: 3, 2: 4, 3: 99 };
 
-/** «Το πουλί πετά .» → «Το», «πουλί», «πετά.»: punctuation stays on its word */
+/** «Το πουλί πετά .» → «Το», «πουλί», «πετά», «.»: the full stop is a piece too */
 export function sentenceParts(s: Sentence): string[] {
-  return sentenceText(s).split(' ');
+  return s.tokens;
 }
+
+const isWord = (t: string) => /\p{L}/u.test(t);
+const wordCount = (s: Sentence) => s.tokens.filter(isWord).length;
 
 export function generateBuildSentence(ctx: GenerateContext): Round {
   const byText = new Map<string, Sentence>();
@@ -27,13 +32,13 @@ export function generateBuildSentence(ctx: GenerateContext): Round {
   const pool = [...byText.values()];
   if (pool.length < MIN_SENTENCES) throw new NotEnoughContent(`only ${pool.length} sentences`);
 
-  const fitting = pool.filter((s) => sentenceParts(s).length <= MAX_WORDS[ctx.level]);
+  const fitting = pool.filter((s) => wordCount(s) <= MAX_WORDS[ctx.level]);
   const source = fitting.length >= MIN_SENTENCES ? fitting : pool;
   const due = new Set(ctx.reviewQueue.filter((k) => k.startsWith('sentence:')).map((k) => k.slice('sentence:'.length)));
   const review = shuffle(source.filter((s) => due.has(s.id)), ctx.rng);
   const fresh = shuffle(source.filter((s) => !due.has(s.id)), ctx.rng);
   // every word on screen: the extra one comes from another readable sentence, never a capitalised first word
-  const spareWords = [...new Set(pool.flatMap((s) => sentenceParts(s).slice(1, -1)))];
+  const spareWords = [...new Set(pool.flatMap((s) => s.tokens.filter(isWord).slice(1)))];
 
   const items: OrderItem[] = [];
   const used = new Set<string>();

@@ -1304,6 +1304,20 @@ button {
   opacity: 0.35;
 }
 
+/* «Ο, η ή το;»: the picture appears once the article is found */
+.article-picture .picture-placeholder {
+  display: block;
+  width: 180px;
+  height: 180px;
+}
+
+/* decoding after a mistake: the syllable being heard lights up */
+.syl--lit {
+  background: #fde9d6;
+  color: #c2571b;
+  border-radius: 10px;
+}
+
 @media (max-width: 600px) {
   :root {
     --gutter: 16px;

@@ -10,7 +10,7 @@ import { distinctSounds } from '../../engine/homophones.ts';
 import { shuffle } from '../../engine/rng.ts';
 import { tokenize } from '../../engine/greekTokenizer.ts';
 import type { Level, Round, Word } from '../../engine/types.ts';
-import { isEasyPosition, isReadable, MIN_DISTINCT_WORDS, NotEnoughContent, pickWords, visuallySimilar } from '../pool.ts';
+import { isEasyPosition, isReadable, MIN_DISTINCT_WORDS, NotEnoughContent, pickWords, visuallySimilar, withLetterReview } from '../pool.ts';
 import type { GenerateContext } from '../types.ts';
 
 export const MISSING_LETTER_ID = 'missing-letter';
@@ -44,7 +44,8 @@ export function generateMissingLetter(ctx: GenerateContext): Round {
   const letters = [...ctx.allowedGraphemes];
   const pool = ctx.wordPool.filter((w) => w.imageId && isReadable(w, ctx) && gapsOf(w).length > 0);
   const fitting = pool.filter((w) => tokensOf(w).length <= MAX_GRAPHEMES[ctx.level]);
-  const words = pickWords(fitting.length >= MIN_DISTINCT_WORDS ? fitting : pool, ctx);
+  const source = fitting.length >= MIN_DISTINCT_WORDS ? fitting : pool;
+  const words = pickWords(source, withLetterReview(ctx, source, (w) => gapsOf(w).map((i) => tokensOf(w)[i]!.g)));
 
   const items: MissingLetterItem[] = words.map((w, i) => {
     const tokens = tokensOf(w);
