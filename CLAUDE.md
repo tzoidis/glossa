@@ -59,13 +59,14 @@ Node ≥ 22.18 (scripts in `scripts/` run as plain `.ts` via Node type stripping
 - `AnswerLog.itemId` is also the review-queue key: `word:<wordId>` or `grapheme:<g>` (helpers in `src/exercises/answer.ts`). Exercises leave `childId` empty; the session fills it.
 - The pure session flow is `src/engine/session.ts`; persistence of answers, review queue, village items and stars is `src/storage/progress.ts`.
 - `Picture` shows the bundled OpenMoji SVG (`src/assets/openmoji/<code>.svg`, unchanged, CC BY-SA 4.0); a code without one falls back to the device emoji font. After adding a word or an icon, run `node scripts/build-openmoji-subset.ts` (`src/ui/Picture.test.ts` fails until every word and station has its SVG).
+- «Δικές μου λέξεις» (`src/screens/parent/MyWordsSection.tsx`, Dexie `customWords`): the app content is `withCustomWords(CONTENT, …)`. A name picked from `names.json` keeps its id, so its bundled clip plays; other words use the parent's recording (`word/<id>`) or the device voice. Names carry the `name` tag and reach only the games with `names: true` in the registry (they show the word whole or in syllables; the rest split it into small letters). After adding a name to `names.json`: `npm run word-list`, then the clips (`--words --only <id>` and the syllable list).
 - The reading font is «Glossa Reading», an Andika subset renamed as the OFL requires (`scripts/fonts/build.py`). Credits for pictures, font and voice are in the parent screen's «Σχετικά»; keep them when an asset changes.
 
 ## Layout
 
 ```
 src/
-  content/    curriculum.json, words.json, sentences.json, stories.json, ui.el.json
+  content/    curriculum.json, words.json, names.json, sentences.json, stories.json, ui.el.json
   engine/     tokenizer, allowed words, round generator, adaptive, review queue, rng
   exercises/  one folder per exercise type (shared ExerciseModule interface)
   audio/      AudioService (+ MockAudioService), recordings list, bundled files

@@ -24,7 +24,7 @@ export function useStations() {
         hasLocalVoice: voice !== null,
         hasTouch: hasTouchScreen(),
       })
-        .filter((e) => canGenerate(e.module, buildGenerateContext({ content, allow, level: 1, recentWordIds: [], reviewQueue: [], seed: 1 })))
+        .filter((e) => canGenerate(e.module, buildGenerateContext({ content, allow, level: 1, recentWordIds: [], reviewQueue: [], seed: 1, names: e.names })))
         .map((e) => ({ id: e.module.id, mechanism: e.mechanism, weight: STAGE_WEIGHTS[stageAt(settings.upToPosition, content.order.unitStart.get(3) ?? 0)][e.family] })),
     [settings, voice, content, allow],
   );

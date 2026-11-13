@@ -1,7 +1,7 @@
 // Stored records (PRD §8 Dexie tables). AnswerLog is the PRD schema itself.
 
 import type { ExerciseLevel } from '../engine/adaptive.ts';
-import type { Flag } from '../engine/types.ts';
+import type { Flag, Word } from '../engine/types.ts';
 
 export const DEFAULT_CHILD_ID = 'child-1';
 export const DEFAULT_DAILY_LIMIT_MINUTES = 15;
@@ -58,6 +58,25 @@ export interface Recording {
   key: string;
   blob: Blob;
   mimeType: string;
+  createdAt: number;
+}
+
+/**
+ * «Δικές μου λέξεις» (PRD §7): a word or name the parent added. It joins the bank
+ * once its letters are taught (PRD §3), like any word.
+ */
+export interface CustomWord {
+  /** a names.json id (its clip is bundled) or custom-<random> */
+  id: string;
+  childId: string;
+  text: string;
+  article: Word['article'];
+  syllables: string[];
+  kind: 'name' | 'word';
+  /** an OpenMoji code; ignored when there is a photo */
+  imageId?: string;
+  /** JPEG data URL, at most 512px, re-encoded so no EXIF or location is kept */
+  photo?: string;
   createdAt: number;
 }
 

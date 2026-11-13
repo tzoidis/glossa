@@ -13,6 +13,8 @@ export interface Content {
   words: Word[];
   sentences: Sentence[];
   stories: Story[];
+  /** names a parent can pick for «Δικές μου λέξεις» (names.json): no picture, capital first letter */
+  names?: Word[];
 }
 
 const ARTICLES = new Set<string | null>([...greek.articles, null]);
@@ -38,7 +40,7 @@ export function validateCurriculum(curriculum: Curriculum): string[] {
   return errors;
 }
 
-export function validateWords(words: Word[], curriculum: Curriculum): string[] {
+export function validateWords(words: Word[], curriculum: Curriculum, { needsImage = true }: { needsImage?: boolean } = {}): string[] {
   const errors: string[] = [];
   const order = graphemeOrder(curriculum);
   const ids = new Set<string>();
@@ -55,8 +57,9 @@ export function validateWords(words: Word[], curriculum: Curriculum): string[] {
 
     if (!ARTICLES.has(w.article)) errors.push(`${at}: bad article ${JSON.stringify(w.article)}`);
     if (!w.category) errors.push(`${at}: missing category`);
-    if (!w.imageId) errors.push(`${at}: missing imageId`);
-    else if (!/^[0-9A-F]{4,6}(-[0-9A-F]{4,6})*$/.test(w.imageId)) errors.push(`${at}: imageId "${w.imageId}" is not an OpenMoji code (e.g. 1F34E)`);
+    if (!w.imageId) {
+      if (needsImage) errors.push(`${at}: missing imageId`);
+    } else if (!/^[0-9A-F]{4,6}(-[0-9A-F]{4,6})*$/.test(w.imageId)) errors.push(`${at}: imageId "${w.imageId}" is not an OpenMoji code (e.g. 1F34E)`);
     if (w.graphemes !== undefined || w.minPosition !== undefined) {
       errors.push(`${at}: graphemes/minPosition are computed, do not write them by hand`);
     }
@@ -188,12 +191,32 @@ export function capacityErrors(config: CapacityConfig, rows: CapacityRow[]): str
   return errors;
 }
 
+/** the masculine and feminine articles (greek.json lists ο, η, το) */
+const NAME_ARTICLES = new Set<string | null>(greek.articles.slice(0, 2));
+
+/** names.json: bank-word checks without the picture, plus a capital first letter, «ο»/«η» and the name tag */
+export function validateNames(names: Word[], words: Word[], curriculum: Curriculum): string[] {
+  const errors = validateWords(names, curriculum, { needsImage: false });
+  const bank = new Set(words.map((w) => normalizeText(w.text).toLocaleLowerCase('el')));
+  for (const n of names) {
+    const at = `name ${n.id} «${n.text}»`;
+    const first = [...n.text][0] ?? '';
+    if (first === first.toLocaleLowerCase('el')) errors.push(`${at}: a name starts with a capital`);
+    if (!NAME_ARTICLES.has(n.article)) errors.push(`${at}: a name takes the masculine or feminine article`);
+    if (!n.tags.includes('name')) errors.push(`${at}: missing the name tag`);
+    if (!n.id.startsWith('name-')) errors.push(`${at}: id must start with name-`);
+    if (bank.has(normalizeText(n.text).toLocaleLowerCase('el'))) errors.push(`${at}: also a bank word`);
+  }
+  return errors;
+}
+
 export function validateContent(content: Content, capacity: CapacityConfig): { errors: string[]; capacity: CapacityRow[] } {
   const rows = capacityTable(capacity, content.curriculum, content.words);
   return {
     errors: [
       ...validateCurriculum(content.curriculum),
       ...validateWords(content.words, content.curriculum),
+      ...validateNames(content.names ?? [], content.words, content.curriculum),
       ...validateTexts(content.sentences, content.stories, content.curriculum),
       ...capacityErrors(capacity, rows),
     ],

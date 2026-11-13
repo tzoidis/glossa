@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import audio from '../content/audio.json' with { type: 'json' };
+import names from '../content/names.json' with { type: 'json' };
 import sentences from '../content/sentences.json' with { type: 'json' };
 import stories from '../content/stories.json' with { type: 'json' };
 import words from '../content/words.json' with { type: 'json' };
+import { syllableSoundKey } from '../engine/homophones.ts';
 import { bundledUrl } from './bundled.ts';
 import { audioKey } from './recordings.ts';
 
@@ -19,6 +21,12 @@ describe('bundled clips', () => {
 
   it('every bank word', () => {
     expect(words.map((w) => audioKey('word', w.id)).filter((k) => !bundledUrl(k))).toEqual([]);
+  });
+
+  it('every listed name, and its syllables (python scripts/voice/generate.py --words --only <id>)', () => {
+    expect(names.map((n) => audioKey('word', n.id)).filter((k) => !bundledUrl(k))).toEqual([]);
+    const keys = new Set(names.flatMap((n) => n.syllables.map((s) => audioKey('syllable', syllableSoundKey(s)))));
+    expect([...keys].filter((k) => !bundledUrl(k))).toEqual([]);
   });
 
   it('every story and story question', () => {

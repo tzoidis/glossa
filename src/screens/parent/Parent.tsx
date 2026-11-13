@@ -15,6 +15,7 @@ import { BackupSection } from './BackupSection.tsx';
 import { ExercisesSection } from './ExercisesSection.tsx';
 import { GuideSection } from './GuideSection.tsx';
 import { LettersSection } from './LettersSection.tsx';
+import { MyWordsSection } from './MyWordsSection.tsx';
 import { ParentGate } from './ParentGate.tsx';
 import { ProgressSection } from './ProgressSection.tsx';
 import { FlagsSection, OtherSection, TimeSection } from './SettingsSections.tsx';
@@ -90,6 +91,7 @@ export function Parent({ onClose }: { onClose(): void }) {
           <LettersSection />
           {hasProgress && <ProgressSection />}
           <ExercisesSection />
+          <MyWordsSection />
           <TimeSection />
           <AudioSection />
           <FlagsSection />

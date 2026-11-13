@@ -9,14 +9,14 @@ import { useUpdateSettings } from './useSettings.ts';
 type Status = 'ok' | 'off' | 'later' | 'noVoice' | 'noTouch' | 'noContent';
 
 /** Why an exercise is or is not offered to the child right now. */
-export function exerciseStatus({ module: m, touchOnly }: ExerciseEntry, app: App, hasTouch = hasTouchScreen()): Status {
+export function exerciseStatus({ module: m, touchOnly, names }: ExerciseEntry, app: App, hasTouch = hasTouchScreen()): Status {
   const { settings } = app;
   if (!isEnabled(m.id, settings)) return 'off';
   if (m.requires.minGraphemes > settings.upToPosition) return 'later';
   if (!m.requires.skills.every((s) => app.allow.skills.has(s))) return 'later';
   if (m.requires.needs.includes('localTTS') && !app.voice) return 'noVoice';
   if (touchOnly && !hasTouch) return 'noTouch';
-  const ctx = buildGenerateContext({ content: app.content, allow: app.allow, level: 1, recentWordIds: [], reviewQueue: [], seed: 1 });
+  const ctx = buildGenerateContext({ content: app.content, allow: app.allow, level: 1, recentWordIds: [], reviewQueue: [], seed: 1, names });
   return canGenerate(m, ctx) ? 'ok' : 'noContent';
 }
 

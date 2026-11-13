@@ -52,23 +52,28 @@ export interface ExerciseEntry {
   family: Family;
   /** practises the hand's movement: pointless with a mouse, so hidden without a touch screen */
   touchOnly?: boolean;
+  /**
+   * takes the names the parent added: the word is shown whole or in syllables, so
+   * its capital stays (games that split it into small letters would lose it)
+   */
+  names?: boolean;
 }
 
 export const EXERCISES: ExerciseEntry[] = [
   { module: firstLetter, mechanism: 'tap-choice', icon: '1F442', family: 'letters' },
-  { module: joinSyllables, mechanism: 'order', icon: '1F9E9', family: 'words' },
-  { module: syllableCount, mechanism: 'tap-choice', icon: '1F44F', family: 'sounds' },
-  { module: wordPicture, mechanism: 'listen-image', icon: '1F4D6', family: 'words' },
+  { module: joinSyllables, mechanism: 'order', icon: '1F9E9', family: 'words', names: true },
+  { module: syllableCount, mechanism: 'tap-choice', icon: '1F44F', family: 'sounds', names: true },
+  { module: wordPicture, mechanism: 'listen-image', icon: '1F4D6', family: 'words', names: true },
   { module: buildWord, mechanism: 'order', icon: '1F9F1', family: 'words' },
   { module: whichSyllable, mechanism: 'tap-choice', icon: '1F4E3', family: 'sounds' },
-  { module: blendSounds, mechanism: 'listen-image', icon: '1F9F2', family: 'sounds' },
+  { module: blendSounds, mechanism: 'listen-image', icon: '1F9F2', family: 'sounds', names: true },
   { module: findAll, mechanism: 'tap-many', icon: '1F50D', family: 'sounds' },
   { module: missingLetter, mechanism: 'tap-choice', icon: '1F573', family: 'letters' },
-  { module: whichWord, mechanism: 'tap-choice', icon: '1F440', family: 'words' },
+  { module: whichWord, mechanism: 'tap-choice', icon: '1F440', family: 'words', names: true },
   { module: trueFalse, mechanism: 'tap-choice', icon: '1F914', family: 'sentences' },
   { module: buildSentence, mechanism: 'order', icon: '1F682', family: 'sentences' },
   { module: readStory, mechanism: 'listen-image', icon: '1F4DA', family: 'sentences' },
-  { module: article, mechanism: 'tap-choice', icon: '1F3F7', family: 'words' },
+  { module: article, mechanism: 'tap-choice', icon: '1F3F7', family: 'words', names: true },
   { module: stress, mechanism: 'tap-choice', icon: '1F4AA', family: 'words' },
   { module: lastSyllable, mechanism: 'tap-choice', icon: '1F3C1', family: 'sounds' },
   { module: upperLower, mechanism: 'memory', icon: '1F3B4', family: 'letters' },

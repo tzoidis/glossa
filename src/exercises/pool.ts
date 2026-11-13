@@ -97,6 +97,12 @@ export function pickWords(pool: Word[], ctx: GenerateContext, size = ROUND_SIZE)
   return out;
 }
 
+/** The first word of each picture: two choices never show the same one (the parent's names may share one). */
+export function distinctPictures<W extends Word>(words: W[]): W[] {
+  const seen = new Set<string | undefined>();
+  return words.filter((w) => !seen.has(w.imageId) && !!seen.add(w.imageId));
+}
+
 const SIMILAR = new Map<string, string[]>();
 for (const [a, b] of greek.visuallySimilar) {
   SIMILAR.set(a!, [...(SIMILAR.get(a!) ?? []), b!]);

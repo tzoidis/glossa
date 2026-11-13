@@ -311,7 +311,20 @@ interface AnswerLog {
 }
 ```
 
-Πίνακες Dexie: `children`, `settings`, `answers`, `reviewQueue`, `recordings` (Blob + mimeType), `world` (αντικείμενα χωριού), `dailyTime`.
+Πίνακες Dexie: `children`, `settings`, `answers`, `reviewQueue`, `recordings` (Blob + mimeType), `world` (αντικείμενα χωριού), `dailyTime`, `customWords` («Δικές μου λέξεις», από την έκδοση 2 της βάσης).
+
+```ts
+interface CustomWord {
+  id: string;                            // id του names.json (έτοιμο ηχητικό) ή custom-<τυχαίο>
+  childId: string; text: string;         // NFC· τα ονόματα με κεφαλαίο
+  article: 'ο' | 'η' | 'το' | null; syllables: string[];
+  kind: 'name' | 'word';                 // τα ονόματα μπαίνουν μόνο σε παιχνίδια που δείχνουν τη λέξη ολόκληρη ή σε συλλαβές
+  imageId?: string; photo?: string;      // κωδικός OpenMoji ή φωτογραφία JPEG (data URL, ≤ 512px, ξανακωδικοποιημένη)
+  createdAt: number;
+}
+```
+
+Ονόματα που διαλέγει ο γονιός: `names.json` (ίδιο σχήμα με το `Word`, χωρίς εικόνα, με tag `name`), το καθένα με ηχητικό στη φωνή των παιχνιδιών.
 
 **Κοινό interface άσκησης**
 

@@ -9,6 +9,7 @@ import {
   defaultSettings,
   localDate,
   type Child,
+  type CustomWord,
   type DailyTime,
   type Recording,
   type ReviewItem,
@@ -26,6 +27,7 @@ export class GlossaDb extends Dexie {
   declare recordings: EntityTable<Recording, 'key'>;
   declare world: EntityTable<WorldItem, 'id'>;
   declare dailyTime: EntityTable<DailyTime, 'id'>;
+  declare customWords: EntityTable<CustomWord, 'id'>;
 
   constructor(name: string, migrations: Migration[]) {
     super(name);

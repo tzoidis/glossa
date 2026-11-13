@@ -2,7 +2,7 @@ import { isTextAllowed, type AllowContext } from '../engine/allowedWords.ts';
 import { mulberry32 } from '../engine/rng.ts';
 import type { Level } from '../engine/types.ts';
 import type { GenerateContext } from '../exercises/types.ts';
-import type { Content } from './content.ts';
+import { NAME_TAG, type Content } from './content.ts';
 
 export interface GenerateInputs {
   content: Content;
@@ -11,6 +11,8 @@ export interface GenerateInputs {
   recentWordIds: string[];
   reviewQueue: string[];
   seed: number;
+  /** the game takes names (registry `names`): the others split words into small letters */
+  names?: boolean;
 }
 
 type Readable = Pick<GenerateContext, 'allowedGraphemes' | 'sentencePool' | 'storyPool'>;
@@ -39,11 +41,19 @@ function readableNow(content: Content, allow: AllowContext): Readable {
   return r;
 }
 
-export function buildGenerateContext({ content, allow, level, recentWordIds, reviewQueue, seed }: GenerateInputs): GenerateContext {
+const withoutNames = new WeakMap<Content, Content['words']>();
+
+function wordsWithoutNames(content: Content): Content['words'] {
+  let words = withoutNames.get(content);
+  if (!words) withoutNames.set(content, (words = content.words.filter((w) => !w.tags.includes(NAME_TAG))));
+  return words;
+}
+
+export function buildGenerateContext({ content, allow, level, recentWordIds, reviewQueue, seed, names = false }: GenerateInputs): GenerateContext {
   return {
     ...readableNow(content, allow),
     unlockedFlags: allow.unlockedFlags,
-    wordPool: content.words,
+    wordPool: names ? content.words : wordsWithoutNames(content),
     level,
     recentWordIds,
     reviewQueue,

@@ -51,7 +51,7 @@ export function RoundPlayer({ exerciseId, onComplete, onSkip, onLeave }: { exerc
         let r: Round | undefined;
         for (let level: number = child.levels?.[exerciseId]?.level ?? 1; !r; level--) {
           try {
-            r = entry.module.generate(buildGenerateContext({ ...inputs, level: level as Level, seed }));
+            r = entry.module.generate(buildGenerateContext({ ...inputs, level: level as Level, seed, names: entry.names }));
           } catch (e) {
             if (level === 1) throw e;
           }
@@ -64,7 +64,7 @@ export function RoundPlayer({ exerciseId, onComplete, onSkip, onLeave }: { exerc
           let item: unknown = r.items[0];
           let extra: Round = r;
           try {
-            extra = entry.module.generate(buildGenerateContext({ ...inputs, level: 1, recentWordIds: [...used], seed: seed ^ 0x9e3779b9 }));
+            extra = entry.module.generate(buildGenerateContext({ ...inputs, level: 1, recentWordIds: [...used], seed: seed ^ 0x9e3779b9, names: entry.names }));
             const first = wordIdOfItem(r.items[0]);
             item =
               extra.items.find((i) => !used.has(wordIdOfItem(i))) ?? // a word the round does not use

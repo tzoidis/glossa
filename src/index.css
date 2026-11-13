@@ -84,6 +84,12 @@ button {
   user-select: none;
 }
 
+/* a parent's photo: square crop with soft corners, like a picture card */
+.picture--photo img {
+  object-fit: cover;
+  border-radius: 18%;
+}
+
 /* ---------- layout ---------- */
 
 .screen {
@@ -1504,3 +1510,94 @@ button {
   }
 }
 
+
+/* ---------- parent: «Δικές μου λέξεις» ---------- */
+
+.my-words {
+  list-style: none;
+  margin: 8px 0 16px;
+  padding: 0;
+}
+
+.my-word {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--bg);
+}
+
+.my-word-blank {
+  width: 56px;
+  height: 56px;
+}
+
+.my-word-text {
+  display: flex;
+  flex: 1 1 200px;
+  flex-direction: column;
+}
+
+.my-word-text strong {
+  font-family: 'Glossa Reading', system-ui, sans-serif;
+  font-size: 22px;
+}
+
+.my-word-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.my-word-form .field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.my-word-form input {
+  font-family: 'Glossa Reading', system-ui, sans-serif;
+}
+
+.my-word-picture {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.my-word-photo {
+  width: 72px;
+  height: 72px;
+  border-radius: 18%;
+  object-fit: cover;
+}
+
+.picture-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  gap: 6px;
+  max-height: 260px;
+  margin-top: 8px;
+  padding: 6px;
+  overflow-y: auto;
+  border-radius: 12px;
+  background: var(--bg);
+}
+
+.picture-choice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background: var(--card);
+  cursor: pointer;
+}
+
+.picture-choice.chosen {
+  border-color: var(--accent, #2563eb);
+}

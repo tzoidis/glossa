@@ -6,7 +6,7 @@
 import { syllableSoundKey } from '../../engine/homophones.ts';
 import { shuffle } from '../../engine/rng.ts';
 import type { Level, Round } from '../../engine/types.ts';
-import { MIN_DISTINCT_WORDS, pickWords } from '../pool.ts';
+import { distinctPictures, MIN_DISTINCT_WORDS, pickWords } from '../pool.ts';
 import type { GenerateContext } from '../types.ts';
 
 export const BLEND_SOUNDS_ID = 'blend-sounds';
@@ -31,9 +31,11 @@ export function generateBlendSounds(ctx: GenerateContext): Round {
 
   const items: BlendSoundsItem[] = words.map((w) => {
     const first = syllableSoundKey(w.syllables[0]!);
-    let others = shuffle(
-      withImage.filter((o) => o.id !== w.id && o.imageId !== w.imageId),
-      ctx.rng,
+    let others = distinctPictures(
+      shuffle(
+        withImage.filter((o) => o.id !== w.id && o.imageId !== w.imageId),
+        ctx.rng,
+      ),
     );
     if (ctx.level === 3) {
       const close = others.filter((o) => syllableSoundKey(o.syllables[0]!) === first);

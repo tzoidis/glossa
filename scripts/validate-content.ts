@@ -44,6 +44,7 @@ const content: Content = {
   words: load('words.json', []),
   sentences: load('sentences.json', []),
   stories: load('stories.json', []),
+  names: load('names.json', []),
 };
 const capacity = load<CapacityConfig>('capacity.json', { minWords: 0, minChoices: 0, checkpoints: [], exercises: {} });
 
@@ -52,7 +53,7 @@ errors.push(...result.errors);
 
 // Capacity report: how many items each exercise can draw from at each unit end.
 const ids = Object.keys(capacity.exercises);
-console.log(`words: ${content.words.length}, sentences: ${content.sentences.length}, stories: ${content.stories.length}`);
+console.log(`words: ${content.words.length}, names: ${content.names?.length ?? 0}, sentences: ${content.sentences.length}, stories: ${content.stories.length}`);
 console.log(['position', ...ids].join('\t'));
 for (const row of result.capacity) {
   console.log([`${row.position} ${row.label}`, ...ids.map((id) => row.counts[id] ?? '-')].join('\t'));

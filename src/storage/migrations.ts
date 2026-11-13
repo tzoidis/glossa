@@ -23,6 +23,7 @@ export const MIGRATIONS: Migration[] = [
       dailyTime: 'id, childId',
     },
   },
+  { version: 2, stores: { customWords: 'id, childId' } },
 ];
 
 export const SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1]!.version;

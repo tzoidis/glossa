@@ -5,10 +5,11 @@ import { createBrowserAudioService, type AudioService, type VoiceInfo } from '..
 import { bundledUrl } from '../audio/bundled.ts';
 import { makeContext, type AllowContext } from '../engine/allowedWords.ts';
 import { ensureChild, openDb, type GlossaDb } from '../storage/db.ts';
-import { DEFAULT_CHILD_ID, type Child, type Settings } from '../storage/schema.ts';
+import { DEFAULT_CHILD_ID, type Child, type CustomWord, type Settings } from '../storage/schema.ts';
 import { t } from '../i18n.ts';
 import { Mascot } from '../ui/Mascot.tsx';
-import { CONTENT, defaultPosition, type Content } from './content.ts';
+import { setPhotos } from '../ui/Picture.tsx';
+import { CONTENT, defaultPosition, photoImageId, withCustomWords, type Content } from './content.ts';
 
 export interface App {
   db: GlossaDb;
@@ -16,9 +17,11 @@ export interface App {
   content: Content;
   child: Child;
   settings: Settings;
+  /** «Δικές μου λέξεις»: already part of content */
+  customWords: CustomWord[];
   allow: AllowContext;
   voice: VoiceInfo | null;
-  /** re-read child and settings after a write */
+  /** re-read child, settings and the parent's words after a write */
   refresh(): Promise<void>;
   /** look for the local voice again (call after the first tap: iOS may only list voices then) */
   recheckVoice(): void;
@@ -37,6 +40,7 @@ interface Loaded {
   audio: AudioService;
   child: Child;
   settings: Settings;
+  customWords: CustomWord[];
   voice: VoiceInfo | null;
 }
 
@@ -75,9 +79,10 @@ export function AppProvider({ children, audio, dbName, fallback }: AppProviderPr
       const db = await openDb(dbName ? { name: dbName } : {});
       const settings = await ensureChild(db, defaultPosition());
       const child = (await db.children.get(DEFAULT_CHILD_ID))!;
+      const customWords = await db.customWords.where('childId').equals(DEFAULT_CHILD_ID).toArray();
       const service = audio ?? createBrowserAudioService(async (key) => (await db.recordings.get(key))?.blob, bundledUrl);
       clearTimeout(timer);
-      if (!cancelled) setLoaded({ db, audio: service, child, settings, voice: null });
+      if (!cancelled) setLoaded({ db, audio: service, child, settings, customWords, voice: null });
       const voice = await service.voice();
       if (!cancelled) setLoaded((l) => l && { ...l, voice });
     })().catch((e) => {
@@ -93,8 +98,12 @@ export function AppProvider({ children, audio, dbName, fallback }: AppProviderPr
 
   const refresh = useCallback(async () => {
     if (!loaded) return;
-    const [child, settings] = await Promise.all([loaded.db.children.get(DEFAULT_CHILD_ID), loaded.db.settings.get(DEFAULT_CHILD_ID)]);
-    setLoaded((l) => l && { ...l, child: child ?? l.child, settings: settings ?? l.settings });
+    const [child, settings, customWords] = await Promise.all([
+      loaded.db.children.get(DEFAULT_CHILD_ID),
+      loaded.db.settings.get(DEFAULT_CHILD_ID),
+      loaded.db.customWords.where('childId').equals(DEFAULT_CHILD_ID).toArray(),
+    ]);
+    setLoaded((l) => l && { ...l, child: child ?? l.child, settings: settings ?? l.settings, customWords });
   }, [loaded]);
 
   const recheckVoice = useCallback(() => {
@@ -104,13 +113,20 @@ export function AppProvider({ children, audio, dbName, fallback }: AppProviderPr
 
   const app = useMemo<App | null>(() => {
     if (!loaded) return null;
+    const content = withCustomWords(CONTENT, loaded.customWords);
     const allow = makeContext(
       CONTENT.curriculum,
       { position: loaded.settings.upToPosition, extraFlags: loaded.settings.extraFlags, extraSkills: loaded.settings.extraSkills },
-      CONTENT.words,
+      content.words,
     );
-    return { ...loaded, content: CONTENT, allow, refresh, recheckVoice };
+    return { ...loaded, content, allow, refresh, recheckVoice };
   }, [loaded, refresh, recheckVoice]);
+
+  // the parent's photos, for every Picture that shows one of their words
+  const customWords = loaded?.customWords;
+  useEffect(() => {
+    if (customWords) setPhotos(customWords.flatMap((c) => (c.photo ? [[photoImageId(c.id), c.photo] as [string, string]] : [])));
+  }, [customWords]);
 
   if (!app) return failed ? <OpenFailed /> : <>{fallback}</>;
   return <AppContext.Provider value={app}>{children}</AppContext.Provider>;

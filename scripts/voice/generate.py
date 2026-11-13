@@ -30,6 +30,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 AUDIO = ROOT / "src" / "content" / "audio.json"
 WORDS = ROOT / "src" / "content" / "words.json"
+NAMES = ROOT / "src" / "content" / "names.json"
 SENTENCES = ROOT / "src" / "content" / "sentences.json"
 STORIES = ROOT / "src" / "content" / "stories.json"
 OUT = ROOT / "src" / "audio" / "files"
@@ -69,8 +70,10 @@ def syllable_clips(path):
 
 
 def word_clips():
-    for w in json.loads(WORDS.read_text(encoding="utf-8")):
-        yield "word", w["id"], w["text"]
+    # the bank words and the names a parent can pick («Δικές μου λέξεις»)
+    for path in (WORDS, NAMES):
+        for w in json.loads(path.read_text(encoding="utf-8")):
+            yield "word", w["id"], w["text"]
 
 
 def sentence_clips():
@@ -144,7 +147,7 @@ async def main():
     parser.add_argument("--pitch", default="+0Hz", help="edge only")
     parser.add_argument("--only", default="", help="comma-separated keys")
     parser.add_argument("--syllables", default="", help="JSON from scripts/voice/syllable-list.ts")
-    parser.add_argument("--words", action="store_true", help="one clip per word of words.json")
+    parser.add_argument("--words", action="store_true", help="one clip per word of words.json and name of names.json")
     parser.add_argument("--sentences", action="store_true", help="one clip per sentence of sentences.json")
     parser.add_argument("--stories", action="store_true", help="one clip per story and per question of stories.json")
     parser.add_argument("--skip-existing", action="store_true")

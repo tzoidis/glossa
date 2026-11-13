@@ -26,7 +26,7 @@ describe('openDb', () => {
     const db = await openDb(opts);
     open.push(db);
     expect(db.tables.map((t) => t.name).sort()).toEqual(
-      ['answers', 'children', 'dailyTime', 'recordings', 'reviewQueue', 'settings', 'world'].sort(),
+      ['answers', 'children', 'customWords', 'dailyTime', 'recordings', 'reviewQueue', 'settings', 'world'].sort(),
     );
     expect(db.verno).toBe(SCHEMA_VERSION);
     expect(await listMigrationBackups(opts.backupsName)).toEqual([]);

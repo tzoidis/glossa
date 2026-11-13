@@ -5,7 +5,7 @@
 
 import { shuffle } from '../../engine/rng.ts';
 import type { Round } from '../../engine/types.ts';
-import { isEasyPosition, isReadable, pickWords, wordGraphemes } from '../pool.ts';
+import { distinctPictures, isEasyPosition, isReadable, pickWords, wordGraphemes } from '../pool.ts';
 import type { GenerateContext } from '../types.ts';
 
 export const WORD_PICTURE_ID = 'word-picture';
@@ -27,9 +27,11 @@ export function generateWordPicture(ctx: GenerateContext): Round {
     const hard = ctx.level > 1 && !isEasyPosition(i);
     const count = hard ? 4 : 3;
     const first = wordGraphemes(w)[0];
-    let others = shuffle(
-      withImage.filter((o) => o.id !== w.id && o.imageId !== w.imageId),
-      ctx.rng,
+    let others = distinctPictures(
+      shuffle(
+        withImage.filter((o) => o.id !== w.id && o.imageId !== w.imageId),
+        ctx.rng,
+      ),
     );
     if (hard) others = [...others.filter((o) => wordGraphemes(o)[0] === first), ...others.filter((o) => wordGraphemes(o)[0] !== first)];
     const options = shuffle([w.id, ...others.slice(0, count - 1).map((o) => o.id)], ctx.rng);
