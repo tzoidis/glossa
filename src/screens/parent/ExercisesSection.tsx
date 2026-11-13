@@ -1,7 +1,7 @@
 import { useApp, type App } from '../../app/AppContext.tsx';
 import { hasTouchScreen } from '../../app/device.ts';
 import { buildGenerateContext } from '../../app/generateContext.ts';
-import { canGenerate, EXERCISES, type ExerciseEntry } from '../../exercises/registry.ts';
+import { canGenerate, EXERCISES, isEnabled, type ExerciseEntry } from '../../exercises/registry.ts';
 import { t, type UiKey } from '../../i18n.ts';
 import { Picture } from '../../ui/Picture.tsx';
 import { useUpdateSettings } from './useSettings.ts';
@@ -11,7 +11,7 @@ type Status = 'ok' | 'off' | 'later' | 'noVoice' | 'noTouch' | 'noContent';
 /** Why an exercise is or is not offered to the child right now. */
 export function exerciseStatus({ module: m, touchOnly }: ExerciseEntry, app: App, hasTouch = hasTouchScreen()): Status {
   const { settings } = app;
-  if (settings.enabledExercises && !settings.enabledExercises.includes(m.id)) return 'off';
+  if (!isEnabled(m.id, settings)) return 'off';
   if (m.requires.minGraphemes > settings.upToPosition) return 'later';
   if (m.requires.needs.includes('localTTS') && !app.voice) return 'noVoice';
   if (touchOnly && !hasTouch) return 'noTouch';
@@ -23,11 +23,12 @@ export function ExercisesSection() {
   const app = useApp();
   const update = useUpdateSettings();
   const all = EXERCISES.map((e) => e.module.id);
-  const enabled = app.settings.enabledExercises ?? all;
+  const enabled = all.filter((id) => isEnabled(id, app.settings));
 
   const toggle = (id: string, on: boolean) => {
     const next = on ? [...new Set([...enabled, id])] : enabled.filter((x) => x !== id);
-    void update({ enabledExercises: next.length === all.length ? null : next });
+    // remember which games exist now: one added later starts on
+    void update(next.length === all.length ? { enabledExercises: null, knownExercises: undefined } : { enabledExercises: next, knownExercises: all });
   };
 
   return (

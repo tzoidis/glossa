@@ -13,15 +13,24 @@ export function BackupSection() {
 
   const doExport = async () => {
     const now = Date.now();
-    // mark the backup first so the file itself records it
-    await update({ lastBackupAt: now });
-    const file = await exportBackup(db, { includeRecordings: !withoutMedia, now });
+    let file;
+    try {
+      file = await exportBackup(db, { includeRecordings: !withoutMedia, now });
+    } catch {
+      // nothing was saved: the monthly reminder must stay on
+      setMessage('parent.backup.failed');
+      return;
+    }
+    // the file records its own date, so a restore does not ask for a backup again
+    for (const row of (file.tables.settings ?? []) as { lastBackupAt?: number | null }[]) row.lastBackupAt = now;
     const url = URL.createObjectURL(new Blob([JSON.stringify(file)], { type: 'application/json' }));
     const a = document.createElement('a');
     a.href = url;
     a.download = backupFileName(now);
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 10_000);
+    // marked only once the file exists
+    await update({ lastBackupAt: now });
   };
 
   const doImport = async (f: File) => {
@@ -64,7 +73,7 @@ export function BackupSection() {
           }}
         />
       </div>
-      {message && <p className={message === 'parent.backup.invalid' ? 'warn-text' : 'help'}>{t(message)}</p>}
+      {message && <p className={message === 'parent.backup.imported' ? 'help' : 'warn-text'}>{t(message)}</p>}
     </section>
   );
 }

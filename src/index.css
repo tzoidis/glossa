@@ -799,8 +799,16 @@ button {
   font-size: 60px;
 }
 
-.letter-tile-slot {
-  min-width: 88px;
+.slot.letter-tile-slot {
+  min-width: clamp(56px, 9vw, 88px);
+}
+
+/* a wrong piece: a warm border, seen even when motion is reduced */
+.letter-tile.shake,
+.syllable-tile.shake,
+.key.shake {
+  border-color: #c2571b;
+  box-shadow: 0 6px 0 #c2571b;
 }
 
 .letter-tile.faded {
@@ -846,6 +854,10 @@ button {
 .slots {
   position: relative;
   display: flex;
+  /* a long word goes on two rows instead of running off the screen */
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 100%;
   gap: 12px;
   padding: 16px;
   min-height: 136px;
@@ -854,7 +866,7 @@ button {
 }
 
 .slot {
-  min-width: 112px;
+  min-width: clamp(64px, 11vw, 112px);
   height: 104px;
   padding: 0 16px;
   border-radius: 28px;
@@ -920,6 +932,7 @@ button {
   .village-item {
     animation: pop-in 400ms ease-out;
   }
+  .letter-tile.shake,
   .syllable-tile.shake,
   .key.shake {
     animation: shake 400ms ease-in-out;

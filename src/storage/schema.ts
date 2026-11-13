@@ -24,6 +24,8 @@ export interface Settings {
   upToPosition: number;
   /** null = every exercise whose requirements are met */
   enabledExercises: string[] | null;
+  /** the exercises that existed when enabledExercises was saved: one added later starts on (missing = all known) */
+  knownExercises?: string[];
   dailyLimitMinutes: number;
   leftHanded: boolean;
   extraFlags: Flag[];

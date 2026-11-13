@@ -24,11 +24,14 @@ export function SyllableCount(props: ExerciseProps) {
     prompt: (i, slow) => audio.word(i.wordId, i.text, slow),
     // after a mistake, hear it syllable by syllable while the beats light up
     onWrong: async (i) => {
+      // stops when anything else plays (a right answer's praise, the next item)
+      const run = audio.sequence();
       for (let k = 0; k < i.syllables.length; k++) {
+        if (!run.alive()) return;
         setBeat({ total: i.syllables.length, on: k });
         await service.play({ kind: 'syllable', key: i.syllables[k]!, text: i.syllables[k]!, slow: true });
       }
-      setBeat({ total: i.syllables.length, on: -1 });
+      if (run.alive()) setBeat({ total: i.syllables.length, on: -1 });
     },
   });
 

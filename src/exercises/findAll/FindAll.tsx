@@ -69,8 +69,8 @@ export function FindAll({ round, onAnswer, onComplete }: ExerciseProps) {
         return;
       }
       log(now.join(','), true, mistake ? 2 : 1);
-      await sayWord(id);
-      if (!run.alive()) return;
+      // the word is cut short if the child taps the speaker meanwhile; the round must move on anyway
+      if (run.alive()) await sayWord(id);
       await audio.praiseThen(() => {
         if (index + 1 >= items.length) return onComplete();
         setIndex(index + 1);

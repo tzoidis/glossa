@@ -62,14 +62,24 @@ export const EXERCISES: ExerciseEntry[] = [
 export interface Availability {
   position: number;
   enabledExercises: string[] | null;
+  knownExercises?: string[];
   hasLocalVoice: boolean;
   hasTouch: boolean;
+}
+
+/**
+ * Turned on by the parent. A game added after the parent last changed the list was
+ * never turned off, so it is on.
+ */
+export function isEnabled(id: string, s: { enabledExercises: string[] | null; knownExercises?: string[] }): boolean {
+  if (!s.enabledExercises || s.enabledExercises.includes(id)) return true;
+  return s.knownExercises !== undefined && !s.knownExercises.includes(id);
 }
 
 export function availableExercises(entries: ExerciseEntry[], a: Availability): ExerciseEntry[] {
   return entries.filter(({ module: m, touchOnly }) => {
     if (touchOnly && !a.hasTouch) return false;
-    if (a.enabledExercises && !a.enabledExercises.includes(m.id)) return false;
+    if (!isEnabled(m.id, a)) return false;
     if (m.requires.minGraphemes > a.position) return false;
     if (m.requires.needs.includes('localTTS') && !a.hasLocalVoice) return false;
     return true;

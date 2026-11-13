@@ -20,7 +20,7 @@ export function DevDebug() {
     return () => clearInterval(id);
   }, []);
 
-  const availability = { position: app.settings.upToPosition, enabledExercises: app.settings.enabledExercises, hasLocalVoice: app.voice !== null, hasTouch: hasTouchScreen() };
+  const availability = { position: app.settings.upToPosition, enabledExercises: app.settings.enabledExercises, knownExercises: app.settings.knownExercises, hasLocalVoice: app.voice !== null, hasTouch: hasTouchScreen() };
   const offered = new Set(availableExercises(EXERCISES, availability).map((e) => e.module.id));
   const ctx = () => buildGenerateContext({ content: app.content, allow: app.allow, level: 1, recentWordIds: [], reviewQueue: [], seed: 1 });
 

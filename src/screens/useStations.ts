@@ -13,6 +13,7 @@ export function useStations() {
       availableExercises(EXERCISES, {
         position: settings.upToPosition,
         enabledExercises: settings.enabledExercises,
+        knownExercises: settings.knownExercises,
         hasLocalVoice: voice !== null,
         hasTouch: hasTouchScreen(),
       })

@@ -25,7 +25,7 @@
 
   "parent.storage.persistent": "Η αποθήκευση είναι μόνιμη.",
   "parent.storage.notPersistent": "Η αποθήκευση δεν είναι μόνιμη: ο browser μπορεί να σβήσει τα δεδομένα αν χρειαστεί χώρο.",
-  "parent.storage.request": "Ζήτησε μόνιμη αποθήκευση",
+  "parent.storage.request": "Ζητήστε μόνιμη αποθήκευση",
   "parent.backupDue": "Πέρασε πάνω από ένας μήνας χωρίς αντίγραφο ασφαλείας. Κάντε μια εξαγωγή παρακάτω.",
 
   "parent.section.letters": "Μέχρι ποιο γράμμα;",
@@ -61,15 +61,15 @@
   "parent.progress.mistakes": "{n} λάθη σε {of}",
   "parent.progress.mistakes.one": "1 λάθος σε {of}",
   "parent.progress.confusions": "Συχνές συγχύσεις",
-  "parent.progress.confusion": "διαλέγει «{given}» αντί «{target}» ({n} φορές)",
-  "parent.progress.confusion.one": "διαλέγει «{given}» αντί «{target}» (1 φορά)",
-  "parent.progress.listened": "Πάτησε «άκουσε» σε υλικό ανάγνωσης {n} φορές.",
-  "parent.progress.listened.one": "Πάτησε «άκουσε» σε υλικό ανάγνωσης 1 φορά.",
+  "parent.progress.confusion": "διαλέγει «{given}» αντί για «{target}» ({n} φορές)",
+  "parent.progress.confusion.one": "διαλέγει «{given}» αντί για «{target}» (1 φορά)",
+  "parent.progress.listened": "Το παιδί πάτησε «άκουσε» σε υλικό ανάγνωσης {n} φορές.",
+  "parent.progress.listened.one": "Το παιδί πάτησε «άκουσε» σε υλικό ανάγνωσης 1 φορά.",
   "parent.progress.practice": "Εξάσκηση σε αυτά",
   "parent.progress.practiceQueued": "Έγινε: θα έρθουν πρώτα στους επόμενους γύρους.",
   "parent.section.exercises": "Παιχνίδια",
   "parent.section.about": "Σχετικά",
-  "parent.about.app": "Glossa: παιχνίδια ανάγνωσης για την Α' Δημοτικού, γράμμα γράμμα με το βιβλίο «Η γλώσσα μας». Δουλεύει χωρίς σύνδεση και δεν στέλνει πουθενά κανένα δεδομένο.",
+  "parent.about.app": "Glossa: παιχνίδια ανάγνωσης για την Α΄ Δημοτικού, γράμμα γράμμα με το βιβλίο «Η γλώσσα μας». Δουλεύει χωρίς σύνδεση και δεν στέλνει δεδομένα πουθενά.",
   "parent.about.pictures": "Εικόνες: OpenMoji, το ανοιχτό έργο emoji και εικονιδίων (openmoji.org), με άδεια CC BY-SA 4.0, χωρίς αλλαγές.",
   "parent.about.font": "Γραμματοσειρά: «Glossa Reading», υποσύνολο της Andika © SIL International, με άδεια SIL Open Font License 1.1 (licenses/OFL.txt).",
   "parent.about.voice": "Φωνή: «Eleni» από την ElevenLabs.",
@@ -124,7 +124,7 @@
   "parent.audio.syllablesHelp": "Ακούστε πώς λέει η φωνή κάθε συλλαβή και ηχογραφήστε όσες ακούγονται λάθος.",
   "parent.audio.record": "Ηχογράφηση",
   "parent.audio.stop": "Τέλος",
-  "parent.audio.play": "Άκουσε",
+  "parent.audio.play": "Ακρόαση",
   "parent.audio.delete": "Διαγραφή",
   "parent.audio.recorded": "ηχογραφημένο",
   "parent.audio.bundled": "ενσωματωμένο",
@@ -146,6 +146,7 @@
   "parent.backup.confirm": "Η εισαγωγή αντικαθιστά τα δεδομένα αυτής της συσκευής. Συνέχεια;",
   "parent.backup.imported": "Η εισαγωγή ολοκληρώθηκε.",
   "parent.backup.invalid": "Το αρχείο δεν είναι αντίγραφο ασφαλείας αυτής της εφαρμογής.",
+  "parent.backup.failed": "Η εξαγωγή δεν έγινε. Δοκιμάστε ξανά, ή επιλέξτε «Χωρίς ηχογραφήσεις και φωτογραφίες».",
   "parent.backup.last": "Τελευταίο αντίγραφο: {date}",
   "parent.backup.never": "Δεν έχει γίνει ακόμα αντίγραφο.",
 
@@ -170,5 +171,5 @@
   "parent.guide.audio.title": "Ήχος",
   "parent.guide.audio.body": "Οι οδηγίες, οι έπαινοι, οι λέξεις και οι συλλαβές είναι έτοιμα ηχητικά. Αν κάτι ακούγεται λάθος, στο «Ήχος» μπορείτε να το ηχογραφήσετε με τη φωνή σας και θα παίζει αυτό. Τίποτα δεν ακούγεται αυτόματα όταν το παιδί πρέπει να διαβάσει.",
   "parent.guide.data.title": "Δεδομένα και ενημερώσεις",
-  "parent.guide.data.body": "Η εφαρμογή δουλεύει χωρίς internet και όλα μένουν μόνο σε αυτή τη συσκευή. Εγκαταστήστε την στην αρχική οθόνη και κάντε εξαγωγή αντιγράφου ασφαλείας μία φορά τον μήνα. Μια νέα έκδοση εφαρμόζεται όταν ξανανοίξει η εφαρμογή, ποτέ στη μέση ενός γύρου."
+  "parent.guide.data.body": "Η εφαρμογή δουλεύει χωρίς σύνδεση στο διαδίκτυο και όλα μένουν μόνο σε αυτή τη συσκευή. Εγκαταστήστε τη στην αρχική οθόνη και κάντε εξαγωγή αντιγράφου ασφαλείας μία φορά τον μήνα. Μια νέα έκδοση εφαρμόζεται στην πρώτη οθόνη ή από εδώ, ποτέ στη μέση ενός γύρου."
 }
