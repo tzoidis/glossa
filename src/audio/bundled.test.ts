@@ -7,6 +7,7 @@ import words from '../content/words.json' with { type: 'json' };
 import { syllableSoundKey } from '../engine/homophones.ts';
 import { bundledUrl } from './bundled.ts';
 import { audioKey } from './recordings.ts';
+import { pluralClipId } from '../exercises/article/generate.ts';
 
 // The games say these without the device voice: a word added to the bank needs
 // its clip (python scripts/voice/generate.py --words --only <id>).
@@ -26,6 +27,13 @@ describe('bundled clips', () => {
   it('every listed name, and its syllables (python scripts/voice/generate.py --words --only <id>)', () => {
     expect(names.map((n) => audioKey('word', n.id)).filter((k) => !bundledUrl(k))).toEqual([]);
     const keys = new Set(names.flatMap((n) => n.syllables.map((s) => audioKey('syllable', syllableSoundKey(s)))));
+    expect([...keys].filter((k) => !bundledUrl(k))).toEqual([]);
+  });
+
+  it('every plural of «Ο, η ή το;», and its syllables', () => {
+    const plurals = words.filter((w) => w.plural);
+    expect(plurals.map((w) => audioKey('word', pluralClipId(w.id))).filter((k) => !bundledUrl(k))).toEqual([]);
+    const keys = new Set(plurals.flatMap((w) => w.plural!.syllables.map((s) => audioKey('syllable', syllableSoundKey(s)))));
     expect([...keys].filter((k) => !bundledUrl(k))).toEqual([]);
   });
 

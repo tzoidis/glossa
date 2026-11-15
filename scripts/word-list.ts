@@ -34,10 +34,11 @@ for (const unit of curriculum.units.filter((u) => u.graphemes.length > 0)) {
     const atLetter = inUnit.filter((w) => w.minPosition === order.positionOf.get(g));
     if (atLetter.length === 0) continue;
     lines.push(`**from «${g}»**`, '');
-    lines.push('| | Word | Syllables | Flags | Category | Image |', '| --- | --- | --- | --- | --- | --- |');
+    lines.push('| | Word | Syllables | Flags | Plural | Category | Image |', '| --- | --- | --- | --- | --- | --- | --- |');
     for (const w of atLetter) {
       const article = w.article ? `${w.article} ` : '';
-      lines.push(`| [ ] | ${article}${w.text} | ${w.syllables.join('-')} | ${w.flags.join(', ') || '–'} | ${w.category} | ${w.imageId ?? ''} |`);
+      const plural = w.plural ? `${w.article === 'το' ? 'τα' : 'οι'} ${w.plural.syllables.join('-')}${w.plural.flags.length ? ` (${w.plural.flags.join(', ')})` : ''}` : '–';
+      lines.push(`| [ ] | ${article}${w.text} | ${w.syllables.join('-')} | ${w.flags.join(', ') || '–'} | ${plural} | ${w.category} | ${w.imageId ?? ''} |`);
     }
     lines.push('');
   }

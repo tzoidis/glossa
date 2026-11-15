@@ -1,5 +1,5 @@
 // Prints {soundKey: text to say} for every syllable the app may play: the syllables
-// of every bank word and listed name, plus each consonant sound of the curriculum before α ε ι ο ου
+// of every bank word (and its plural) and listed name, plus each consonant sound of the curriculum before α ε ι ο ου
 // and the vowels alone (for «Ποια συλλαβή ακούς;»). Feeds scripts/voice/generate.py.
 
 import curriculum from '../../src/content/curriculum.json' with { type: 'json' };
@@ -16,4 +16,5 @@ const add = (text: string) => {
 };
 for (const s of cvSyllables(curriculum.units.flatMap((u) => u.graphemes), greek.vowels, soundOf, greek.syllableVowels)) add(s);
 for (const w of [...words, ...names]) for (const s of w.syllables) add(s);
+for (const w of words) for (const s of w.plural?.syllables ?? []) add(s);
 console.log(JSON.stringify(Object.fromEntries(out), null, 0));

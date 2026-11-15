@@ -40,6 +40,28 @@ export function validateCurriculum(curriculum: Curriculum): string[] {
   return errors;
 }
 
+/** Syllables that join to the text without splitting a grapheme, and flags as detected. */
+function checkSpelling(at: string, w: { text: string; syllables: string[]; flags: Flag[] }): string[] {
+  const errors: string[] = [];
+  if (!Array.isArray(w.syllables) || w.syllables.length === 0) {
+    errors.push(`${at}: missing syllables`);
+  } else {
+    if (w.syllables.join('') !== w.text) errors.push(`${at}: syllables ${JSON.stringify(w.syllables)} do not join to the word`);
+    const fromSyllables = w.syllables.flatMap((s) => graphemes(s));
+    if (fromSyllables.join('|') !== graphemes(w.text).join('|')) {
+      errors.push(`${at}: syllables split a grapheme (${fromSyllables.join(' ')} vs ${graphemes(w.text).join(' ')})`);
+    }
+  }
+  const unknown = w.flags.filter((f) => !ALL_FLAGS.includes(f));
+  if (unknown.length) errors.push(`${at}: unknown flags ${unknown.join(', ')}`);
+  const expected = detectFlags(w.text, w.syllables);
+  const given = ALL_FLAGS.filter((f) => w.flags.includes(f));
+  if (expected.join() !== given.join()) {
+    errors.push(`${at}: flags ${JSON.stringify(given)} but detected ${JSON.stringify(expected)} (ask before changing)`);
+  }
+  return errors;
+}
+
 export function validateWords(words: Word[], curriculum: Curriculum, { needsImage = true }: { needsImage?: boolean } = {}): string[] {
   const errors: string[] = [];
   const order = graphemeOrder(curriculum);
@@ -64,22 +86,14 @@ export function validateWords(words: Word[], curriculum: Curriculum, { needsImag
       errors.push(`${at}: graphemes/minPosition are computed, do not write them by hand`);
     }
 
-    if (!Array.isArray(w.syllables) || w.syllables.length === 0) {
-      errors.push(`${at}: missing syllables`);
-    } else {
-      if (w.syllables.join('') !== w.text) errors.push(`${at}: syllables ${JSON.stringify(w.syllables)} do not join to the word`);
-      const fromSyllables = w.syllables.flatMap((s) => graphemes(s));
-      if (fromSyllables.join('|') !== graphemes(w.text).join('|')) {
-        errors.push(`${at}: syllables split a grapheme (${fromSyllables.join(' ')} vs ${graphemes(w.text).join(' ')})`);
-      }
-    }
-
-    const unknown = w.flags.filter((f) => !ALL_FLAGS.includes(f));
-    if (unknown.length) errors.push(`${at}: unknown flags ${unknown.join(', ')}`);
-    const expected = detectFlags(w.text, w.syllables);
-    const given = ALL_FLAGS.filter((f) => w.flags.includes(f));
-    if (expected.join() !== given.join()) {
-      errors.push(`${at}: flags ${JSON.stringify(given)} but detected ${JSON.stringify(expected)} (ask before changing)`);
+    errors.push(...checkSpelling(at, w));
+    if (w.plural) {
+      const pl = `${at} plural «${w.plural.text}»`;
+      if (!w.article) errors.push(`${pl}: a plural needs the article`);
+      if (w.plural.text === w.text) errors.push(`${pl}: same as the singular (leave it out)`);
+      errors.push(...checkSpelling(pl, w.plural));
+      const missingPl = outsideCurriculum(w.plural.text, order);
+      if (missingPl.length) errors.push(`${pl}: graphemes not in curriculum: ${missingPl.join(', ')}`);
     }
 
     const missing = outsideCurriculum(w.text, order);

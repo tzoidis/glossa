@@ -3,7 +3,7 @@ word clips from words.json and the syllable clips, into
 src/audio/files/<kind>/<key>.mp3.
 
 Runs once on the PC, never in the app. Needs network and, in a separate venv,
-`pip install requests` (ElevenLabs, the default) or `pip install edge-tts`
+nothing for ElevenLabs (the default, standard library only) or `pip install edge-tts`
 (--engine edge, the Microsoft Athina voice used before). ElevenLabs reads its
 key from ~/.elevenlabs-key (one line, outside the repo); the voice is a library
 voice, so the account needs a paid plan (Starter is enough, and its licence
@@ -74,6 +74,9 @@ def word_clips():
     for path in (WORDS, NAMES):
         for w in json.loads(path.read_text(encoding="utf-8")):
             yield "word", w["id"], w["text"]
+            # the plural of «Ο, η ή το;», key as pluralClipId in src/exercises/article/generate.ts
+            if "plural" in w:
+                yield "word", f"{w['id']}-plural", w["plural"]["text"]
 
 
 def sentence_clips():
@@ -115,27 +118,31 @@ async def edge(text, path, args):
 
 
 def eleven(text, path, args, clip_key):
-    import requests
+    # urllib, not requests: on this PC urllib3's TLS handshakes started failing mid-run
+    import time
+    import urllib.error
+    import urllib.parse
+    import urllib.request
 
     api_key = (Path.home() / ".elevenlabs-key").read_text(encoding="utf-8").strip()
     model, language = MODEL_FOR.get(clip_key, (ELEVEN_MODEL, None))
     body = {"text": text, "model_id": model}
     if language:
         body["language_code"] = language
+    url = f"https://api.elevenlabs.io/v1/text-to-speech/{args.voice or ELEVEN_VOICE}?" + urllib.parse.urlencode({"output_format": ELEVEN_FORMAT})
     for attempt in range(1, 5):
-        r = requests.post(
-            f"https://api.elevenlabs.io/v1/text-to-speech/{args.voice or ELEVEN_VOICE}",
-            params={"output_format": ELEVEN_FORMAT},
-            headers={"xi-api-key": api_key},
-            json=body,
-            timeout=60,
-        )
-        if r.status_code == 200:
-            path.write_bytes(r.content)
-            return True
-        print(f"  {r.status_code} {r.text[:200]}", flush=True)
-        if r.status_code not in (429, 500, 502, 503):
-            return False
+        req = urllib.request.Request(url, data=json.dumps(body).encode("utf-8"), headers={"xi-api-key": api_key, "Content-Type": "application/json"}, method="POST")
+        try:
+            with urllib.request.urlopen(req, timeout=60) as r:
+                path.write_bytes(r.read())
+                return True
+        except urllib.error.HTTPError as e:
+            print(f"  {e.code} {e.read()[:200].decode('utf-8', 'replace')}", flush=True)
+            if e.code not in (429, 500, 502, 503):
+                return False
+        except (urllib.error.URLError, OSError) as e:
+            print(f"  {e}", flush=True)
+        time.sleep(2 * attempt)
     return False
 
 

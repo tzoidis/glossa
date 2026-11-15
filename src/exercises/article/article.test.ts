@@ -3,36 +3,65 @@ import { CONTENT } from '../../app/content.ts';
 import { isTextAllowed, makeContext } from '../../engine/allowedWords.ts';
 import { cases, tryGenerate } from '../propertyTest.ts';
 import { isReadable } from '../pool.ts';
-import { articleByEnding, ARTICLES, type ArticleItem } from './generate.ts';
+import { articleByEnding, ARTICLES, asPlural, type ArticleItem } from './generate.ts';
 import { article } from './index.ts';
 
 describe('article property test', () => {
-  it('shows readable words with their own article among ο, η, το', () => {
+  it('shows readable words with their own article: ο, η, το, or οι, τα for a plural', () => {
     let generated = 0;
+    let plurals = 0;
     for (const c of cases()) {
       const round = tryGenerate(article, c);
       if (!round) continue;
       generated++;
       const allow = makeContext(CONTENT.curriculum, { position: c.position }, CONTENT.words);
-      for (const item of round.items as ArticleItem[]) {
+      const items = round.items as ArticleItem[];
+      expect(new Set(items.map((i) => i.wordId)).size, c.label).toBe(items.length);
+      for (const item of items) {
         const word = CONTENT.wordsById.get(item.wordId)!;
         expect(isReadable(word, c.ctx), `${c.label}: «${word.text}»`).toBe(true);
-        expect(item.target, c.label).toBe(word.article);
-        expect(item.options, c.label).toEqual([...ARTICLES]);
+        if (item.plural) {
+          plurals++;
+          const shown = asPlural(word)!;
+          // the plural is read too: its letters and flags must be allowed
+          expect(isReadable(shown, c.ctx), `${c.label}: «${shown.text}»`).toBe(true);
+          expect(item.text).toBe(shown.text);
+          expect(item.target, c.label).toBe(word.article === 'το' ? 'τα' : 'οι');
+          expect(item.options, c.label).toEqual([word.article, 'οι', 'τα']);
+        } else {
+          expect(item.target, c.label).toBe(word.article);
+          expect(item.options, c.label).toEqual([...ARTICLES]);
+        }
         for (const a of item.options) expect(isTextAllowed(a, allow), `${c.label}: «${a}»`).toBe(true);
       }
     }
     expect(generated).toBeGreaterThan(0);
+    expect(plurals).toBeGreaterThan(0);
+  });
+
+  it('asks for a plural only once «οι» is taught, never as the first or last item', () => {
+    const oi = CONTENT.order.positionOf.get('οι')!;
+    for (const c of cases()) {
+      const items = (tryGenerate(article, c)?.items ?? []) as ArticleItem[];
+      items.forEach((item, i) => {
+        if (!item.plural) return;
+        expect(c.position, c.label).toBeGreaterThanOrEqual(oi);
+        expect(i, c.label).not.toBe(0);
+        expect(i, c.label).not.toBe(items.length - 1);
+      });
+    }
   });
 
   it('level 1 keeps to words whose ending gives the article', () => {
     for (const c of cases()) {
       if (c.level !== 1) continue;
       const round = tryGenerate(article, c);
-      for (const item of (round?.items ?? []) as ArticleItem[]) {
+      if (!round) continue;
+      const regular = CONTENT.words.filter((w) => w.imageId && isReadable(w, c.ctx) && articleByEnding(w.text) === w.article);
+      if (regular.length < 3) continue;
+      for (const item of round.items as ArticleItem[]) {
         const word = CONTENT.wordsById.get(item.wordId)!;
-        const regular = CONTENT.words.filter((w) => w.imageId && isReadable(w, c.ctx) && articleByEnding(w.text) === w.article);
-        if (regular.length >= 3) expect(articleByEnding(word.text), `${c.label}: «${word.text}»`).toBe(word.article);
+        expect(articleByEnding(word.text), `${c.label}: «${word.text}»`).toBe(word.article);
       }
     }
   });

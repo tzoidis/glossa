@@ -9,31 +9,50 @@ import { SyllableWord, useSyllableReplay } from '../shared/SyllableWord.tsx';
 import { useChoiceRound } from '../shared/useChoiceRound.ts';
 import { useRoundAudio } from '../shared/useRoundAudio.ts';
 import type { ExerciseProps } from '../types.ts';
-import { ARTICLE_ID, type ArticleItem } from './generate.ts';
+import { ARTICLE_ID, asPlural, type ArticleItem } from './generate.ts';
+
+/** A plural shows the picture this many times. */
+const MANY = 3;
 
 export function Article(props: ExerciseProps) {
   const audio = useRoundAudio();
   const { content } = useApp();
   const syllables = useSyllableReplay();
+  const shownWord = (i: ArticleItem) => {
+    const w = content.wordsById.get(i.wordId)!;
+    return (i.plural && asPlural(w)) || w;
+  };
   const { item, pick, stateOf, showHand, markListen } = useChoiceRound<ArticleItem>(props, {
     exerciseId: ARTICLE_ID,
     itemId: (i) => wordItemId(i.wordId),
     // no prompt: the word is read; after a mistake it is decoded aloud, syllable by syllable
-    onWrong: (i) => syllables.replay(content.wordsById.get(i.wordId)!),
+    onWrong: (i) => syllables.replay(shownWord(i)),
   });
-  const word = content.wordsById.get(item.wordId)!;
+  const word = shownWord(item);
   const solved = stateOf(item.target) === 'correct';
 
   return (
     <div className="exercise-stage article">
       <div className="prompt">
         {/* shown only once solved: with the picture a child knows the article without reading the word */}
-        <span className="article-picture">{solved ? <Picture imageId={item.imageId} size={180} /> : <span className="picture-placeholder" />}</span>
+        <span className="article-picture">{solved ? (
+            item.plural ? (
+              <span className="picture-many">
+                {Array.from({ length: MANY }, (_, k) => (
+                  <Picture key={k} imageId={item.imageId} size={110} />
+                ))}
+              </span>
+            ) : (
+              <Picture imageId={item.imageId} size={180} />
+            )
+          ) : (
+            <span className="picture-placeholder" />
+          )}</span>
         <IconButton
           label={t('exercise.listen')}
           onClick={() => {
             markListen();
-            audio.replay(() => audio.word(item.wordId, item.text));
+            audio.replay(() => audio.word(word.id, word.text));
           }}
         >
           <SpeakerIcon />

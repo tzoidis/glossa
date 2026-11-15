@@ -22,7 +22,9 @@ export function InstructionHeard({ children }: { children: ReactNode }) {
 
 /** Whether the round should open with its spoken instruction. */
 export function useOpensWithInstruction(index: number): boolean {
-  return index === 0 && !useContext(InstructionHeardContext);
+  // the hook runs on every render: after `index === 0 &&` it would be skipped from item 2 on
+  const heard = useContext(InstructionHeardContext);
+  return index === 0 && !heard;
 }
 
 /** A paw that taps. Put it inside the element the child should press. */

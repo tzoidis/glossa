@@ -1332,6 +1332,17 @@ button {
   height: 180px;
 }
 
+/* a plural («οι γάτες»): the picture several times, in the same height */
+.article-picture .picture-many {
+  display: flex;
+  align-items: center;
+  height: 180px;
+}
+
+.article-picture .picture-many > * + * {
+  margin-left: -18px;
+}
+
 /* decoding after a mistake: the syllable being heard lights up */
 .syl--lit {
   background: #fde9d6;

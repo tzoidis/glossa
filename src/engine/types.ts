@@ -14,6 +14,8 @@ export interface Word {
   imageId?: string;
   audioKey?: string;
   flags: Flag[];
+  /** Plural for «Ο, η ή το;» (οι/τα); flags as for the word, checked by validate-content. Countable nouns only. */
+  plural?: { text: string; syllables: string[]; flags: Flag[] };
   tags: string[];
   // Computed (see analyzeWord), never written by hand:
   graphemes?: string[];
