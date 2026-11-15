@@ -4,6 +4,7 @@
 
 import { useEffect, useRef, useState, type PointerEvent, type RefObject } from 'react';
 import { useApp } from '../app/AppContext.tsx';
+import { isTextAllowed } from '../engine/allowedWords.ts';
 import { t } from '../i18n.ts';
 import { placeWorldItem, worldItems } from '../storage/progress.ts';
 import type { WorldItem } from '../storage/schema.ts';
@@ -16,7 +17,10 @@ import { insideScene, scenePercent } from './villageDrag.ts';
 const TAP_SLOP_PX = 10;
 
 export function Village({ onHome }: { onHome(): void }) {
-  const { db, child } = useApp();
+  const { db, child, allow } = useApp();
+  // the name the child chose is on the signpost once she can read it (PRD §3)
+  const villageName = t('village.name');
+  const showName = isTextAllowed(villageName, allow);
   const [placed, setPlaced] = useState<WorldItem[]>([]);
   const { items: unplaced, place } = useUnplaced();
   const label = useItemLabel();
@@ -40,6 +44,11 @@ export function Village({ onHome }: { onHome(): void }) {
       <div className="village-scene" ref={scene}>
         <div className="village-sun" />
         <div className="village-ground" />
+        {showName && (
+          <div className="village-sign">
+            <span>{villageName}</span>
+          </div>
+        )}
         <div className="village-mascot">
           <Mascot mood="happy" size={150} />
         </div>

@@ -6,6 +6,7 @@
 
 import { useEffect, useState } from 'react';
 import { useApp } from '../app/AppContext.tsx';
+import { isTextAllowed } from '../engine/allowedWords.ts';
 import { installUpdate, useUpdateReady } from '../app/appUpdate.ts';
 import { useNextLetterDue } from '../app/useNextLetterDue.ts';
 import { t } from '../i18n.ts';
@@ -14,7 +15,8 @@ import { Mascot } from '../ui/Mascot.tsx';
 
 /** onGo gets the welcome clip in progress, so the next screen can speak after it. */
 export function Start({ onGo, onParent }: { onGo(welcome: Promise<unknown>): void; onParent(): void }) {
-  const { audio, recheckVoice, db } = useApp();
+  const { audio, recheckVoice, db, allow } = useApp();
+  const mascotName = t('mascot.name');
   const updateReady = useUpdateReady();
   const [firstTime, setFirstTime] = useState(false);
   const nextLetter = useNextLetterDue();
@@ -31,6 +33,7 @@ export function Start({ onGo, onParent }: { onGo(welcome: Promise<unknown>): voi
   return (
     <main className="screen screen--center start">
       <Mascot mood="happy" size={220} />
+      {isTextAllowed(mascotName, allow) && <p className="mascot-name">{mascotName}</p>}
       <button
         type="button"
         className="go"
