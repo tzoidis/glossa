@@ -1,6 +1,8 @@
 // Navigation icons. Navigation never uses text (PRD §6).
 
-const common = { width: 40, height: 40, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2.4, strokeLinecap: 'round', strokeLinejoin: 'round' } as const;
+import { square } from './rem.ts';
+
+const common = { style: square(40), viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2.4, strokeLinecap: 'round', strokeLinejoin: 'round' } as const;
 
 export const HomeIcon = () => (
   <svg {...common} aria-hidden>
@@ -26,7 +28,7 @@ export const NextIcon = () => (
 );
 
 export const LockIcon = () => (
-  <svg {...common} width={28} height={28} aria-hidden>
+  <svg {...common} style={square(28)} aria-hidden>
     <rect x="5" y="11" width="14" height="10" rx="2" />
     <path d="M8 11V7a4 4 0 0 1 8 0v4" />
   </svg>
@@ -63,7 +65,7 @@ export const CheckIcon = () => (
 );
 
 export const StarIcon = ({ size = 40 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden>
+  <svg style={square(size)} viewBox="0 0 24 24" aria-hidden>
     <path
       d="M12 2.5l2.9 6 6.6.8-4.9 4.6 1.3 6.6L12 17.2l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"
       fill="var(--star)"

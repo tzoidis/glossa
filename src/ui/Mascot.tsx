@@ -1,6 +1,8 @@
 // The hedgehog guide (PRD §6). Moods: happy, thinking, encouraging, surprised.
 // Never sad.
 
+import { square } from './rem.ts';
+
 export type Mood = 'happy' | 'thinking' | 'encouraging' | 'surprised';
 
 const SPIKES = Array.from({ length: 9 }, (_, i) => {
@@ -28,7 +30,7 @@ function Mouth({ mood }: { mood: Mood }) {
 export function Mascot({ mood = 'happy', size = 200 }: { mood?: Mood; size?: number }) {
   const eyeY = mood === 'thinking' ? 96 : 100;
   return (
-    <svg className={`mascot mascot--${mood}`} width={size} height={size} viewBox="0 0 200 200" aria-hidden>
+    <svg className={`mascot mascot--${mood}`} style={square(size)} viewBox="0 0 200 200" aria-hidden>
       <ellipse cx="100" cy="178" rx="70" ry="8" fill="var(--shadow)" />
       {SPIKES.map((points, i) => (
         <polygon key={i} points={points} fill="var(--mascot-spikes)" />

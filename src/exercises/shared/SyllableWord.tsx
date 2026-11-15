@@ -4,6 +4,7 @@
 
 import { useCallback, useState } from 'react';
 import type { Word } from '../../engine/types.ts';
+import { wordFit } from '../../ui/rem.ts';
 import { useRoundAudio } from './useRoundAudio.ts';
 
 /** The word as written, one span per syllable; `lit` marks the one being heard. */
@@ -11,7 +12,7 @@ export function SyllableWord({ word, lit, before }: { word: Pick<Word, 'syllable
   // the syllables spell the word, accents included; fall back to the plain word if not
   const parts = word.syllables.join('') === word.text ? word.syllables : [word.text];
   return (
-    <span className="reading-word">
+    <span className="reading-word" style={wordFit(word.text, before ? 3 : 0)}>
       {before}
       {parts.map((s, k) => (
         <span key={k} className={`syl ${k === lit ? 'syl--lit' : ''}`}>

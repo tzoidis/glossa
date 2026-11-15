@@ -1,4 +1,5 @@
 import { t } from '../../i18n.ts';
+import { wordFit } from '../../ui/rem.ts';
 import { IconButton } from '../../ui/IconButton.tsx';
 import { SpeakerIcon } from '../../ui/Icons.tsx';
 import { Picture } from '../../ui/Picture.tsx';
@@ -32,7 +33,7 @@ export function Digraph(props: ExerciseProps) {
           <SpeakerIcon />
         </IconButton>
       </div>
-      <span className="reading-word">
+      <span className="reading-word" style={wordFit(`${item.before}${item.pair}${item.after}`)}>
         {item.before}
         <span className="pair-mark">{item.pair}</span>
         {item.after}

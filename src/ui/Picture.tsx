@@ -34,12 +34,14 @@ export function setPhotos(photos: Iterable<[string, string]>): void {
 
 const isPhotoId = (imageId: string) => imageId.startsWith('photo:');
 
+import { rem, square } from './rem.ts';
+
 export function Picture({ imageId, size = 120, className }: { imageId: string; size?: number; className?: string }) {
   const photo = PHOTOS.get(imageId);
   const url = photo ?? pictureUrl(imageId);
   return (
-    <span className={`picture ${photo ? 'picture--photo' : ''} ${className ?? ''}`} style={{ fontSize: size * 0.8, width: size, height: size }} aria-hidden>
-      {url ? <img src={url} alt="" width={size} height={size} draggable={false} /> : isPhotoId(imageId) ? null : emojiFromCode(imageId)}
+    <span className={`picture ${photo ? 'picture--photo' : ''} ${className ?? ''}`} style={{ fontSize: rem(size * 0.8), ...square(size) }} aria-hidden>
+      {url ? <img src={url} alt="" draggable={false} /> : isPhotoId(imageId) ? null : emojiFromCode(imageId)}
     </span>
   );
 }

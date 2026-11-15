@@ -2,6 +2,7 @@
 // practice question that does not count (PRD §4).
 
 import { createContext, useContext, type ReactNode } from 'react';
+import { square } from '../../ui/rem.ts';
 
 const DemoContext = createContext(false);
 
@@ -31,7 +32,7 @@ export function useOpensWithInstruction(index: number): boolean {
 export function Hand() {
   return (
     <span className="demo-hand" aria-hidden>
-      <svg width="72" height="72" viewBox="0 0 64 64">
+      <svg style={square(72)} viewBox="0 0 64 64">
         <ellipse cx="32" cy="40" rx="16" ry="14" fill="var(--mascot-face)" stroke="var(--mascot-spikes)" strokeWidth="3" />
         <circle cx="20" cy="22" r="6" fill="var(--mascot-face)" stroke="var(--mascot-spikes)" strokeWidth="3" />
         <circle cx="32" cy="17" r="6" fill="var(--mascot-face)" stroke="var(--mascot-spikes)" strokeWidth="3" />

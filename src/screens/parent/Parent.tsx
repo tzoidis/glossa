@@ -55,6 +55,12 @@ function InstallNotice({ onContinue }: { onContinue(): void }) {
 export function Parent({ onClose }: { onClose(): void }) {
   const { db, child, settings } = useApp();
   const [unlocked, setUnlocked] = useState(false);
+
+  // the parent reads text here: full size even on a phone (see `html` in index.css)
+  useEffect(() => {
+    document.documentElement.classList.add('parent-mode');
+    return () => document.documentElement.classList.remove('parent-mode');
+  }, []);
   const [installAck, setInstallAck] = useState(isInstalled);
   const [hasProgress, setHasProgress] = useState(false);
   const updateReady = useUpdateReady();

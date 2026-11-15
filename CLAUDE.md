@@ -41,7 +41,8 @@ Node ≥ 22.18 (scripts in `scripts/` run as plain `.ts` via Node type stripping
 - Everything is precached, including bundled recordings in `src/audio/files/`; `base: './'` so the build works at a domain root or a subpath.
 - `navigator.storage.persist()` runs at startup when installed.
 - Hosted at https://tzoidis.github.io/glossa/ (repo `tzoidis/glossa`, public). Every push to `main` runs CI and, if it passes, deploys `dist/` to GitHub Pages (`.github/workflows/ci.yml`).
-- Manual tablet checks: `docs/tablet-checklist.md`.
+- Manual device checks (tablets and phones, iOS and Android): `docs/tablet-checklist.md`.
+- Child screens size everything in rem (inline sizes via `rem()`/`square()` from `src/ui/rem.ts`, never px): the `html` font-size drops below 16px on phones so each exercise fits without scrolling (375×667 portrait, 667×375 landscape); the parent screen sets `html.parent-mode` and stays at 16px.
 
 ## Engine conventions
 
