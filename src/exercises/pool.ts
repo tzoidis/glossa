@@ -48,7 +48,13 @@ export const NEWEST = 2;
 
 /** The letters the class is learning now: the last taught (allowedGraphemes keeps book order). */
 export function newestGraphemes(ctx: GenerateContext): Set<string> {
-  return new Set([...ctx.allowedGraphemes].slice(-NEWEST));
+  return ctx.newestGraphemes ?? new Set([...ctx.allowedGraphemes].slice(-NEWEST));
+}
+
+/** The list with its first `close` element moved to the front (unchanged if none is close). */
+export function oneCloseFirst<T>(list: T[], close: (x: T) => boolean): T[] {
+  const k = list.findIndex(close);
+  return k <= 0 ? list : [list[k]!, ...list.slice(0, k), ...list.slice(k + 1)];
 }
 
 /** a0, b0, a1, b1, …, then what is left of the longer list */

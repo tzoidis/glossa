@@ -63,12 +63,24 @@ describe('pickStations', () => {
     }
   });
 
-  it('offers three stations with as many different mechanisms as it can', () => {
-    for (let i = 0; i < 50; i++) {
+  it('offers three stations, mostly of different mechanisms', () => {
+    let distinct = 0;
+    for (let i = 0; i < 200; i++) {
       const picked = pickStations(c, null, [], mulberry32(i));
       expect(picked).toHaveLength(3);
-      expect(new Set(picked.map((id) => c.find((x) => x.id === id)!.mechanism)).size).toBe(3);
+      expect(new Set(picked).size).toBe(3);
+      if (new Set(picked.map((id) => c.find((x) => x.id === id)!.mechanism)).size === 3) distinct++;
     }
+    expect(distinct).toBeGreaterThan(100);
+  });
+
+  it('does not favour a game for being alone in its mechanism (review: trace was offered 3× its share)', () => {
+    const many = [{ id: 'trace', mechanism: 'trace' }, ...Array.from({ length: 9 }, (_, k) => ({ id: `tap${k}`, mechanism: 'tap' }))];
+    let trace = 0;
+    const n = 3000;
+    for (let i = 0; i < n; i++) if (pickStations(many, null, [], mulberry32(i)).includes('trace')) trace++;
+    // fair is 3 offers out of 10 games; the mechanism variety may lift it a little
+    expect(trace / n).toBeLessThan(0.5);
   });
 
   it('fills the third station with a repeated mechanism rather than show two', () => {

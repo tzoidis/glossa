@@ -1,6 +1,7 @@
-// Shared logic of "tap the right one" exercises (PRD §4): the wrong choice fades,
-// the prompt is heard again, the right one glows and the child taps it; only the
-// first attempt counts; a misspelling that sounds right is logged as such.
+// Shared logic of "tap the right one" exercises (PRD §4): the wrong choice fades and
+// the prompt is heard again slowly; the child tries once more on their own, and the
+// right one glows only if that is not enough (or one choice is left). Only the first
+// attempt counts; a misspelling that sounds right is logged as such.
 
 import { useEffect, useRef, useState } from 'react';
 import type { Round } from '../../engine/types.ts';
@@ -75,7 +76,7 @@ export function useChoiceRound<T extends ChoiceItem>({ round, onAnswer, onComple
     audio.stop();
     const run = audio.sequence();
     if (option === item.target) {
-      log(option, true, mistake ? 2 : 1);
+      if (faded.length < 2) log(option, true, mistake ? 2 : 1);
       setSolved(true);
       await audio.praiseThen(() => {
         if (index + 1 >= items.length) return onComplete();
@@ -87,7 +88,8 @@ export function useChoiceRound<T extends ChoiceItem>({ round, onAnswer, onComple
       return;
     }
     const soundsRight = cfg.current.soundsRight?.(item, option) ?? false;
-    if (!mistake) log(option, false, 1, soundsRight);
+    // attempt 1, then the child's own second try; later taps are not logged
+    if (faded.length < 2) log(option, false, faded.length === 0 ? 1 : 2, soundsRight);
     setMistake(true);
     setFaded((f) => [...f, option]);
     if (soundsRight) await audio.instruction('sounds-right');
@@ -95,8 +97,10 @@ export function useChoiceRound<T extends ChoiceItem>({ round, onAnswer, onComple
     if (run.alive()) await cfg.current.prompt?.(item, true);
   };
 
+  // the glow comes after a second mistake, or when only the right one is left anyway
+  const hint = faded.length >= 2 || item.options.length - faded.length <= 1;
   const stateOf = (option: string): ChoiceState =>
-    solved && option === item.target ? 'correct' : faded.includes(option) ? 'faded' : mistake && option === item.target ? 'hint' : '';
+    solved && option === item.target ? 'correct' : faded.includes(option) ? 'faded' : hint && option === item.target ? 'hint' : '';
 
   return {
     item,

@@ -3,6 +3,7 @@ import { mulberry32 } from '../engine/rng.ts';
 import type { Level } from '../engine/types.ts';
 import type { GenerateContext } from '../exercises/types.ts';
 import { NAME_TAG, type Content } from './content.ts';
+import { NEWEST } from '../exercises/pool.ts';
 
 export interface GenerateInputs {
   content: Content;
@@ -15,7 +16,7 @@ export interface GenerateInputs {
   names?: boolean;
 }
 
-type Readable = Pick<GenerateContext, 'allowedGraphemes' | 'sentencePool' | 'storyPool'>;
+type Readable = Pick<GenerateContext, 'allowedGraphemes' | 'newestGraphemes' | 'sentencePool' | 'storyPool'>;
 
 /** a sentence ending in «;» or «!» waits for the unit that teaches it (5 and 7) */
 const MARK_SKILL: Record<string, string> = { ';': 'question-mark', '!': 'exclamation-mark' };
@@ -32,6 +33,8 @@ function readableNow(content: Content, allow: AllowContext): Readable {
   if (!r) {
     r = {
       allowedGraphemes: new Set(content.order.order.slice(0, allow.position)),
+      // past the last letter (units 5-7) no letter is new: τσ, τζ stop filling every round
+      newestGraphemes: new Set(allow.position > content.order.order.length ? [] : content.order.order.slice(Math.max(0, allow.position - NEWEST), allow.position)),
       // the context carries no sight words, so texts are filtered here: only what can be read now
       sentencePool: content.sentences.filter((x) => isTextAllowed(x.tokens.join(' '), allow) && marksTaught(x.tokens, allow)),
       storyPool: content.stories.filter((x) => [...x.sentences, ...x.questions.map((q) => q.prompt)].every((line) => isTextAllowed(line, allow))),

@@ -73,7 +73,7 @@ export function Session({ firstExerciseId, onHome, onVillage }: { firstExerciseI
       return (
         <main className="screen screen--center done">
           <Mascot mood={phase.reason === 'limit' ? 'encouraging' : 'happy'} size={220} />
-          {phase.reason === 'complete' && (
+          {state.played.length > 0 && (
             <div className="stars-row">
               {state.played.map((_, i) => (
                 <StarIcon key={i} size={72} />

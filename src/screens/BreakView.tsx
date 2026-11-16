@@ -20,12 +20,24 @@ export function useItemLabel() {
   return (item: WorldItem) => (item.kind === 'word' ? (content.wordsById.get(item.ref)?.text ?? item.ref) : item.ref);
 }
 
+/** The picture of a won item; none when its word left the bank (it is then not shown at all). */
+function imageOf(content: ReturnType<typeof useApp>['content'], item: WorldItem): string | undefined {
+  return item.kind === 'word' ? content.wordsById.get(item.ref)?.imageId : item.ref;
+}
+
+/** The child's won items that still have a picture. */
+export function useShownItems() {
+  const { db, child, content } = useApp();
+  return () => worldItems(db, child.id).then((all) => all.filter((i) => imageOf(content, i)));
+}
+
 export function useUnplaced() {
-  const { db, child } = useApp();
+  const { db } = useApp();
+  const shown = useShownItems();
   const [items, setItems] = useState<WorldItem[]>([]);
   useEffect(() => {
-    void worldItems(db, child.id).then((all) => setItems(all.filter((i) => i.x === null)));
-  }, [db, child.id]);
+    void shown().then((all) => setItems(all.filter((i) => i.x === null)));
+  }, []); // once per mount
   /** at `spot` (scene percent) when dropped there, else somewhere on the grass */
   const place = (item: WorldItem, spot = randomGroundSpot()) => {
     const { x, y } = spot;
@@ -37,7 +49,7 @@ export function useUnplaced() {
 
 export function WorldItemPicture({ item, size }: { item: WorldItem; size: number }) {
   const { content } = useApp();
-  const imageId = item.kind === 'word' ? content.wordsById.get(item.ref)?.imageId : item.ref;
+  const imageId = imageOf(content, item);
   return imageId ? <Picture imageId={imageId} size={size} /> : null;
 }
 

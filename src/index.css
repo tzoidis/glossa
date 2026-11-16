@@ -37,7 +37,8 @@
   --mascot-ink: #2a1c12;
   --mascot-cheek: #f2a7a0;
   --gutter: 1.5rem;
-  color-scheme: light;
+  /* "only" keeps Android's automatic dark mode from inverting the pictures */
+  color-scheme: only light;
   font-family: system-ui, sans-serif;
   color: var(--ink);
   background: var(--bg);
@@ -190,6 +191,11 @@ button {
 .left-handed .tiles,
 .left-handed .stations {
   flex-direction: row-reverse;
+}
+
+/* the parts of a word and numbers still read left to right */
+.left-handed .choices.in-order {
+  flex-direction: row;
 }
 
 /* ---------- parent ---------- */
@@ -1001,8 +1007,11 @@ button {
   .stations .station {
     animation: invite 2.4s ease-in-out infinite;
   }
-  .stations .station--1 {
-    animation-delay: 1.2s;
+  .stations .station:nth-child(2) {
+    animation-delay: 0.8s;
+  }
+  .stations .station:nth-child(3) {
+    animation-delay: 1.6s;
   }
   .village-item,
   .arrived-item {
@@ -1445,6 +1454,14 @@ button {
 .hold-home {
   width: 4rem;
   height: 4rem;
+}
+
+/* a finger is not smaller on a small phone: 44px is the least a child can hit */
+.icon-button,
+.hold-home,
+.key {
+  min-width: 44px;
+  min-height: 44px;
 }
 
 .pebbles {

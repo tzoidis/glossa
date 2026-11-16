@@ -49,7 +49,7 @@ export function SyllableCount(props: ExerciseProps) {
         {beat?.total !== undefined &&
           Array.from({ length: beat.total }, (_, k) => <span key={k} className={`beat ${k <= beat.on || beat.on === -1 ? 'on' : ''}`} />)}
       </div>
-      <div className="choices">
+      <div className="choices in-order">
         {item.options.map((n) => (
           <ChoiceTile key={n} variant="count" label={n} state={stateOf(n)} hand={showHand(n)} onPick={() => void pick(n)}>
             {Array.from({ length: Number(n) }, (_, k) => (

@@ -24,4 +24,13 @@ describe('pickWords and the letters of the week', () => {
     const c = [...cases()].find((x) => x.position === 12)!;
     expect([...newestGraphemes(c.ctx)]).toEqual(CONTENT.order.order.slice(10, 12));
   });
+
+  it('has no newest letters in the thematic units 5-7', () => {
+    const last = CONTENT.order.order.length;
+    const atLast = [...cases()].find((x) => x.position === last)!;
+    expect(newestGraphemes(atLast.ctx).size).toBe(2);
+    const thematic = [...cases()].filter((x) => x.position > last);
+    expect(thematic.length).toBeGreaterThan(0);
+    for (const c of thematic) expect(newestGraphemes(c.ctx).size, c.label).toBe(0);
+  });
 });

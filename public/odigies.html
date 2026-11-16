@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="el">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#2f7d4a" />
+    <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+    <title>Γράμμα Γράμμα: οδηγίες για γονείς</title>
+    <style>
+      :root {
+        --bg: #fdf8ee;
+        --card: #ffffff;
+        --edge: #d4c29c;
+        --ink: #1f2a37;
+        --muted: #4b5563;
+        --accent: #2f7d4a;
+        --accent-soft: #e6f2e9;
+        --note: #fff6dd;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        font-size: 17px;
+        line-height: 1.55;
+      }
+      main {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 24px 16px 48px;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 8px;
+      }
+      header img {
+        width: 72px;
+        height: 72px;
+        flex: none;
+      }
+      h1 {
+        font-size: 1.7rem;
+        line-height: 1.2;
+        margin: 0;
+      }
+      .lead {
+        font-size: 1.1rem;
+        color: var(--muted);
+        margin: 4px 0 20px;
+      }
+      h2 {
+        font-size: 1.25rem;
+        margin: 32px 0 10px;
+      }
+      section.card {
+        background: var(--card);
+        border: 2px solid var(--edge);
+        border-radius: 16px;
+        padding: 4px 18px 10px;
+        margin: 12px 0;
+      }
+      section.card h3 {
+        font-size: 1.08rem;
+        margin: 14px 0 6px;
+      }
+      ol,
+      ul {
+        padding-left: 1.3em;
+        margin: 6px 0 12px;
+      }
+      li {
+        margin: 5px 0;
+      }
+      .open {
+        display: block;
+        text-align: center;
+        background: var(--accent);
+        color: #fff;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 1.2rem;
+        border-radius: 14px;
+        padding: 14px 18px;
+        margin: 8px 0 6px;
+      }
+      .url {
+        text-align: center;
+        font-size: 0.95rem;
+        color: var(--muted);
+        word-break: break-all;
+        margin: 0 0 8px;
+      }
+      .note {
+        background: var(--note);
+        border-left: 5px solid #e0a82e;
+        border-radius: 10px;
+        padding: 10px 14px;
+        margin: 12px 0;
+      }
+      .ok {
+        background: var(--accent-soft);
+        border-left: 5px solid var(--accent);
+        border-radius: 10px;
+        padding: 10px 14px;
+        margin: 12px 0;
+      }
+      footer {
+        margin-top: 40px;
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <img src="./icon.svg" alt="" />
+        <div>
+          <h1>Γράμμα Γράμμα</h1>
+        </div>
+      </header>
+      <p class="lead">
+        Παιχνίδια ανάγνωσης για την Α΄ Δημοτικού, γράμμα γράμμα με το βιβλίο «Η γλώσσα μας». Ο σκαντζόχοιρος Αγκαθούλης έχασε
+        τα γράμματα της Αστερούπολης και το παιδί τον βοηθά να τα ξαναβρεί.
+      </p>
+
+      <a class="open" href="./">Άνοιγμα της εφαρμογής</a>
+      <p class="url">https://tzoidis.github.io/glossa/</p>
+
+      <div class="ok">
+        Δωρεάν, χωρίς διαφημίσεις και χωρίς λογαριασμό. Μόλις εγκατασταθεί, δουλεύει και χωρίς internet. Η πρόοδος του παιδιού
+        μένει μόνο στη συσκευή σας: η εφαρμογή δεν στέλνει τίποτα πουθενά.
+      </div>
+
+      <h2>1. Εγκατάσταση (2 λεπτά)</h2>
+      <div class="note">
+        Εγκαταστήστε την <b>πριν</b> ρυθμίσετε οτιδήποτε. Ειδικά σε iPhone και iPad, ό,τι ρυθμίσετε στο Safari δεν περνά στην
+        εγκατεστημένη εφαρμογή.
+      </div>
+
+      <section class="card">
+        <h3>iPhone και iPad</h3>
+        <ol>
+          <li>Ανοίξτε τη διεύθυνση στο <b>Safari</b>.</li>
+          <li>Πατήστε <b class="ui">«Κοινοποίηση»</b> (το τετράγωνο με το βελάκι προς τα πάνω).</li>
+          <li>Διαλέξτε <b class="ui">«Προσθήκη στην οθόνη Αφετηρίας»</b> και μετά <b>«Προσθήκη»</b>.</li>
+          <li>Ανοίξτε την εφαρμογή από το νέο εικονίδιο με τον σκαντζόχοιρο.</li>
+        </ol>
+      </section>
+
+      <section class="card">
+        <h3>Android (κινητό ή tablet)</h3>
+        <ol>
+          <li>Ανοίξτε τη διεύθυνση στο <b>Chrome</b>.</li>
+          <li>Πατήστε το μενού <b>⋮</b> πάνω δεξιά.</li>
+          <li>Διαλέξτε <b class="ui">«Εγκατάσταση εφαρμογής»</b> (ή <b class="ui">«Προσθήκη στην αρχική οθόνη»</b>).</li>
+          <li>Ανοίξτε την εφαρμογή από το νέο εικονίδιο.</li>
+        </ol>
+      </section>
+
+      <p>
+        Μετά την πρώτη φορά, ανοίξτε την εφαρμογή μία φορά με internet για να κατεβάσει όλους τους ήχους. Από εκεί και πέρα παίζει
+        και χωρίς σύνδεση.
+      </p>
+
+      <h2>2. Πρώτη ρύθμιση από τον γονιό</h2>
+      <section class="card">
+        <ol>
+          <li>
+            Στην πρώτη οθόνη πατήστε κάτω κάτω <b class="ui">«Για γονείς: ρυθμίσεις και οδηγίες»</b> και απαντήστε στον
+            πολλαπλασιασμό (για να μη μπαίνει το παιδί).
+          </li>
+          <li>
+            Στο <b class="ui">«Μέχρι ποιο γράμμα;»</b> διαλέξτε το <b>τελευταίο γράμμα που έχει κάνει η τάξη</b>. Το παιδί βλέπει
+            μόνο λέξεις που μπορεί να διαβάσει με αυτά τα γράμματα. Αλλάξτε το κάθε φορά που η τάξη μαθαίνει νέο γράμμα.
+          </li>
+          <li>Στο <b class="ui">«Χρόνος ανά ημέρα»</b> ορίστε πόσα λεπτά την ημέρα θα παίζει (προεπιλογή 15).</li>
+          <li>
+            Αν το παιδί γράφει με το αριστερό χέρι, στο <b class="ui">«Άλλα»</b> ενεργοποιήστε
+            <b class="ui">«Αριστερόχειρας»</b>: αλλάζει η διάταξη και η φορά γραφής των γραμμάτων.
+          </li>
+          <li>
+            Προαιρετικά, στις <b class="ui">«Δικές μου λέξεις»</b> προσθέστε το όνομα του παιδιού ή λέξεις που αγαπά (με
+            φωτογραφία και δική σας ηχογράφηση).
+          </li>
+        </ol>
+        <p>Στην αρχή της σελίδας γονέα, το <b class="ui">«Πώς λειτουργεί η εφαρμογή»</b> εξηγεί όλα τα υπόλοιπα.</p>
+      </section>
+
+      <h2>3. Πώς παίζει το παιδί</h2>
+      <section class="card">
+        <ul>
+          <li>Πατά <b>«Πάμε!»</b> και ακούει τι να κάνει. Δεν χρειάζεται να διαβάζει οδηγίες: όλα λέγονται με φωνή.</li>
+          <li>
+            Κάθε φορά παίζει 3 γύρους των 5 ερωτήσεων (περίπου 8 λεπτά). Πριν από κάθε γύρο διαλέγει ένα από 3 παιχνίδια.
+          </li>
+          <li>Ό,τι κερδίζει μπαίνει στην Αστερούπολη, το χωριό του Αγκαθούλη, όπου το τακτοποιεί όπως θέλει.</li>
+          <li>Στο λάθος δεν χάνει τίποτα: η εφαρμογή του δείχνει τη σωστή απάντηση και την ξαναφέρνει αργότερα.</li>
+          <li>Ανεβάστε την ένταση. Ο ήχος είναι απαραίτητος, και στο iPhone παίζει και με τον διακόπτη σίγασης.</li>
+          <li>Γυρίζει και κάθετα και οριζόντια. Σε κινητό όλα χωράνε σε μία οθόνη.</li>
+        </ul>
+      </section>
+
+      <h2>4. Καλό να ξέρετε</h2>
+      <section class="card">
+        <ul>
+          <li>
+            <b>Η πρόοδος μένει σε αυτή τη συσκευή.</b> Αν αλλάξετε συσκευή ή σβήσετε την εφαρμογή, χάνεται. Μία φορά τον μήνα
+            κάντε <b class="ui">«Αντίγραφο ασφαλείας» → «Εξαγωγή»</b> και κρατήστε το αρχείο κάπου αλλού. Με
+            <b class="ui">«Εισαγωγή από αρχείο»</b> τα επαναφέρετε σε οποιαδήποτε συσκευή.
+          </li>
+          <li>
+            <b>Ενημερώσεις:</b> όταν βγει νέα έκδοση, περνά μόνη της στην πρώτη οθόνη ή από τη σελίδα γονέα, ποτέ στη μέση ενός
+            παιχνιδιού.
+          </li>
+          <li><b>Δύο παιδιά;</b> Η εφαρμογή κρατά ένα παιδί ανά συσκευή.</li>
+          <li>
+            <b>Κάτι δεν δουλεύει;</b> Κλείστε την εφαρμογή εντελώς και ανοίξτε την ξανά. Αν συνεχίζει, πείτε το στον γονιό που σας
+            έστειλε τον σύνδεσμο.
+          </li>
+        </ul>
+      </section>
+
+      <footer>
+        Εικόνες: OpenMoji (CC BY-SA 4.0). Γραμματοσειρά ανάγνωσης: βασισμένη στην Andika (SIL Open Font License). Τα πλήρη στοιχεία
+        είναι στη σελίδα γονέα, στο «Σχετικά».
+      </footer>
+    </main>
+  </body>
+</html>

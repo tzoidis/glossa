@@ -7,7 +7,7 @@
 import { soundOf } from '../../engine/homophones.ts';
 import { shuffle } from '../../engine/rng.ts';
 import type { Round, Word } from '../../engine/types.ts';
-import { isEasyPosition, isReadable, MIN_DISTINCT_WORDS, NotEnoughContent, pickWords, wordGraphemes } from '../pool.ts';
+import { isEasyPosition, isReadable, oneCloseFirst, MIN_DISTINCT_WORDS, NotEnoughContent, pickWords, wordGraphemes } from '../pool.ts';
 import type { GenerateContext } from '../types.ts';
 
 export const WHICH_WORD_ID = 'which-word';
@@ -43,6 +43,8 @@ export function generateWhichWord(ctx: GenerateContext): Round {
     );
     const close = (o: Word) => wordGraphemes(o)[0] === first;
     if (hard) others = [...others.filter(close), ...others.filter((o) => !close(o))];
+    // level 1 too, mid-round: one wrong word shares the first letter (review: else it alone gives the answer)
+    else if (!isEasyPosition(i)) others = oneCloseFirst(others, close);
     // at most one written form per sound among the choices
     const picked: Word[] = [];
     for (const o of others) {

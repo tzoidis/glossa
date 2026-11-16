@@ -29,7 +29,7 @@ export function Stress(props: ExerciseProps) {
           <SpeakerIcon />
         </IconButton>
       </div>
-      <div className="choices stress-syllables">
+      <div className="choices in-order stress-syllables">
         {item.options.map((id, i) => {
           const state = stateOf(id);
           return (

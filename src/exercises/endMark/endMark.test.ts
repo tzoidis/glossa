@@ -22,6 +22,8 @@ describe('end-mark property test', () => {
       for (const item of items) {
         const s = CONTENT.sentences.find((x) => x.id === item.sentenceId)!;
         expect(item.target, c.label).toBe(s.tokens.at(-1));
+        // the true/false game's wrong sentences («Το κουνέλι πετά.») are not read as facts
+        expect(s.isTrueForImage, `${c.label}: «${item.full}»`).not.toBe(false);
         expect(isTextAllowed(item.full, allow), `${c.label}: «${item.full}»`).toBe(true);
         expect(item.text.endsWith(item.target), c.label).toBe(false);
         expect(item.options, c.label).toContain(item.target);

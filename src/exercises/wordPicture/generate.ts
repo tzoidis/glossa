@@ -4,8 +4,8 @@
 // where possible, so the first letter alone does not give the answer.
 
 import { shuffle } from '../../engine/rng.ts';
-import type { Round } from '../../engine/types.ts';
-import { distinctPictures, isEasyPosition, isReadable, pickWords, wordGraphemes } from '../pool.ts';
+import type { Round, Word } from '../../engine/types.ts';
+import { distinctPictures, isEasyPosition, oneCloseFirst, isReadable, pickWords, wordGraphemes } from '../pool.ts';
 import type { GenerateContext } from '../types.ts';
 
 export const WORD_PICTURE_ID = 'word-picture';
@@ -33,7 +33,10 @@ export function generateWordPicture(ctx: GenerateContext): Round {
         ctx.rng,
       ),
     );
-    if (hard) others = [...others.filter((o) => wordGraphemes(o)[0] === first), ...others.filter((o) => wordGraphemes(o)[0] !== first)];
+    const close = (o: Word) => wordGraphemes(o)[0] === first;
+    if (hard) others = [...others.filter(close), ...others.filter((o) => !close(o))];
+    // level 1 too, mid-round: one wrong picture shares the first letter (review: else it alone gives the answer)
+    else if (!isEasyPosition(i)) others = oneCloseFirst(others, close);
     const options = shuffle([w.id, ...others.slice(0, count - 1).map((o) => o.id)], ctx.rng);
     return { wordId: w.id, text: w.text, options, target: w.id };
   });

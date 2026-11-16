@@ -29,7 +29,7 @@ export interface EndMarkItem {
 const markOf = (s: Sentence) => s.tokens.at(-1) as Mark;
 
 export function generateEndMark(ctx: GenerateContext): Round {
-  const byMark = (m: Mark) => shuffle(ctx.sentencePool.filter((s) => markOf(s) === m), ctx.rng);
+  const byMark = (m: Mark) => shuffle(ctx.sentencePool.filter((s) => markOf(s) === m && s.isTrueForImage !== false), ctx.rng);
   const stops = byMark('.');
   const questions = byMark(';');
   const exclamations = byMark('!');

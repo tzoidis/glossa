@@ -8,6 +8,8 @@ export type ExerciseNeed = 'image' | 'syllables' | 'phonemeAudio' | 'localTTS' |
 
 export interface GenerateContext {
   allowedGraphemes: Set<string>;
+  /** the letters the class is learning now; empty in the thematic units 5-7 (no new letters) */
+  newestGraphemes?: Set<string>;
   unlockedFlags: Set<Flag>;
   wordPool: Word[];
   sentencePool: Sentence[];

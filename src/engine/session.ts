@@ -77,10 +77,24 @@ export interface StationCandidate {
   weight?: number;
 }
 
+/** One of `list`, each as likely as its weight. */
+function weightedPick<T>(list: T[], weight: (x: T) => number, rng: () => number): T {
+  const total = list.reduce((s, x) => s + weight(x), 0);
+  let r = rng() * total;
+  for (const x of list) if ((r -= weight(x)) < 0) return x;
+  return list[list.length - 1]!;
+}
+
+/** A station already played in this session is offered again only now and then. */
+const PLAYED_AGAIN = 0.1;
+/** A second station of a mechanism already on offer is this much less likely. */
+export const SAME_MECHANISM = 0.5;
+
 /**
- * Up to `count` stations: never the previous mechanism (unless nothing else is available),
- * least-played first, and as many different mechanisms as possible. Among equals a
- * station with twice the weight is about twice as likely to come first.
+ * Up to `count` stations: never the previous mechanism (unless nothing else is available)
+ * and mostly different mechanisms. Each station is drawn by its weight, so its chance
+ * follows its weight whether its mechanism has one game (trace) or twelve (tap-choice).
+ * Stations not played yet in this session come first.
  */
 export function pickStations(
   candidates: StationCandidate[],
@@ -92,14 +106,21 @@ export function pickStations(
   const fresh = candidates.filter((c) => c.mechanism !== lastMechanism);
   const pool = fresh.length > 0 ? fresh : candidates;
   const timesPlayed = (id: string) => played.filter((p) => p === id).length;
-  const ranked = pool
-    // weighted random order: the key r^(1/w) puts heavier stations first more often
-    .map((c) => ({ c, r: rng() ** (1 / Math.max(c.weight ?? 1, 0.01)) }))
-    .sort((a, b) => timesPlayed(a.c.id) - timesPlayed(b.c.id) || b.r - a.r)
-    .map((x) => x.c);
+  const weightOf = (c: StationCandidate) => Math.max(c.weight ?? 1, 0.01) * PLAYED_AGAIN ** timesPlayed(c.id);
 
   const picked: StationCandidate[] = [];
-  for (const c of ranked) if (picked.length < count && !picked.some((p) => p.mechanism === c.mechanism)) picked.push(c);
-  for (const c of ranked) if (picked.length < count && !picked.includes(c)) picked.push(c);
-  return picked.map((c) => c.id);
+  let left = [...pool];
+  while (picked.length < count && left.length > 0) {
+    // a mechanism already on offer is less likely, not excluded: excluding it gave the
+    // games alone in theirs (trace, memory) far more than their share
+    const w = (c: StationCandidate) => weightOf(c) * (picked.some((p) => p.mechanism === c.mechanism) ? SAME_MECHANISM : 1);
+    const c = weightedPick(left, w, rng);
+    picked.push(c);
+    left = left.filter((x) => x !== c);
+  }
+  // not played yet first; otherwise in the order drawn
+  return picked
+    .map((c, i) => ({ c, i }))
+    .sort((a, b) => timesPlayed(a.c.id) - timesPlayed(b.c.id) || a.i - b.i)
+    .map((x) => x.c.id);
 }

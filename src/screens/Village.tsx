@@ -6,12 +6,12 @@ import { useEffect, useRef, useState, type PointerEvent, type RefObject } from '
 import { useApp } from '../app/AppContext.tsx';
 import { isTextAllowed } from '../engine/allowedWords.ts';
 import { t } from '../i18n.ts';
-import { placeWorldItem, worldItems } from '../storage/progress.ts';
+import { placeWorldItem } from '../storage/progress.ts';
 import type { WorldItem } from '../storage/schema.ts';
 import { IconButton } from '../ui/IconButton.tsx';
 import { HomeIcon, StarIcon } from '../ui/Icons.tsx';
 import { Mascot } from '../ui/Mascot.tsx';
-import { useItemLabel, useUnplaced, WorldItemPicture } from './BreakView.tsx';
+import { useItemLabel, useShownItems, useUnplaced, WorldItemPicture } from './BreakView.tsx';
 import { insideScene, scenePercent } from './villageDrag.ts';
 
 const TAP_SLOP_PX = 10;
@@ -26,9 +26,10 @@ export function Village({ onHome }: { onHome(): void }) {
   const label = useItemLabel();
   const scene = useRef<HTMLDivElement>(null);
 
+  const shown = useShownItems();
   useEffect(() => {
-    void worldItems(db, child.id).then((all) => setPlaced(all.filter((i) => i.x !== null)));
-  }, [db, child.id, unplaced.length]);
+    void shown().then((all) => setPlaced(all.filter((i) => i.x !== null)));
+  }, [unplaced.length]);
 
   // the last item moved stays on top; the list keeps its order, since moving a
   // DOM node would replay every item's pop-in
