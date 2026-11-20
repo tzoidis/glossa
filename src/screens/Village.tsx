@@ -10,7 +10,9 @@ import { placeWorldItem } from '../storage/progress.ts';
 import type { WorldItem } from '../storage/schema.ts';
 import { IconButton } from '../ui/IconButton.tsx';
 import { HomeIcon, StarIcon } from '../ui/Icons.tsx';
-import { Mascot } from '../ui/Mascot.tsx';
+import { DressedMascot } from '../village/DressedMascot.tsx';
+import { Picture } from '../ui/Picture.tsx';
+import { ShopPanel } from '../village/ShopPanel.tsx';
 import { useItemLabel, useShownItems, useUnplaced, WorldItemPicture } from './BreakView.tsx';
 import { insideScene, scenePercent } from './villageDrag.ts';
 
@@ -22,7 +24,8 @@ export function Village({ onHome }: { onHome(): void }) {
   const villageName = t('village.name');
   const showName = isTextAllowed(villageName, allow);
   const [placed, setPlaced] = useState<WorldItem[]>([]);
-  const { items: unplaced, place } = useUnplaced();
+  const { items: unplaced, place, reload } = useUnplaced();
+  const [shopOpen, setShopOpen] = useState(false);
   const label = useItemLabel();
   const scene = useRef<HTMLDivElement>(null);
 
@@ -45,12 +48,20 @@ export function Village({ onHome }: { onHome(): void }) {
       <div className="village-scene" ref={scene}>
         <div className="village-sun" />
         <div className="village-ground" />
+        {/* the scenery, there from the first day (village review: an empty field) */}
+        <div className="village-pond" aria-hidden />
+        <div className="village-house" aria-hidden>
+          <Picture imageId="1F3E1" size={160} />
+        </div>
+        <div className="village-tree" aria-hidden>
+          <Picture imageId="1F333" size={140} />
+        </div>
         <div className="village-sign">
           {showName && <span>{villageName}</span>}
           <LetterBoard />
         </div>
         <div className="village-mascot">
-          <Mascot mood="happy" size={150} />
+          <DressedMascot mood="happy" size={150} />
         </div>
         {placed.map((item) => (
           <PlacedItem key={item.id} item={item} scene={scene} label={label(item)} onTop={item.id === top} onMove={(x, y) => move(item.id, x, y)} />
@@ -65,11 +76,12 @@ export function Village({ onHome }: { onHome(): void }) {
             <TrayItem key={item.id} item={item} scene={scene} label={label(item)} onPlace={(spot) => void place(item, spot)} />
           ))}
         </div>
-        <div className="star-count" aria-label={t('village.stars')}>
+        <button type="button" className="star-count star-count--shop" aria-label={t('shop.open')} onClick={() => setShopOpen(true)}>
           <StarIcon size={48} />
           <span>{child.stars}</span>
-        </div>
+        </button>
       </div>
+      {shopOpen && <ShopPanel onClose={() => setShopOpen(false)} onBought={(item) => item.kind === 'decoration' && void reload()} />}
     </main>
   );
 }

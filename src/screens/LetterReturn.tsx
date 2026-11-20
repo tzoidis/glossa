@@ -7,7 +7,7 @@ import { useApp } from '../app/AppContext.tsx';
 import { t } from '../i18n.ts';
 import { IconButton } from '../ui/IconButton.tsx';
 import { NextIcon, VillageIcon } from '../ui/Icons.tsx';
-import { Mascot } from '../ui/Mascot.tsx';
+import { DressedMascot } from '../village/DressedMascot.tsx';
 
 export function LetterReturn({ letters, after, onDone }: { letters: string[]; after?: Promise<unknown> | null; onDone(): void }) {
   const { audio } = useApp();
@@ -25,7 +25,7 @@ export function LetterReturn({ letters, after, onDone }: { letters: string[]; af
     <main className="screen screen--center letter-return">
       <div className="letter-return__scene">
         <div className="mascot-hop mascot-hop--loop">
-          <Mascot mood="surprised" size={200} />
+          <DressedMascot mood="surprised" size={200} />
         </div>
         <div className="letter-return__letters" aria-label={t('letters.returned')}>
           {letters.map((g, i) => (

@@ -89,3 +89,28 @@ export async function nextLetterDue(db: GlossaDb, childId: string, since: number
   const answers = await db.answers.where('[childId+ts]').between([childId, since], [childId, Infinity]).toArray();
   return readyForNextLetter(answers, position, lastPosition);
 }
+
+/**
+ * Spends stars in the shop (PRD §5). An outfit is bought once and put on at once; a
+ * decoration joins the village tray. False, and nothing changes, if the stars are not
+ * enough or the outfit is already owned.
+ */
+export async function buyShopItem(db: GlossaDb, childId: string, item: { id: string; kind: 'outfit' | 'decoration'; price: number }, wearAfter: (current: string[]) => string[], now = Date.now()): Promise<boolean> {
+  return db.transaction('rw', db.children, db.world, async () => {
+    const child = await db.children.get(childId);
+    if (!child || child.stars < item.price) return false;
+    const id = item.kind === 'outfit' ? `${childId}:outfit:${item.id}` : `${childId}:decoration:${item.id}:${now}`;
+    if (await db.world.get(id)) return false;
+    await db.world.add({ id, childId, kind: item.kind, ref: item.id, placedAt: now, x: null, y: null });
+    await db.children.update(childId, {
+      stars: child.stars - item.price,
+      ...(item.kind === 'outfit' ? { wearing: wearAfter(child.wearing ?? []) } : {}),
+    });
+    return true;
+  });
+}
+
+/** Puts on or takes off an outfit already owned. */
+export async function setWearing(db: GlossaDb, childId: string, wearing: string[]): Promise<void> {
+  await db.children.update(childId, { wearing });
+}

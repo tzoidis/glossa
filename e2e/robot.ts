@@ -185,7 +185,8 @@ export function seeded(seed: number): () => number {
 
 /** Writes settings and child fields straight into the app's database, then reloads. */
 export async function setUp(page: Page, settings: Record<string, unknown>, child: Record<string, unknown> = {}): Promise<void> {
-  await page.locator('main').first().waitFor();
+  // the start screen: the database is open and set up by then
+  await page.locator('.go').waitFor({ timeout: 30_000 });
   await page.evaluate(
     async ({ settings, child }) => {
       const registry = '/src/exercises/registry.ts';

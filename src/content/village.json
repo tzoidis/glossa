@@ -1,0 +1,6 @@
+{
+  "about": "Where a won word lands in the village when the child taps it in (src/village/zones.ts). A drag still puts it wherever the child lets go. Word ids from words.json; categories as written there. Everything else goes to the meadow.",
+  "pond": ["duck", "crab", "jellyfish", "squid", "shrimp", "fish", "seal", "turtle", "octopus", "dolphin", "frog", "whale", "penguin", "swan", "ship", "canoe", "boat", "anchor", "coral", "wave"],
+  "sky": ["eagle", "bird", "butterfly", "bee", "mosquito", "airplane", "balloon", "sun", "star", "comet", "full-moon", "feather"],
+  "gardenCategories": ["σπίτι", "φαγητό"]
+}

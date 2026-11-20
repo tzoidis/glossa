@@ -7,7 +7,7 @@ import { t } from '../i18n.ts';
 import { addDailyTime } from '../storage/db.ts';
 import { IconButton } from '../ui/IconButton.tsx';
 import { HomeIcon, StarIcon, VillageIcon } from '../ui/Icons.tsx';
-import { Mascot } from '../ui/Mascot.tsx';
+import { DressedMascot } from '../village/DressedMascot.tsx';
 import { BreakView } from './BreakView.tsx';
 import { RoundPlayer } from './RoundPlayer.tsx';
 import { StationChoice } from './StationChoice.tsx';
@@ -71,7 +71,7 @@ export function Session({ firstExerciseId, onHome, onVillage }: { firstExerciseI
     case 'choose':
       return (
         <main className="screen home-body">
-          <Mascot mood="happy" size={160} />
+          <DressedMascot mood="happy" size={160} />
           <StationChoice options={phase.options} onPick={(id) => dispatch({ type: 'choose', exerciseId: id })} />
         </main>
       );
@@ -80,7 +80,7 @@ export function Session({ firstExerciseId, onHome, onVillage }: { firstExerciseI
       return (
         <main className="screen screen--center done">
           <span className="mascot-hop mascot-hop--loop">
-            <Mascot mood={phase.reason === 'limit' ? 'encouraging' : 'happy'} size={220} />
+            <DressedMascot mood={phase.reason === 'limit' ? 'encouraging' : 'happy'} size={220} />
           </span>
           {state.played.length > 0 && (
             <div className="stars-row">

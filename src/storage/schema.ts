@@ -18,6 +18,8 @@ export interface Child {
   levels?: Record<string, ExerciseLevel>;
   /** position up to which the child has seen the letters return to the village (app/lettersReturn.ts); set at first start */
   lettersReturned?: number;
+  /** shop outfits Αγκαθούλης has on (src/village/shop.ts), one per place */
+  wearing?: string[];
 }
 
 export interface Settings {

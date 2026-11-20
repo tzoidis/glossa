@@ -11,7 +11,7 @@ import { installUpdate, useUpdateReady } from '../app/appUpdate.ts';
 import { useNextLetterDue } from '../app/useNextLetterDue.ts';
 import { t } from '../i18n.ts';
 import { LockIcon } from '../ui/Icons.tsx';
-import { Mascot } from '../ui/Mascot.tsx';
+import { DressedMascot } from '../village/DressedMascot.tsx';
 
 /** onGo gets the welcome clip in progress, so the next screen can speak after it. */
 export function Start({ onGo, onParent }: { onGo(welcome: Promise<unknown>): void; onParent(): void }) {
@@ -32,7 +32,7 @@ export function Start({ onGo, onParent }: { onGo(welcome: Promise<unknown>): voi
 
   return (
     <main className="screen screen--center start">
-      <Mascot mood="happy" size={220} />
+      <DressedMascot mood="happy" size={220} />
       {isTextAllowed(mascotName, allow) && <p className="mascot-name">{mascotName}</p>}
       <button
         type="button"

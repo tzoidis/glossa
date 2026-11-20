@@ -8,7 +8,7 @@ import { t } from '../i18n.ts';
 import { getDailyTime } from '../storage/db.ts';
 import { IconButton } from '../ui/IconButton.tsx';
 import { LockIcon, VillageIcon } from '../ui/Icons.tsx';
-import { Mascot } from '../ui/Mascot.tsx';
+import { DressedMascot } from '../village/DressedMascot.tsx';
 import { StationChoice } from './StationChoice.tsx';
 import { useStations } from './useStations.ts';
 import { DevDebug } from '../ui/DevDebug.tsx';
@@ -64,11 +64,11 @@ export function Home({
       </div>
       {limitReached ? (
         <div className="screen--center grow">
-          <Mascot mood="encouraging" size={240} />
+          <DressedMascot mood="encouraging" size={240} />
         </div>
       ) : (
         <div className="home-body">
-          <Mascot mood={options.length ? 'happy' : 'thinking'} size={180} />
+          <DressedMascot mood={options.length ? 'happy' : 'thinking'} size={180} />
           <StationChoice options={options} onPick={onPlay} />
         </div>
       )}

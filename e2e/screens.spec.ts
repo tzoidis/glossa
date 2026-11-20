@@ -20,7 +20,7 @@ async function visible(page: Page, selector: string): Promise<boolean> {
 test('a whole day, from «Πάμε!» to the parent screen', async ({ page }, info) => {
   const errors = watchErrors(page);
   await page.goto('./?fast');
-  await setUp(page, { upToPosition: POS, dailyLimitMinutes: 600, seenDemos: [], enabledExercises: null }, { roundsPlayed: 3, lettersReturned: POS - 2 });
+  await setUp(page, { upToPosition: POS, dailyLimitMinutes: 600, seenDemos: [], enabledExercises: null }, { roundsPlayed: 3, lettersReturned: POS - 2, stars: 9 });
 
   // start
   await page.locator('.go').waitFor();
@@ -97,6 +97,22 @@ test('a whole day, from «Πάμε!» to the parent screen', async ({ page }, in
   await checkLayout(page, 'village');
   await checkLetters(page, POS, 'village');
   await shot(page, info, 'village');
+
+  // the star shop: a hat for Αγκαθούλης, a flower for the village
+  await page.locator('.star-count--shop').click();
+  await page.locator('.shop').waitFor();
+  await checkLayout(page, 'shop');
+  await shot(page, info, 'shop');
+  await page.locator('.shop__row').first().locator('.shop-item:not(.shop-item--locked)').first().click();
+  await page.locator('.shop__row').nth(1).locator('.shop-item:not(.shop-item--locked)').first().click();
+  await page.waitForTimeout(500);
+  await expect(page.locator('.shop .outfit')).toHaveCount(1);
+  await shot(page, info, 'shop, after buying');
+  await page.locator('.shop .icon-button--primary').click();
+  await page.locator('.village-bar .tray-item').last().click();
+  await page.waitForTimeout(600);
+  await checkLayout(page, 'village, dressed');
+  await shot(page, info, 'village, dressed');
 
   // home, then the parent's gate and screen
   await page.locator('.village-bar .icon-button').first().click();
