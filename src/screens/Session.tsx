@@ -72,7 +72,9 @@ export function Session({ firstExerciseId, onHome, onVillage }: { firstExerciseI
     case 'done':
       return (
         <main className="screen screen--center done">
-          <Mascot mood={phase.reason === 'limit' ? 'encouraging' : 'happy'} size={220} />
+          <span className="mascot-hop mascot-hop--loop">
+            <Mascot mood={phase.reason === 'limit' ? 'encouraging' : 'happy'} size={220} />
+          </span>
           {state.played.length > 0 && (
             <div className="stars-row">
               {state.played.map((_, i) => (

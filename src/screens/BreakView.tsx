@@ -67,7 +67,9 @@ export function BreakView({ onContinue }: { onContinue(): void }) {
 
   return (
     <div className="break">
-      <Mascot mood="happy" size={180} />
+      <span key={arrived.length} className="mascot-hop">
+        <Mascot mood="happy" size={180} />
+      </span>
       <div className="break-village" aria-hidden>
         <VillageIcon />
         {arrived.map((item) => (

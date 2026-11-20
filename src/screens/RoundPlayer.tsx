@@ -11,7 +11,7 @@ import type { AnswerLog, Level, Round } from '../engine/types.ts';
 import { findExercise } from '../exercises/registry.ts';
 import { DemoProvider, InstructionHeard } from '../exercises/shared/demo.tsx';
 import { completeRound, dueReviewKeys, recentWordIds, recordAnswer } from '../storage/progress.ts';
-import { RoundBar } from './RoundBar.tsx';
+import { RoundBar, type Reaction } from './RoundBar.tsx';
 
 /** what a question is about: its word, or its target for questions without one (a syllable) */
 const wordIdOfItem = (item: unknown) => {
@@ -34,6 +34,7 @@ export function RoundPlayer({ exerciseId, onComplete, onSkip, onLeave }: { exerc
   const answers = useRef<AnswerLog[]>([]);
   // questions solved so far: one right answer ends each question
   const [solved, setSolved] = useState(0);
+  const [reaction, setReaction] = useState<Reaction | null>(null);
 
   useEffect(() => {
     if (!entry) return;
@@ -89,7 +90,7 @@ export function RoundPlayer({ exerciseId, onComplete, onSkip, onLeave }: { exerc
 
   if (!entry) return null;
   const bar = (inDemo: boolean) => (
-    <RoundBar exerciseId={exerciseId} total={inDemo || !round || NO_PEBBLES.has(exerciseId) ? null : round.items.length} done={solved} onLeave={onLeave} />
+    <RoundBar exerciseId={exerciseId} total={inDemo || !round || NO_PEBBLES.has(exerciseId) ? null : round.items.length} done={solved} reaction={inDemo ? null : reaction} onLeave={onLeave} />
   );
   if (!round) return <div className="exercise-stage" />;
   const { Component } = entry.module;
@@ -119,6 +120,7 @@ export function RoundPlayer({ exerciseId, onComplete, onSkip, onLeave }: { exerc
   const onAnswer = (a: AnswerLog) => {
     answers.current.push(a);
     if (a.correct) setSolved((n) => n + 1);
+    setReaction((r) => ({ right: a.correct, n: (r?.n ?? 0) + 1 }));
     void recordAnswer(db, { ...a, childId: child.id }, child.roundsPlayed).catch((e) => console.error('recordAnswer', e));
   };
 

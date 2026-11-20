@@ -45,11 +45,10 @@ export function Village({ onHome }: { onHome(): void }) {
       <div className="village-scene" ref={scene}>
         <div className="village-sun" />
         <div className="village-ground" />
-        {showName && (
-          <div className="village-sign">
-            <span>{villageName}</span>
-          </div>
-        )}
+        <div className="village-sign">
+          {showName && <span>{villageName}</span>}
+          <LetterBoard />
+        </div>
         <div className="village-mascot">
           <Mascot mood="happy" size={150} />
         </div>
@@ -171,5 +170,32 @@ function TrayItem(props: { item: WorldItem; scene: RefObject<HTMLDivElement | nu
         </div>
       )}
     </>
+  );
+}
+
+/**
+ * The letters found so far, one row per unit of the book, under the signpost (game
+ * review: the lost letters come back). A letter not taught yet is an empty slot, so
+ * nothing unreadable reaches the screen (PRD §3).
+ */
+function LetterBoard() {
+  const { content, settings } = useApp();
+  const rows = content.curriculum.units.map((u) => u.graphemes).filter((g) => g.length > 0);
+  let k = 0;
+  return (
+    <div className="letter-board" role="img" aria-label={t('letters.board')}>
+      {rows.map((row, r) => (
+        <div key={r} className="letter-board__row">
+          {row.map((g) => {
+            const found = ++k <= settings.upToPosition;
+            return (
+              <span key={g} className={`letter-board__slot${found ? ' letter-board__slot--found' : ''}`}>
+                {found ? g : ''}
+              </span>
+            );
+          })}
+        </div>
+      ))}
+    </div>
   );
 }

@@ -9,6 +9,7 @@ import { DEFAULT_CHILD_ID, type Child, type CustomWord, type Settings } from '..
 import { t } from '../i18n.ts';
 import { Mascot } from '../ui/Mascot.tsx';
 import { setPhotos } from '../ui/Picture.tsx';
+import { markLettersReturned } from './lettersReturn.ts';
 import { CONTENT, defaultPosition, photoImageId, withCustomWords, type Content } from './content.ts';
 
 export interface App {
@@ -78,6 +79,8 @@ export function AppProvider({ children, audio, dbName, fallback }: AppProviderPr
     (async () => {
       const db = await openDb(dbName ? { name: dbName } : {});
       const settings = await ensureChild(db, defaultPosition());
+      // the letters already taught at first start are found already: only later ones return with a celebration
+      if ((await db.children.get(DEFAULT_CHILD_ID))?.lettersReturned === undefined) await markLettersReturned(db, DEFAULT_CHILD_ID, settings.upToPosition);
       const child = (await db.children.get(DEFAULT_CHILD_ID))!;
       const customWords = await db.customWords.where('childId').equals(DEFAULT_CHILD_ID).toArray();
       const service = audio ?? createBrowserAudioService(async (key) => (await db.recordings.get(key))?.blob, bundledUrl);

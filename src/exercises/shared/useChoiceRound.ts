@@ -76,7 +76,8 @@ export function useChoiceRound<T extends ChoiceItem>({ round, onAnswer, onComple
     audio.stop();
     const run = audio.sequence();
     if (option === item.target) {
-      if (faded.length < 2) log(option, true, mistake ? 2 : 1);
+      // always logged: the round counts the solved questions (pebbles); only attempt 1 counts for statistics
+      log(option, true, mistake ? 2 : 1);
       setSolved(true);
       await audio.praiseThen(() => {
         if (index + 1 >= items.length) return onComplete();
@@ -88,7 +89,7 @@ export function useChoiceRound<T extends ChoiceItem>({ round, onAnswer, onComple
       return;
     }
     const soundsRight = cfg.current.soundsRight?.(item, option) ?? false;
-    // attempt 1, then the child's own second try; later taps are not logged
+    // attempt 1, then the child's own second try; later wrong taps are not logged
     if (faded.length < 2) log(option, false, faded.length === 0 ? 1 : 2, soundsRight);
     setMistake(true);
     setFaded((f) => [...f, option]);

@@ -16,6 +16,8 @@ export interface Child {
   roundsPlayed: number;
   /** difficulty per exercise id (PRD §5); missing = level 1 */
   levels?: Record<string, ExerciseLevel>;
+  /** position up to which the child has seen the letters return to the village (app/lettersReturn.ts); set at first start */
+  lettersReturned?: number;
 }
 
 export interface Settings {

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { AppProvider, useApp } from './app/AppContext.tsx';
+import { markLettersReturned, returningLetters } from './app/lettersReturn.ts';
 import { Home } from './screens/Home.tsx';
+import { LetterReturn } from './screens/LetterReturn.tsx';
 import { Parent } from './screens/parent/Parent.tsx';
 import { Session } from './screens/Session.tsx';
 import { Start } from './screens/Start.tsx';
@@ -11,12 +13,13 @@ import { Mascot } from './ui/Mascot.tsx';
 type Screen =
   | { name: 'start' }
   | { name: 'home' }
+  | { name: 'letters'; letters: string[] }
   | { name: 'session'; exerciseId: string }
   | { name: 'village' }
   | { name: 'parent'; from: 'start' | 'home' };
 
 function Screens() {
-  const { settings } = useApp();
+  const { settings, child, content, db, refresh } = useApp();
   const [screen, setScreen] = useState<Screen>({ name: 'start' });
   // the welcome clip from «Πάμε!»: Home speaks only after it ends
   const [welcome, setWelcome] = useState<Promise<unknown> | null>(null);
@@ -30,9 +33,24 @@ function Screens() {
           <Start
             onGo={(w) => {
               setWelcome(w);
+              const letters = returningLetters(content.order.order, settings.upToPosition, child);
+              if (letters.length > 0) return setScreen({ name: 'letters', letters });
+              // before the first round (or in units 5-7) the letters just count as found
+              if (settings.upToPosition > (child.lettersReturned ?? 0)) void markLettersReturned(db, child.id, settings.upToPosition).then(refresh);
               home();
             }}
             onParent={() => setScreen({ name: 'parent', from: 'start' })}
+          />
+        )}
+        {screen.name === 'letters' && (
+          <LetterReturn
+            letters={screen.letters}
+            after={welcome}
+            onDone={() => {
+              setWelcome(null);
+              void markLettersReturned(db, child.id, settings.upToPosition).then(refresh);
+              home();
+            }}
           />
         )}
         {screen.name === 'home' && (

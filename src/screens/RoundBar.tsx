@@ -1,4 +1,5 @@
-// The strip above every game (UI review): the mascot replays the instruction, five
+// The strip above every game (UI review): the mascot replays the instruction (and
+// reacts to each answer), five
 // pebbles fill as questions are solved, and home is pressed and held to leave, so
 // a stray tap does not end the round. Navigation never uses text (PRD §6).
 
@@ -39,7 +40,25 @@ function HoldToLeave({ onLeave }: { onLeave(): void }) {
   );
 }
 
-export function RoundBar({ exerciseId, total, done, onLeave }: { exerciseId: string; total: number | null; done: number; onLeave(): void }) {
+/** The last answer, for the mascot to react to; `n` counts answers so each one restarts the motion. */
+export interface Reaction {
+  right: boolean;
+  n: number;
+}
+
+export function RoundBar({
+  exerciseId,
+  total,
+  done,
+  reaction,
+  onLeave,
+}: {
+  exerciseId: string;
+  total: number | null;
+  done: number;
+  reaction?: Reaction | null;
+  onLeave(): void;
+}) {
   const { audio } = useApp();
   return (
     <div className="round-bar">
@@ -50,7 +69,10 @@ export function RoundBar({ exerciseId, total, done, onLeave }: { exerciseId: str
           void audio.play({ kind: 'instruction', key: exerciseId });
         }}
       >
-        <Mascot mood="happy" size={52} />
+        {/* hops on a right answer, wonders on a wrong one (never sad, PRD §6) */}
+        <span key={reaction?.n ?? 0} className={reaction ? (reaction.right ? 'mascot-hop' : 'mascot-wonder') : undefined}>
+          <Mascot mood={reaction && !reaction.right ? 'thinking' : 'happy'} size={52} />
+        </span>
       </IconButton>
       <div className="pebbles" aria-hidden>
         {total !== null && Array.from({ length: total }, (_, i) => <span key={i} className={`pebble ${i < done ? 'pebble--done' : ''}`} />)}
