@@ -9,6 +9,7 @@ import { Session } from './screens/Session.tsx';
 import { Start } from './screens/Start.tsx';
 import { Village } from './screens/Village.tsx';
 import { ErrorBoundary } from './ui/ErrorBoundary.tsx';
+import { useFit } from './ui/fit.ts';
 import { Mascot } from './ui/Mascot.tsx';
 
 // ?try=… plays one game in dev (src/dev/TryScreen.tsx); not in the production build
@@ -29,6 +30,7 @@ type Screen =
 function Screens() {
   const { settings, child, content, db, refresh } = useApp();
   const [screen, setScreen] = useState<Screen>(trying ? { name: 'try' } : { name: 'start' });
+  useFit();
   // the welcome clip from «Πάμε!»: Home speaks only after it ends
   const [welcome, setWelcome] = useState<Promise<unknown> | null>(null);
   const home = () => setScreen({ name: 'home' });
