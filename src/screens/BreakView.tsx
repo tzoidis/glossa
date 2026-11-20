@@ -1,6 +1,6 @@
 // Break between rounds (PRD §5): the child places what they won in the village.
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useApp } from '../app/AppContext.tsx';
 import { t } from '../i18n.ts';
 import { placeWorldItem, worldItems } from '../storage/progress.ts';
@@ -10,9 +10,23 @@ import { NextIcon, VillageIcon } from '../ui/Icons.tsx';
 import { Mascot } from '../ui/Mascot.tsx';
 import { Picture } from '../ui/Picture.tsx';
 
+type Spot = { x: number; y: number };
+
 /** Somewhere on the grass, right of the mascot. */
-export function randomGroundSpot(): { x: number; y: number } {
+export function randomGroundSpot(): Spot {
   return { x: 30 + Math.random() * 62, y: 60 + Math.random() * 30 };
+}
+
+/** The freest of a few random spots on the grass, so a new item does not land on another (robot player). */
+export function freeGroundSpot(taken: readonly Spot[], tries = 12, random: () => Spot = randomGroundSpot): Spot {
+  let best = random();
+  let bestGap = -1;
+  for (let k = 0; k < tries; k++) {
+    const s = k === 0 ? best : random();
+    const gap = Math.min(Infinity, ...taken.map((o) => Math.hypot(s.x - o.x, (s.y - o.y) * 1.5)));
+    if (gap > bestGap) [best, bestGap] = [s, gap];
+  }
+  return best;
 }
 
 export function useItemLabel() {
@@ -35,12 +49,17 @@ export function useUnplaced() {
   const { db } = useApp();
   const shown = useShownItems();
   const [items, setItems] = useState<WorldItem[]>([]);
+  const taken = useRef<Spot[]>([]);
   useEffect(() => {
-    void shown().then((all) => setItems(all.filter((i) => i.x === null)));
+    void shown().then((all) => {
+      setItems(all.filter((i) => i.x === null));
+      taken.current = all.flatMap((i) => (i.x !== null && i.y !== null ? [{ x: i.x, y: i.y }] : []));
+    });
   }, []); // once per mount
-  /** at `spot` (scene percent) when dropped there, else somewhere on the grass */
-  const place = (item: WorldItem, spot = randomGroundSpot()) => {
+  /** at `spot` (scene percent) when dropped there, else on a free patch of grass */
+  const place = (item: WorldItem, spot = freeGroundSpot(taken.current)) => {
     const { x, y } = spot;
+    taken.current = [...taken.current, spot];
     setItems((list) => list.filter((i) => i.id !== item.id));
     return placeWorldItem(db, item.id, x, y);
   };

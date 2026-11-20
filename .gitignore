@@ -8,3 +8,5 @@ test-results/
 .DS_Store
 .vscode/*
 !.vscode/extensions.json
+play-report/
+play-shots/

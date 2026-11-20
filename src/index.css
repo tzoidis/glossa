@@ -346,7 +346,7 @@ button {
 
 .parent-button,
 .parent-chip {
-  min-height: 2.75rem;
+  min-height: max(2.75rem, 44px);
   padding: 0 1rem;
   border-radius: 0.75rem;
   border: 2px solid var(--card-edge);
@@ -1474,7 +1474,10 @@ button {
   color: #c2571b;
   background: #fde9d6;
   border-radius: 0.75rem;
-  padding: 0 0.25rem;
+  padding: 0.04em 0.12em;
+  /* one line high: an inline background spilled past the word's card (robot player) */
+  display: inline-block;
+  line-height: 1;
 }
 
 .digraph .choice-word {
@@ -1490,10 +1493,14 @@ button {
   gap: 1.25rem;
 }
 
-/* a phone on its side: picture and boxes on the left, keyboard on the right */
 /* Narrow phones held upright: a long word, sentence or a story's three pictures would
    push the game below the screen (device walk-through of every game at level 3). */
 @media (max-width: 480px) {
+  /* the demo hand on a tile at the right edge stays on the screen */
+  .demo-hand {
+    right: -0.5rem;
+  }
+
   .choices,
   .tiles {
     gap: 0.875rem;
@@ -1518,8 +1525,25 @@ button {
     font-size: 2.75rem;
   }
 
+  /* a word's boxes stay on one row up to 8 letters (6 + 1 read as two words) */
   .slot.letter-tile-slot {
-    min-width: 3.25rem;
+    min-width: 2.75rem;
+    padding: 0 0.25rem;
+  }
+
+  .order-exercise .slots {
+    gap: 0.375rem;
+  }
+
+  /* the syllables of a word stay on one row */
+  .choices.in-order {
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+  }
+
+  .stress-syllables .letter-tile {
+    min-width: 0;
+    padding: 0 0.75rem;
   }
 
   .build-sentence .syllable-tile,
@@ -1542,7 +1566,13 @@ button {
   }
 }
 
+/* a phone on its side: picture and boxes on the left, keyboard on the right */
 @media (orientation: landscape) and (max-height: 500px) {
+  /* the demo hand under the bottom row stays on the screen (robot player, sideways phone) */
+  .demo-hand {
+    bottom: -1.25rem;
+  }
+
   .dictation {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
@@ -1564,10 +1594,20 @@ button {
     grid-area: keyboard;
     align-self: center;
   }
+
+  /* the village board: rem is small here, so the letters get a floor */
+  .letter-board__slot {
+    width: max(1.75rem, 22px);
+    height: max(1.75rem, 22px);
+    font-size: max(1.125rem, 15px);
+  }
 }
 
 .dictation-slot {
-  min-width: 4rem;
+  /* a fixed width: a box that grew as it filled moved every key under the child's finger */
+  width: 4rem;
+  min-width: 0;
+  padding: 0;
   height: 5.25rem;
   font-size: 3.25rem;
 }
@@ -1659,6 +1699,7 @@ button {
 /* a finger is not smaller on a small phone: 44px is the least a child can hit */
 .icon-button,
 .hold-home,
+.parent-lock,
 .key {
   min-width: 44px;
   min-height: 44px;
@@ -1757,6 +1798,13 @@ button {
   text-align: center;
 }
 
+/* once answered the mark sits right after the word, as it is written */
+.end-gap.gap--filled {
+  min-width: 0;
+  margin-left: 0;
+  border-bottom-color: transparent;
+}
+
 .mark {
   font-size: 5rem;
   line-height: 1;
@@ -1797,10 +1845,6 @@ button {
     font-size: 1.875rem;
   }
 
-  .memory-grid--8 {
-    grid-template-columns: repeat(3, auto);
-  }
-
   .memory-card {
     width: 5.25rem;
     height: 6.25rem;
@@ -1815,7 +1859,7 @@ button {
   }
 
   .dictation-slot {
-    min-width: 2.75rem;
+    width: 2.75rem;
     height: 3.75rem;
     font-size: 2.25rem;
   }

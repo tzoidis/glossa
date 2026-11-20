@@ -21,7 +21,7 @@
   "letters.board": "Τα γράμματα που βρήκαμε",
 
   "parent.title": "Ρυθμίσεις γονέα",
-  "parent.gate.question": "Για τους γονείς: πόσο κάνει {a} × {b};",
+  "parent.gate.question": "Για τους γονείς: πόσο κάνει {a} × {b};",
   "parent.gate.pin": "Πληκτρολογήστε το PIN γονέα",
   "parent.gate.enter": "Είσοδος",
   "parent.gate.wrong": "Λάθος. Δοκιμάστε ξανά.",

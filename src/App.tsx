@@ -1,5 +1,6 @@
 import { lazy, Suspense, useState } from 'react';
 import { AppProvider, useApp } from './app/AppContext.tsx';
+import { MockAudioService } from './audio/MockAudioService.ts';
 import { markLettersReturned, returningLetters } from './app/lettersReturn.ts';
 import { Home } from './screens/Home.tsx';
 import { LetterReturn } from './screens/LetterReturn.tsx';
@@ -12,6 +13,8 @@ import { Mascot } from './ui/Mascot.tsx';
 
 // ?try=… plays one game in dev (src/dev/TryScreen.tsx); not in the production build
 const trying = import.meta.env.DEV && new URLSearchParams(location.search).has('try');
+// ?fast (dev only): silent audio that ends at once, for the Playwright robot player (e2e/)
+const silent = import.meta.env.DEV && new URLSearchParams(location.search).has('fast') ? new MockAudioService() : undefined;
 const TryScreen = import.meta.env.DEV ? lazy(() => import('./dev/TryScreen.tsx')) : null;
 
 type Screen =
@@ -83,6 +86,7 @@ function Screens() {
 export function App() {
   return (
     <AppProvider
+      audio={silent}
       fallback={
         <main className="screen screen--center">
           <Mascot mood="thinking" />
