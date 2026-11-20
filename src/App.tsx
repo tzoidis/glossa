@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { AppProvider, useApp } from './app/AppContext.tsx';
 import { markLettersReturned, returningLetters } from './app/lettersReturn.ts';
 import { Home } from './screens/Home.tsx';
@@ -10,17 +10,22 @@ import { Village } from './screens/Village.tsx';
 import { ErrorBoundary } from './ui/ErrorBoundary.tsx';
 import { Mascot } from './ui/Mascot.tsx';
 
+// ?try=… plays one game in dev (src/dev/TryScreen.tsx); not in the production build
+const trying = import.meta.env.DEV && new URLSearchParams(location.search).has('try');
+const TryScreen = import.meta.env.DEV ? lazy(() => import('./dev/TryScreen.tsx')) : null;
+
 type Screen =
   | { name: 'start' }
   | { name: 'home' }
   | { name: 'letters'; letters: string[] }
   | { name: 'session'; exerciseId: string }
   | { name: 'village' }
-  | { name: 'parent'; from: 'start' | 'home' };
+  | { name: 'parent'; from: 'start' | 'home' }
+  | { name: 'try' };
 
 function Screens() {
   const { settings, child, content, db, refresh } = useApp();
-  const [screen, setScreen] = useState<Screen>({ name: 'start' });
+  const [screen, setScreen] = useState<Screen>(trying ? { name: 'try' } : { name: 'start' });
   // the welcome clip from «Πάμε!»: Home speaks only after it ends
   const [welcome, setWelcome] = useState<Promise<unknown> | null>(null);
   const home = () => setScreen({ name: 'home' });
@@ -29,6 +34,11 @@ function Screens() {
   return (
     <div className={`app ${settings.leftHanded ? 'left-handed' : ''}`}>
       <ErrorBoundary onHome={home}>
+        {screen.name === 'try' && TryScreen && (
+          <Suspense fallback={null}>
+            <TryScreen search={location.search} />
+          </Suspense>
+        )}
         {screen.name === 'start' && (
           <Start
             onGo={(w) => {

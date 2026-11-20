@@ -155,6 +155,24 @@ describe('BrowserAudioService', () => {
     vi.useRealTimers();
   });
 
+  it('gives up on speech that never ends or errors', async () => {
+    vi.useFakeTimers();
+    const speech = fakeSpeech([voice('el-GR', true)]);
+    speech.speak = (u) => speech.spoken.push(u); // dropped by the engine
+    const { service } = makeService({ speech, maxClipMs: 1000 });
+    const playing = service.play({ kind: 'word', key: 'melon', text: 'πεπόνι' });
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(await playing).toBe('tts');
+    expect(speech.cancelled).toBe(1);
+    vi.useRealTimers();
+  });
+
+  it('starts nothing while the app is in the background', async () => {
+    const { service, played } = makeService({ bundled: { 'phoneme/σ': '/s.m4a' }, isHidden: () => true });
+    expect(await service.play({ kind: 'phoneme', key: 'σ' })).toBeNull();
+    expect(played).toEqual([]);
+  });
+
   it('stop cancels speech in progress', async () => {
     const speech = fakeSpeech([voice('el-GR', true)]);
     speech.speak = (u) => speech.spoken.push(u); // never ends on its own

@@ -13,6 +13,7 @@ Offline PWA with Greek reading games for a first-grade child, following the book
 - `npm run ci` – everything CI runs, in order
 - `npm run word-list` – regenerates `docs/word-list.md` (the parent's approval list) from `words.json`
 - `npm run build && npm run preview` – production build with the service worker (the dev server has no service worker)
+- Dev only: `http://localhost:5173/?try` lists every game; `?try=<exercise id>&pos=<n>&level=1|2|3[&seed=n]` plays one game at one letter and level, `?try=screen:<name>` shows a screen around the games (`src/dev/TryScreen.tsx`, not in the production build, answers not stored)
 - `bash scripts/icons/render.sh` – re-renders the PNG app icons from `public/icon.svg` with headless Edge
 - `python scripts/voice/generate.py` – re-creates the instruction and praise clips (`src/audio/files/`) from `audio.json` with the ElevenLabs voice «Eleni» (eleven_multilingual_v2, 24 kHz / 48 kbps); needs Python (standard library only), network, and the parent's paid-plan key in `~/.elevenlabs-key` (never in the repo). `--engine edge` uses the old free Athina voice. Run it after changing a phrase in `audio.json`.
 - `python scripts/voice/generate.py --words [--only <id>]` – the word clips (`src/audio/files/word/<id>.mp3`); run after adding a word (`src/audio/bundled.test.ts` fails until every bank word has one).

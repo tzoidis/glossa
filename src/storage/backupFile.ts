@@ -2,7 +2,7 @@
 // recordings. Recording blobs travel as base64 so one file restores everything.
 
 import type { Dexie } from 'dexie';
-import { exportTables, importTables, type Snapshot } from './backup.ts';
+import { exportTables, importTables, saveMigrationBackup, type Snapshot } from './backup.ts';
 
 export const BACKUP_APP = 'glossa';
 const RECORDINGS = 'recordings';
@@ -77,8 +77,13 @@ function checkCoreRows(tables: Snapshot): void {
   }
 }
 
-/** Validates and restores a backup. Tables missing from the file (e.g. recordings) are left as they are. */
-export async function importBackup(db: Dexie, file: unknown): Promise<void> {
+/**
+ * Validates and restores a backup. The file is the whole state: a table it does not have
+ * (one added since it was made) is emptied, so stars and village items stay in step.
+ * Only the recordings of a file made without them are left as they are. What was on the
+ * device is kept first, like before a migration.
+ */
+export async function importBackup(db: Dexie, file: unknown, now = Date.now(), backupsName?: string): Promise<void> {
   const f = file as Partial<BackupFile> | null;
   if (!f || f.app !== BACKUP_APP || typeof f.schemaVersion !== 'number' || typeof f.tables !== 'object' || f.tables === null) {
     throw new InvalidBackup('not a backup of this app');
@@ -89,12 +94,15 @@ export async function importBackup(db: Dexie, file: unknown): Promise<void> {
   for (const [name, rows] of Object.entries(f.tables)) {
     if (!known.has(name)) continue;
     if (!Array.isArray(rows)) throw new InvalidBackup(`table ${name} is not a list`);
+    if (!rows.every((r) => typeof r === 'object' && r !== null && !Array.isArray(r))) throw new InvalidBackup(`table ${name} has rows that are not records`);
     tables[name] =
       name === RECORDINGS
         ? (rows as { blob: unknown }[]).map((r) => ({ ...r, blob: isEncodedBlob(r.blob) ? base64ToBlob(r.blob.__blob, r.blob.type) : r.blob }))
         : rows;
   }
   checkCoreRows(tables);
+  for (const name of known) if (!(name === RECORDINGS && f.includesRecordings === false)) tables[name] ??= [];
+  await saveMigrationBackup({ dbName: db.name, fromVersion: db.verno, toVersion: db.verno, createdAt: now, data: await exportTables(db) }, backupsName);
   await importTables(db, tables);
 }
 

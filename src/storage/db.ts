@@ -55,10 +55,16 @@ export async function openDb(options: OpenOptions = {}): Promise<GlossaDb> {
     try {
       await probe.open();
       if (probe.verno < target) {
-        await saveMigrationBackup(
-          { dbName: name, fromVersion: probe.verno, toVersion: target, createdAt: now(), data: await exportTables(probe) },
-          backupsName,
-        );
+        // Best effort: on a full device the copy may not fit, and an app that never opens
+        // again is worse than an upgrade without it.
+        try {
+          await saveMigrationBackup(
+            { dbName: name, fromVersion: probe.verno, toVersion: target, createdAt: now(), data: await exportTables(probe) },
+            backupsName,
+          );
+        } catch (e) {
+          console.warn('pre-upgrade backup failed', e);
+        }
       }
     } finally {
       probe.close();
@@ -67,6 +73,13 @@ export async function openDb(options: OpenOptions = {}): Promise<GlossaDb> {
 
   const db = new GlossaDb(name, migrations);
   await db.open();
+  // Another tab, or a newer copy of the app, is upgrading the database: this connection
+  // is closed and its writes would be lost, so reload into the new version.
+  db.on('versionchange', () => {
+    db.close();
+    if (typeof location !== 'undefined' && typeof document !== 'undefined') location.reload();
+    return false;
+  });
   return db;
 }
 

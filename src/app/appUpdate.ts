@@ -32,6 +32,9 @@ export function startServiceWorker(): void {
   });
 }
 
+/** True once a new version is waiting. */
+export const isUpdateReady = (): boolean => updateReady;
+
 export function useUpdateReady(): boolean {
   return useSyncExternalStore(
     (l) => {

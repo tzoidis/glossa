@@ -1491,6 +1491,57 @@ button {
 }
 
 /* a phone on its side: picture and boxes on the left, keyboard on the right */
+/* Narrow phones held upright: a long word, sentence or a story's three pictures would
+   push the game below the screen (device walk-through of every game at level 3). */
+@media (max-width: 480px) {
+  .choices,
+  .tiles {
+    gap: 0.875rem;
+  }
+
+  .order-exercise .letter-tile {
+    min-width: 4.5rem;
+    height: 5rem;
+    padding: 0 0.75rem;
+    font-size: 3rem;
+  }
+
+  .slots {
+    gap: 0.5rem;
+    padding: 0.625rem;
+    min-height: 6.5rem;
+  }
+
+  .slot {
+    height: 5rem;
+    padding: 0 0.5rem;
+    font-size: 2.75rem;
+  }
+
+  .slot.letter-tile-slot {
+    min-width: 3.25rem;
+  }
+
+  .build-sentence .syllable-tile,
+  .build-sentence .slot {
+    height: 4.5rem;
+    min-width: 4.5rem;
+    font-size: 2.25rem;
+  }
+
+  .read-story .picture-tile {
+    min-width: 6.75rem;
+    height: 6.75rem;
+    padding: 0.5rem;
+  }
+
+  /* the picture's size is inline (rem): override it here only */
+  .read-story .picture-tile .picture {
+    width: 5.25rem !important;
+    height: 5.25rem !important;
+  }
+}
+
 @media (orientation: landscape) and (max-height: 500px) {
   .dictation {
     display: grid;

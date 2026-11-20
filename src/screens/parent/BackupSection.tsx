@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { useApp } from '../../app/AppContext.tsx';
+import { isInstalled } from '../../app/appUpdate.ts';
 import { t, type UiKey } from '../../i18n.ts';
 import { backupFileName, exportBackup, importBackup, InvalidBackup } from '../../storage/backupFile.ts';
 import { useUpdateSettings } from './useSettings.ts';
@@ -23,14 +24,31 @@ export function BackupSection() {
     }
     // the file records its own date, so a restore does not ask for a backup again
     for (const row of (file.tables.settings ?? []) as { lastBackupAt?: number | null }[]) row.lastBackupAt = now;
-    const url = URL.createObjectURL(new Blob([JSON.stringify(file)], { type: 'application/json' }));
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = backupFileName(now);
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 10_000);
+    const name = backupFileName(now);
+    const blob = new File([JSON.stringify(file)], name, { type: 'application/json' });
+    // An installed app on iPad/iPhone often saves nothing from a download link, so there
+    // the share sheet saves it («Αποθήκευση στα Αρχεία»), and only a completed share counts.
+    let shared = false;
+    if (isInstalled() && navigator.canShare?.({ files: [blob] })) {
+      try {
+        await navigator.share({ files: [blob] });
+        shared = true;
+      } catch (e) {
+        if (e instanceof DOMException && e.name === 'AbortError') return; // cancelled: nothing was saved
+        // e.g. NotAllowedError when reading a big database outlasted the tap: download instead
+      }
+    }
+    if (!shared) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = name;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 10_000);
+    }
     // marked only once the file exists
     await update({ lastBackupAt: now });
+    setMessage('parent.backup.saved');
   };
 
   const doImport = async (f: File) => {
@@ -40,8 +58,8 @@ export function BackupSection() {
       await refresh();
       setMessage('parent.backup.imported');
     } catch (e) {
-      if (e instanceof InvalidBackup || e instanceof SyntaxError) setMessage('parent.backup.invalid');
-      else throw e;
+      console.error('import', e);
+      setMessage(e instanceof InvalidBackup || e instanceof SyntaxError ? 'parent.backup.invalid' : 'parent.backup.importFailed');
     }
   };
 
@@ -73,7 +91,7 @@ export function BackupSection() {
           }}
         />
       </div>
-      {message && <p className={message === 'parent.backup.imported' ? 'help' : 'warn-text'}>{t(message)}</p>}
+      {message && <p className={message === 'parent.backup.imported' || message === 'parent.backup.saved' ? 'help' : 'warn-text'}>{t(message)}</p>}
     </section>
   );
 }

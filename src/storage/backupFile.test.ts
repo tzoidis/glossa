@@ -1,6 +1,7 @@
 import 'fake-indexeddb/auto';
 import { afterEach, describe, expect, it } from 'vitest';
 import { backupDue, backupFileName, exportBackup, importBackup, InvalidBackup } from './backupFile.ts';
+import { listMigrationBackups } from './backup.ts';
 import { ensureChild, openDb, type GlossaDb } from './db.ts';
 import { recordAnswer } from './progress.ts';
 import { DEFAULT_CHILD_ID } from './schema.ts';
@@ -47,6 +48,29 @@ describe('backup file', () => {
     await target.recordings.put({ key: 'phoneme/μ', blob: new Blob(['m']), mimeType: 'audio/webm', createdAt: 1 });
     await importBackup(target, JSON.parse(JSON.stringify(file)));
     expect(await target.recordings.count()).toBe(1);
+    expect(await target.answers.count()).toBe(1);
+  });
+
+  it('treats the file as the whole state, keeping a copy of the device first', async () => {
+    const source = await seeded();
+    const file = JSON.parse(JSON.stringify(await exportBackup(source, { includeRecordings: true, now: 5 })));
+    delete file.tables.world; // a table the file does not have (e.g. added later)
+    const target = await freshDb();
+    await ensureChild(target, 9);
+    await target.world.put({ id: 'w1', childId: DEFAULT_CHILD_ID, kind: 'word', ref: 'pie', x: null, y: null, createdAt: 1 } as never);
+    await importBackup(target, file, 77, `bf-copies-${n}`);
+    expect(await target.world.count()).toBe(0);
+    const copies = await listMigrationBackups(`bf-copies-${n}`);
+    expect(copies.map((c) => c.createdAt)).toEqual([77]);
+    expect(copies[0]!.data.world).toHaveLength(1);
+  });
+
+  it('refuses rows that are not records, before changing anything', async () => {
+    const source = await seeded();
+    const file = JSON.parse(JSON.stringify(await exportBackup(source, { includeRecordings: false })));
+    file.tables.answers = [1, 2];
+    const target = await seeded();
+    await expect(importBackup(target, file)).rejects.toBeInstanceOf(InvalidBackup);
     expect(await target.answers.count()).toBe(1);
   });
 
